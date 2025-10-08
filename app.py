@@ -17,7 +17,7 @@ def load_data():
     # Clean data
     df['TMDb_Rating'] = pd.to_numeric(df['TMDb_Rating'], errors='coerce')
     df['Release_Year'] = pd.to_numeric(df['Release_Year'], errors='coerce')
-    df['N\'th time of watching'] = df['N\'th time of watching'].fillna(1)
+    df['N\'th time of watching'] = pd.to_numeric(df['N\'th time of watching'], errors='coerce').fillna(1)
     return df
 
 df = load_data()
@@ -66,9 +66,9 @@ rewatch_options = st.sidebar.radio(
     ["All", "First time only", "Rewatched (2+)"]
 )
 if rewatch_options == "First time only":
-    df = df[df['N\'th time of watching'] == 1]
+    df = df[df['N\'th time of watching'] <= 1]
 elif rewatch_options == "Rewatched (2+)":
-    df = df[df['N\'th time of watching'] > 1]
+    df = df[df['N\'th time of watching'] >= 2]
 
 # Theatre filter
 theatre_options = st.sidebar.radio(
@@ -98,7 +98,7 @@ with col3:
     st.metric("Avg TMDb Rating", f"{avg_rating:.1f}")
 
 with col4:
-    total_rewatches = df[df['N\'th time of watching'] > 1].shape[0]
+    total_rewatches = df[df['N\'th time of watching'] >= 2].shape[0]
     st.metric("Movies Rewatched", total_rewatches)
 
 st.markdown("---")
