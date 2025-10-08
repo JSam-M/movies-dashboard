@@ -126,12 +126,14 @@ with tab1:
     with col2:
         # Top directors
         st.subheader("Top Directors")
-        director_counts = df['Director'].value_counts().head(10)
+        director_counts = df['Director'].value_counts().head(10).reset_index()
+        director_counts.columns = ['Director', 'Count']
         fig = px.bar(
-            x=director_counts.values,
-            y=director_counts.index,
+            director_counts,
+            x='Count',
+            y='Director',
             orientation='h',
-            labels={'x': 'Movies', 'y': 'Director'}
+            labels={'Count': 'Movies', 'Director': 'Director'}
         )
         fig.update_layout(showlegend=False, yaxis={'categoryorder': 'total ascending'})
         st.plotly_chart(fig, use_container_width=True)
@@ -159,8 +161,7 @@ with tab2:
         genre_df = pd.DataFrame(list(genre_counts.items()), columns=['Genre', 'Count'])
         genre_df = genre_df.sort_values('Count', ascending=False).head(10)
         
-        fig = px.bar(genre_df, x='Count', y='Genre',
-                    orientation='h')
+        fig = px.bar(genre_df, x='Count', y='Genre', orientation='h')
         fig.update_layout(showlegend=False, yaxis={'categoryorder': 'total ascending'})
         st.plotly_chart(fig, use_container_width=True)
 
