@@ -70,15 +70,16 @@ if rewatch_options == "First time only":
 elif rewatch_options == "Rewatched (2+)":
     df = df[df['N\'th time of watching'] >= 2]
 
-# Location filter
-location_options = st.sidebar.radio(
-    "Viewing Location",
-    ["All", "Theatre", "Home"]
-)
-if location_options == "Theatre":
-    df = df[df['Location'].str.lower().str.contains('theatre', na=False)]
-elif location_options == "Home":
-    df = df[df['Location'].str.lower().str.contains('home', na=False)]
+# Location filter - check if column exists
+if 'Location' in df.columns:
+    location_options = st.sidebar.radio(
+        "Viewing Location",
+        ["All", "Theatre", "Home"]
+    )
+    if location_options == "Theatre":
+        df = df[df['Location'].str.lower().str.contains('theatre', na=False)]
+    elif location_options == "Home":
+        df = df[df['Location'].str.lower().str.contains('home', na=False)]
 
 st.sidebar.markdown("---")
 st.sidebar.markdown(f"**Showing {len(df)} of {load_data().shape[0]} movies**")
@@ -212,3 +213,4 @@ with tab4:
 # Footer
 st.markdown("---")
 st.markdown("🎬 **810 movies** enriched with TMDb data | Made with Streamlit")
+st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v1.1 | Last updated: 2025-01-08</p>", unsafe_allow_html=True)
