@@ -29,10 +29,15 @@ st.markdown("---")
 # Sidebar filters
 st.sidebar.header("🔍 Filters")
 
-# Search
-search = st.sidebar.text_input("Search movie name")
-if search:
-    df = df[df['Name'].str.contains(search, case=False, na=False)]
+# Search with autocomplete dropdown
+all_movies = ['All'] + sorted(load_data()['Name'].dropna().unique().tolist())
+selected_movie = st.sidebar.selectbox(
+    "Search movie name",
+    options=all_movies,
+    index=0
+)
+if selected_movie != 'All':
+    df = df[df['Name'] == selected_movie]
 
 # Language filter
 languages = ['All'] + sorted(df['Language'].dropna().unique().tolist())
@@ -71,7 +76,8 @@ elif rewatch_options == "Rewatched (2+)":
     df = df[df['N\'th time of watching'] >= 2]
 
 # Location filter - check if column exists
-if 'Location' in df.columns:
+original_df = load_data()
+if 'Location' in original_df.columns:
     location_options = st.sidebar.radio(
         "Viewing Location",
         ["All", "Theatre", "Home"]
@@ -80,6 +86,9 @@ if 'Location' in df.columns:
         df = df[df['Location'].str.lower().str.contains('theatre', na=False)]
     elif location_options == "Home":
         df = df[df['Location'].str.lower().str.contains('home', na=False)]
+else:
+    # Debug: show available columns
+    st.sidebar.error(f"⚠️ Location column not found. Available columns: {', '.join(original_df.columns[:5])}...")
 
 st.sidebar.markdown("---")
 st.sidebar.markdown(f"**Showing {len(df)} of {load_data().shape[0]} movies**")
