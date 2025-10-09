@@ -29,15 +29,10 @@ st.markdown("---")
 # Sidebar filters
 st.sidebar.header("🔍 Filters")
 
-# Search with autocomplete dropdown
-all_movies = ['All'] + sorted(load_data()['Name'].dropna().unique().tolist())
-selected_movie = st.sidebar.selectbox(
-    "Search movie name",
-    options=all_movies,
-    index=0
-)
-if selected_movie != 'All':
-    df = df[df['Name'] == selected_movie]
+# Search - back to text input
+search = st.sidebar.text_input("Search movie name")
+if search:
+    df = df[df['Name'].str.contains(search, case=False, na=False)]
 
 # Language filter
 languages = ['All'] + sorted(df['Language'].dropna().unique().tolist())
@@ -49,12 +44,18 @@ if 'All' not in selected_language and selected_language:
 if df['Release_Year'].notna().any():
     min_year = int(df['Release_Year'].min())
     max_year = int(df['Release_Year'].max())
-    year_range = st.sidebar.slider(
-        "Release Year",
-        min_year, max_year,
-        (min_year, max_year)
-    )
-    df = df[(df['Release_Year'] >= year_range[0]) & (df['Release_Year'] <= year_range[1])]
+    
+    # Only show slider if there's a range
+    if min_year < max_year:
+        year_range = st.sidebar.slider(
+            "Release Year",
+            min_year, max_year,
+            (min_year, max_year)
+        )
+        df = df[(df['Release_Year'] >= year_range[0]) & (df['Release_Year'] <= year_range[1])]
+    else:
+        # Just show the year as text if only one year
+        st.sidebar.text(f"Release Year: {min_year}")
 
 # Genre filter
 all_genres = set()
