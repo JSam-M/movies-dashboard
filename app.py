@@ -76,9 +76,9 @@ theatre_options = st.sidebar.radio(
     ["All", "Theatre only", "Home only"]
 )
 if theatre_options == "Theatre only":
-    df = df[df['Theatre?'] == 'Yes']
+    df = df[df['Theatre?'].fillna('').str.lower() == 'yes']
 elif theatre_options == "Home only":
-    df = df[df['Theatre?'] == 'No']
+    df = df[df['Theatre?'].fillna('').str.lower() == 'no']
 
 st.sidebar.markdown("---")
 st.sidebar.markdown(f"**Showing {len(df)} of {load_data().shape[0]} movies**")
