@@ -18,7 +18,25 @@ def load_data():
     df['TMDb_Rating'] = pd.to_numeric(df['TMDb_Rating'], errors='coerce')
     df['Release_Year'] = pd.to_numeric(df['Release_Year'], errors='coerce')
     df['N\'th time of watching'] = pd.to_numeric(df['N\'th time of watching'], errors='coerce').fillna(1)
-    return df
+    
+    # Get unique movies with max rewatch count
+    df_unique = df.groupby('Name', as_index=False).agg({
+        'Date': 'last',  # Most recent watch date
+        'Language': 'first',
+        'Year': 'first',
+        'Good?': 'first',
+        'N\'th time of watching': 'max',  # Take the highest rewatch number
+        'Location': 'last',  # Most recent location
+        'Director': 'first',
+        'Runtime': 'first',
+        'Genre': 'first',
+        'TMDb_Rating': 'first',
+        'Release_Year': 'first',
+        'Overview': 'first',
+        'API_Status': 'first'
+    })
+    
+    return df_unique
 
 df = load_data()
 
@@ -98,7 +116,7 @@ st.sidebar.markdown(f"**Showing {len(df)} of {load_data().shape[0]} movies**")
 col1, col2, col3, col4 = st.columns(4)
 
 with col1:
-    st.metric("Total Movies", len(df))
+    st.metric("Unique Movies", len(df))
 
 with col2:
     top_language = df['Language'].value_counts().index[0] if len(df) > 0 else "N/A"
@@ -109,6 +127,7 @@ with col3:
     st.metric("Avg TMDb Rating", f"{avg_rating:.1f}")
 
 with col4:
+    # Count movies with rewatch value >= 2
     total_rewatches = df[df['N\'th time of watching'] >= 2].shape[0]
     st.metric("Movies Rewatched", total_rewatches)
 
@@ -222,5 +241,5 @@ with tab4:
 
 # Footer
 st.markdown("---")
-st.markdown("🎬 **810 movies** enriched with TMDb data | Made with Streamlit")
-st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v1.1 | Last updated: 2025-01-08</p>", unsafe_allow_html=True)
+st.markdown("🎬 **Unique movies tracked** | TMDb enriched data | Made with Streamlit")
+st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v1.3 | Last updated: 2025-01-08</p>", unsafe_allow_html=True)
