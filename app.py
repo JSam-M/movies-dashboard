@@ -71,15 +71,14 @@ elif rewatch_options == "Rewatched (2+)":
     df = df[df['N\'th time of watching'] >= 2]
 
 # Location filter
-if 'Location' in df.columns:
-    location_options = st.sidebar.radio(
-        "Viewing Location",
-        ["All", "Theatre", "Home"]
-    )
-    if location_options == "Theatre":
-        df = df[df['Location'].str.lower().str.contains('theatre', na=False)]
-    elif location_options == "Home":
-        df = df[df['Location'].str.lower().str.contains('home', na=False)]
+location_options = st.sidebar.radio(
+    "Viewing Location",
+    ["All", "Theatre", "Home"]
+)
+if location_options == "Theatre":
+    df = df[df['Location'].str.lower().str.contains('theatre', na=False)]
+elif location_options == "Home":
+    df = df[df['Location'].str.lower().str.contains('home', na=False)]
 
 st.sidebar.markdown("---")
 st.sidebar.markdown(f"**Showing {len(df)} of {load_data().shape[0]} movies**")
