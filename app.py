@@ -36,9 +36,9 @@ def load_data():
         'API_Status': 'first'
     })
     
-    return df_unique
+    return df_unique, df  # Return both unique and original
 
-df = load_data()
+df, df_original = load_data()
 original_count = len(df)
 
 # Title
@@ -48,13 +48,16 @@ st.markdown("---")
 # Sidebar filters
 st.sidebar.header("🔍 Filters")
 
+# Get full list of unique values from original unique dataset
+df_full, _ = load_data()
+
 # Search - back to text input
 search = st.sidebar.text_input("Search movie name")
 if search:
     df = df[df['Name'].str.contains(search, case=False, na=False)]
 
 # Language filter
-languages = ['All'] + sorted(df['Language'].dropna().unique().tolist())
+languages = ['All'] + sorted(df_full['Language'].dropna().unique().tolist())
 selected_language = st.sidebar.multiselect("Language", languages, default=['All'])
 if 'All' not in selected_language and selected_language:
     df = df[df['Language'].isin(selected_language)]
@@ -78,7 +81,7 @@ if df['Release_Year'].notna().any():
 
 # Genre filter
 all_genres = set()
-for genres in df['Genre'].dropna():
+for genres in df_full['Genre'].dropna():
     all_genres.update([g.strip() for g in str(genres).split(',')])
 all_genres = ['All'] + sorted(list(all_genres))
 selected_genres = st.sidebar.multiselect("Genre", all_genres, default=['All'])
@@ -86,7 +89,7 @@ if 'All' not in selected_genres and selected_genres:
     df = df[df['Genre'].apply(lambda x: any(genre in str(x) for genre in selected_genres) if pd.notna(x) else False)]
 
 # Director filter
-directors = ['All'] + sorted(df['Director'].dropna().unique().tolist())
+directors = ['All'] + sorted(df_full['Director'].dropna().unique().tolist())
 selected_directors = st.sidebar.multiselect("Director", directors, default=['All'])
 if 'All' not in selected_directors and selected_directors:
     df = df[df['Director'].isin(selected_directors)]
@@ -102,8 +105,8 @@ elif rewatch_options == "Rewatched (2+)":
     df = df[df['N\'th time of watching'] >= 2]
 
 # Location filter - check if column exists
-original_df = load_data()
-if 'Location' in original_df.columns:
+df_check, _ = load_data()
+if 'Location' in df_check.columns:
     location_options = st.sidebar.radio(
         "Viewing Location",
         ["All", "Theatre", "Home"]
@@ -114,10 +117,43 @@ if 'Location' in original_df.columns:
         df = df[df['Location'].str.lower().str.contains('home', na=False)]
 else:
     # Debug: show available columns
-    st.sidebar.error(f"⚠️ Location column not found. Available columns: {', '.join(original_df.columns[:5])}...")
+    st.sidebar.error(f"⚠️ Location column not found. Available columns: {', '.join(df_check.columns[:5])}...")
 
 st.sidebar.markdown("---")
 st.sidebar.markdown(f"**Showing {len(df)} of {original_count} unique movies**")
+
+# Calculate total time spent
+def parse_runtime(runtime_str):
+    """Extract minutes from runtime string like '120 min'"""
+    if pd.isna(runtime_str):
+        return 0
+    try:
+        return int(str(runtime_str).split()[0])
+    except:
+        return 0
+
+# Calculate total time from ALL viewings (including rewatches)
+total_minutes = df_original['Runtime'].apply(parse_runtime).sum()
+total_hours = total_minutes / 60
+total_days = total_hours / 24
+
+# Top stats row
+st.subheader("📊 Collection Overview")
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.metric("Total Entries", len(df_original), help="Including rewatches")
+
+with col2:
+    st.metric("Unique Movies", original_count)
+
+with col3:
+    if total_hours >= 24:
+        st.metric("Total Time Spent", f"{total_days:.1f} days", help=f"{total_hours:.0f} hours = {total_minutes:,} minutes")
+    else:
+        st.metric("Total Time Spent", f"{total_hours:.1f} hours", help=f"{total_minutes:,} minutes")
+
+st.markdown("---")
 
 # Main dashboard
 col1, col2, col3, col4 = st.columns(4)
@@ -249,4 +285,4 @@ with tab4:
 # Footer
 st.markdown("---")
 st.markdown("🎬 **Unique movies tracked** | TMDb enriched data | Made with Streamlit")
-st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v1.4 | Last updated: 2025-01-08</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v1.5 | Last updated: 2025-01-08</p>", unsafe_allow_html=True)
