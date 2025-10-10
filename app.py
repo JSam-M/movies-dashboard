@@ -249,16 +249,6 @@ with tab3:
         st.subheader("Highest Rated Movies")
         top_rated = df.nlargest(10, 'TMDb_Rating')[['Name', 'Release_Year', 'TMDb_Rating', 'Director']]
         st.dataframe(top_rated, hide_index=True, use_container_width=True)
-    
-    # Note about your rating system
-    st.info("💡 Your 2x2 Rating System will appear here once you fill the 'Good?' column in your Excel!")
-    st.markdown("""
-    **Your Rating System:**
-    - 🟢 **Good movie, I liked it** - Quality + Enjoyment ✓
-    - 🟡 **Good movie, I didn't like it** - Quality ✓, Personal taste ✗
-    - 🟠 **Bad movie, I liked it** - Guilty pleasure!
-    - 🔴 **Bad movie, I didn't like it** - Skip it
-    """)
 
 with tab4:
     # Full table
@@ -279,4 +269,4 @@ with tab4:
 # Footer
 st.markdown("---")
 st.markdown("🎬 **Unique movies tracked** | TMDb enriched data | Made with Streamlit")
-st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v1.7 | Last updated: 2025-01-08</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v1.9 | Last updated: 2025-01-08</p>", unsafe_allow_html=True)
