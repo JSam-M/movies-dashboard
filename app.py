@@ -141,39 +141,32 @@ total_minutes = filtered_entries['Runtime'].apply(parse_runtime).sum()
 total_hours = total_minutes / 60
 total_days = total_hours / 24
 
-# Top stats row - updates with filters
-st.subheader("📊 Collection Overview")
-col1, col2, col3 = st.columns(3)
+# Single compact metrics row
+col1, col2, col3, col4, col5, col6 = st.columns(6)
 
 with col1:
-    st.metric("Total Entries", len(filtered_entries), help="Including rewatches (updates with filters)")
+    st.metric("Entries", len(filtered_entries), help="Including rewatches")
 
 with col2:
-    st.metric("Unique Movies", len(df), help="Unique movies (updates with filters)")
+    st.metric("Unique", len(df), help="Unique movies")
 
 with col3:
     if total_hours >= 24:
-        st.metric("Total Time Spent", f"{total_days:.1f} days", help=f"{total_hours:.0f} hours = {total_minutes:,} minutes (updates with filters)")
+        st.metric("Time", f"{total_days:.1f}d", help=f"{total_hours:.0f} hours")
     else:
-        st.metric("Total Time Spent", f"{total_hours:.1f} hours", help=f"{total_minutes:,} minutes (updates with filters)")
+        st.metric("Time", f"{total_hours:.0f}h", help=f"{total_minutes:,} minutes")
 
-st.markdown("---")
-
-# Filtered results stats
-col1, col2, col3 = st.columns(3)
-
-with col1:
+with col4:
     top_language = df['Language'].value_counts().index[0] if len(df) > 0 else "N/A"
-    st.metric("Top Language", top_language, help="In filtered results")
+    st.metric("Top Lang", top_language)
 
-with col2:
+with col5:
     avg_rating = df['TMDb_Rating'].mean() if df['TMDb_Rating'].notna().any() else 0
-    st.metric("Avg TMDb Rating", f"{avg_rating:.1f}", help="In filtered results")
+    st.metric("Avg Rating", f"{avg_rating:.1f}")
 
-with col3:
-    # Count movies with rewatch value >= 2
+with col6:
     total_rewatches = df[df['N\'th time of watching'] >= 2].shape[0]
-    st.metric("Movies Rewatched", total_rewatches, help="In filtered results")
+    st.metric("Rewatched", total_rewatches)
 
 st.markdown("---")
 
@@ -286,4 +279,4 @@ with tab4:
 # Footer
 st.markdown("---")
 st.markdown("🎬 **Unique movies tracked** | TMDb enriched data | Made with Streamlit")
-st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v1.6 | Last updated: 2025-01-08</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v1.7 | Last updated: 2025-01-08</p>", unsafe_allow_html=True)
