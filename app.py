@@ -205,26 +205,55 @@ with tab1:
         fig.update_layout(showlegend=False, yaxis={'categoryorder': 'total ascending'})
         st.plotly_chart(fig, use_container_width=True)
     
-    # Second row - Top rated movies
-    st.subheader("Top Rated Movies")
-    top_rated = df.nlargest(10, 'TMDb_Rating')[['Name', 'Release_Year', 'TMDb_Rating', 'Director']].reset_index(drop=True)
-    top_rated['Movie'] = top_rated['Name'] + ' (' + top_rated['Release_Year'].astype(str) + ')'
+    # Second row - Top rated and Most rewatched
+    col1, col2 = st.columns(2)
     
-    fig = px.bar(
-        top_rated,
-        x='TMDb_Rating',
-        y='Movie',
-        orientation='h',
-        labels={'TMDb_Rating': 'Rating', 'Movie': ''},
-        color='TMDb_Rating',
-        color_continuous_scale='Viridis'
-    )
-    fig.update_layout(
-        showlegend=False, 
-        yaxis={'categoryorder': 'total ascending'},
-        height=400
-    )
-    st.plotly_chart(fig, use_container_width=True)
+    with col1:
+        st.subheader("Top Rated Movies")
+        top_rated = df.nlargest(10, 'TMDb_Rating')[['Name', 'Release_Year', 'TMDb_Rating']].reset_index(drop=True)
+        top_rated['Movie'] = top_rated['Name'] + ' (' + top_rated['Release_Year'].astype(str) + ')'
+        
+        fig = px.bar(
+            top_rated,
+            x='TMDb_Rating',
+            y='Movie',
+            orientation='h',
+            labels={'TMDb_Rating': 'Rating', 'Movie': ''},
+            color='TMDb_Rating',
+            color_continuous_scale='Viridis'
+        )
+        fig.update_layout(
+            showlegend=False, 
+            yaxis={'categoryorder': 'total ascending'},
+            height=400
+        )
+        st.plotly_chart(fig, use_container_width=True)
+    
+    with col2:
+        st.subheader("Most Rewatched Movies")
+        # Get movies with highest rewatch count
+        most_rewatched = df[df['N\'th time of watching'] > 1].nlargest(10, 'N\'th time of watching')[['Name', 'Release_Year', 'N\'th time of watching']].reset_index(drop=True)
+        
+        if len(most_rewatched) > 0:
+            most_rewatched['Movie'] = most_rewatched['Name'] + ' (' + most_rewatched['Release_Year'].astype(str) + ')'
+            
+            fig = px.bar(
+                most_rewatched,
+                x='N\'th time of watching',
+                y='Movie',
+                orientation='h',
+                labels={'N\'th time of watching': 'Times Watched', 'Movie': ''},
+                color='N\'th time of watching',
+                color_continuous_scale='Blues'
+            )
+            fig.update_layout(
+                showlegend=False, 
+                yaxis={'categoryorder': 'total ascending'},
+                height=400
+            )
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.info("No rewatched movies in filtered results")
 
 with tab2:
     col1, col2 = st.columns(2)
