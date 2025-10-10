@@ -39,6 +39,7 @@ def load_data():
     return df_unique
 
 df = load_data()
+original_count = len(df)
 
 # Title
 st.title("🎬 My Movie Collection")
@@ -84,6 +85,12 @@ selected_genres = st.sidebar.multiselect("Genre", all_genres, default=['All'])
 if 'All' not in selected_genres and selected_genres:
     df = df[df['Genre'].apply(lambda x: any(genre in str(x) for genre in selected_genres) if pd.notna(x) else False)]
 
+# Director filter
+directors = ['All'] + sorted(df['Director'].dropna().unique().tolist())
+selected_directors = st.sidebar.multiselect("Director", directors, default=['All'])
+if 'All' not in selected_directors and selected_directors:
+    df = df[df['Director'].isin(selected_directors)]
+
 # Rewatch filter
 rewatch_options = st.sidebar.radio(
     "Rewatches",
@@ -110,7 +117,7 @@ else:
     st.sidebar.error(f"⚠️ Location column not found. Available columns: {', '.join(original_df.columns[:5])}...")
 
 st.sidebar.markdown("---")
-st.sidebar.markdown(f"**Showing {len(df)} of {load_data().shape[0]} movies**")
+st.sidebar.markdown(f"**Showing {len(df)} of {original_count} unique movies**")
 
 # Main dashboard
 col1, col2, col3, col4 = st.columns(4)
@@ -242,4 +249,4 @@ with tab4:
 # Footer
 st.markdown("---")
 st.markdown("🎬 **Unique movies tracked** | TMDb enriched data | Made with Streamlit")
-st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v1.3 | Last updated: 2025-01-08</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v1.4 | Last updated: 2025-01-08</p>", unsafe_allow_html=True)
