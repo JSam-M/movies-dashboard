@@ -204,6 +204,27 @@ with tab1:
         )
         fig.update_layout(showlegend=False, yaxis={'categoryorder': 'total ascending'})
         st.plotly_chart(fig, use_container_width=True)
+    
+    # Second row - Top rated movies
+    st.subheader("Top Rated Movies")
+    top_rated = df.nlargest(10, 'TMDb_Rating')[['Name', 'Release_Year', 'TMDb_Rating', 'Director']].reset_index(drop=True)
+    top_rated['Movie'] = top_rated['Name'] + ' (' + top_rated['Release_Year'].astype(str) + ')'
+    
+    fig = px.bar(
+        top_rated,
+        x='TMDb_Rating',
+        y='Movie',
+        orientation='h',
+        labels={'TMDb_Rating': 'Rating', 'Movie': ''},
+        color='TMDb_Rating',
+        color_continuous_scale='Viridis'
+    )
+    fig.update_layout(
+        showlegend=False, 
+        yaxis={'categoryorder': 'total ascending'},
+        height=400
+    )
+    st.plotly_chart(fig, use_container_width=True)
 
 with tab2:
     col1, col2 = st.columns(2)
@@ -269,4 +290,4 @@ with tab4:
 # Footer
 st.markdown("---")
 st.markdown("🎬 **Unique movies tracked** | TMDb enriched data | Made with Streamlit")
-st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v1.9 | Last updated: 2025-01-08</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v2.0 | Last updated: 2025-01-08</p>", unsafe_allow_html=True)
