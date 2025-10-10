@@ -122,7 +122,12 @@ else:
 st.sidebar.markdown("---")
 st.sidebar.markdown(f"**Showing {len(df)} of {original_count} unique movies**")
 
-# Calculate total time spent
+# Calculate stats based on filtered movies
+# Get all entries from original data that match filtered unique movies
+filtered_movie_names = df['Name'].tolist()
+filtered_entries = df_original[df_original['Name'].isin(filtered_movie_names)]
+
+# Calculate total time spent for filtered movies
 def parse_runtime(runtime_str):
     """Extract minutes from runtime string like '120 min'"""
     if pd.isna(runtime_str):
@@ -132,47 +137,43 @@ def parse_runtime(runtime_str):
     except:
         return 0
 
-# Calculate total time from ALL viewings (including rewatches)
-total_minutes = df_original['Runtime'].apply(parse_runtime).sum()
+total_minutes = filtered_entries['Runtime'].apply(parse_runtime).sum()
 total_hours = total_minutes / 60
 total_days = total_hours / 24
 
-# Top stats row
+# Top stats row - updates with filters
 st.subheader("📊 Collection Overview")
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    st.metric("Total Entries", len(df_original), help="Including rewatches")
+    st.metric("Total Entries", len(filtered_entries), help="Including rewatches (updates with filters)")
 
 with col2:
-    st.metric("Unique Movies", original_count)
+    st.metric("Unique Movies", len(df), help="Unique movies (updates with filters)")
 
 with col3:
     if total_hours >= 24:
-        st.metric("Total Time Spent", f"{total_days:.1f} days", help=f"{total_hours:.0f} hours = {total_minutes:,} minutes")
+        st.metric("Total Time Spent", f"{total_days:.1f} days", help=f"{total_hours:.0f} hours = {total_minutes:,} minutes (updates with filters)")
     else:
-        st.metric("Total Time Spent", f"{total_hours:.1f} hours", help=f"{total_minutes:,} minutes")
+        st.metric("Total Time Spent", f"{total_hours:.1f} hours", help=f"{total_minutes:,} minutes (updates with filters)")
 
 st.markdown("---")
 
-# Main dashboard
-col1, col2, col3, col4 = st.columns(4)
+# Filtered results stats
+col1, col2, col3 = st.columns(3)
 
 with col1:
-    st.metric("Unique Movies", len(df))
+    top_language = df['Language'].value_counts().index[0] if len(df) > 0 else "N/A"
+    st.metric("Top Language", top_language, help="In filtered results")
 
 with col2:
-    top_language = df['Language'].value_counts().index[0] if len(df) > 0 else "N/A"
-    st.metric("Top Language", top_language)
+    avg_rating = df['TMDb_Rating'].mean() if df['TMDb_Rating'].notna().any() else 0
+    st.metric("Avg TMDb Rating", f"{avg_rating:.1f}", help="In filtered results")
 
 with col3:
-    avg_rating = df['TMDb_Rating'].mean() if df['TMDb_Rating'].notna().any() else 0
-    st.metric("Avg TMDb Rating", f"{avg_rating:.1f}")
-
-with col4:
     # Count movies with rewatch value >= 2
     total_rewatches = df[df['N\'th time of watching'] >= 2].shape[0]
-    st.metric("Movies Rewatched", total_rewatches)
+    st.metric("Movies Rewatched", total_rewatches, help="In filtered results")
 
 st.markdown("---")
 
@@ -285,4 +286,4 @@ with tab4:
 # Footer
 st.markdown("---")
 st.markdown("🎬 **Unique movies tracked** | TMDb enriched data | Made with Streamlit")
-st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v1.5 | Last updated: 2025-01-08</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v1.6 | Last updated: 2025-01-08</p>", unsafe_allow_html=True)
