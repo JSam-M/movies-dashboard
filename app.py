@@ -85,7 +85,7 @@ min_rating = st.sidebar.slider(
     max_value=10.0,
     value=0.0,
     step=0.5,
-    help="Filter by TMDb rating"
+    help="Filter by rating"
 )
 df = df[df['TMDb_Rating'] >= min_rating]
 
@@ -224,7 +224,7 @@ with tab2:
                 labels={'N\'th time of watching': 'Times Watched', 'Movie': ''},
                 color='N\'th time of watching',
                 color_continuous_scale='Blues',
-                hover_data={'TMDb_Rating': True}
+                hover_data={'TMDb_Rating': ':.1f'}
             )
             fig.update_layout(
                 showlegend=False, 
@@ -352,20 +352,20 @@ with tab4:
         st.subheader("Viewing Activity Over Time")
         
         if view_by == "All Time":
-            # Show monthly data
+            # Show monthly data - MOVIES count, not time
             time_data = time_df.groupby('Year-Month').agg({
-                'Name': 'count',
-                'Runtime_mins': 'sum'
+                'Name': 'count'
             }).reset_index()
-            time_data.columns = ['Month', 'Movies', 'Minutes']
-            time_data['Hours'] = time_data['Minutes'] / 60
+            time_data.columns = ['Month', 'Movies']
             
             fig = go.Figure()
             fig.add_trace(go.Bar(
                 x=time_data['Month'],
                 y=time_data['Movies'],
                 name='Movies',
-                marker_color='lightblue'
+                marker_color='lightblue',
+                text=time_data['Movies'],
+                textposition='outside'
             ))
             fig.update_layout(
                 xaxis_tickangle=45,
@@ -389,7 +389,7 @@ with tab4:
                 y=monthly['Movies'],
                 name='Movies',
                 marker_color='lightblue',
-                text=monthly['Hours'].apply(lambda x: f"{x:.1f}h"),
+                text=monthly['Movies'],
                 textposition='outside'
             ))
             fig.update_layout(
@@ -410,7 +410,9 @@ with tab4:
                 x=daily['Day'],
                 y=daily['Movies'],
                 name='Movies',
-                marker_color='lightblue'
+                marker_color='lightblue',
+                text=daily['Movies'],
+                textposition='outside'
             ))
             fig.update_layout(
                 xaxis_title='Day of Month',
@@ -429,25 +431,41 @@ with tab4:
             time_data['Cumulative_Hours'] = time_data['Runtime_mins'].cumsum() / 60
             time_data['Cumulative_Days'] = time_data['Cumulative_Hours'] / 24
             
-            fig = px.area(
-                time_data,
-                x='Year-Month',
-                y='Cumulative_Days',
-                labels={'Cumulative_Days': 'Total Days', 'Year-Month': ''},
-                title='Cumulative Time Spent'
+            fig = go.Figure()
+            fig.add_trace(go.Scatter(
+                x=time_data['Year-Month'],
+                y=time_data['Cumulative_Days'],
+                mode='lines+markers+text',
+                name='Total Days',
+                line=dict(color='darkblue', width=2),
+                marker=dict(size=6),
+                text=time_data['Cumulative_Days'].apply(lambda x: f"{x:.1f}d"),
+                textposition='top center',
+                textfont=dict(size=9)
+            ))
+            fig.update_layout(
+                xaxis_tickangle=45,
+                yaxis_title='Total Days',
+                height=400,
+                showlegend=False
             )
-            fig.update_layout(xaxis_tickangle=45, height=400)
             
         elif view_by == "By Year":
             # Hours per month in selected year
-            fig = px.bar(
-                monthly,
-                x='Month_Name',
-                y='Hours',
-                labels={'Hours': 'Hours Spent', 'Month_Name': ''},
-                title=f'Hours per Month in {selected_year}'
+            fig = go.Figure()
+            fig.add_trace(go.Bar(
+                x=monthly['Month_Name'],
+                y=monthly['Hours'],
+                name='Hours',
+                marker_color='darkblue',
+                text=monthly['Hours'].apply(lambda x: f"{x:.1f}h"),
+                textposition='outside'
+            ))
+            fig.update_layout(
+                yaxis_title='Hours Spent',
+                height=400,
+                showlegend=False
             )
-            fig.update_layout(height=400)
         
         else:  # By Month
             # Pie chart of viewing preferences for that month
@@ -473,5 +491,5 @@ with tab4:
 
 # Footer
 st.markdown("---")
-st.markdown("🎬 **Movie recommendation database** | Powered by TMDb")
-st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v2.4 | Optimized for recommendations</p>", unsafe_allow_html=True)
+st.markdown("🎬 **Movie recommendation database** | Curated collection")
+st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v2.6 | Optimized for recommendations</p>", unsafe_allow_html=True)
