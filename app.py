@@ -352,7 +352,7 @@ with tab4:
         st.subheader("Viewing Activity Over Time")
         
         if view_by == "All Time":
-            # Show monthly data - MOVIES count, not time
+            # Show monthly data - NO labels for All Time (too messy)
             time_data = time_df.groupby('Year-Month').agg({
                 'Name': 'count'
             }).reset_index()
@@ -363,18 +363,16 @@ with tab4:
                 x=time_data['Month'],
                 y=time_data['Movies'],
                 name='Movies',
-                marker_color='lightblue',
-                text=time_data['Movies'],
-                textposition='outside'
+                marker_color='lightblue'
             ))
             fig.update_layout(
                 xaxis_tickangle=45,
                 yaxis_title='Movies Watched',
-                height=400
+                height=500
             )
             
         elif view_by == "By Year":
-            # Show months within selected year
+            # Show months within selected year - WITH labels
             monthly = time_filtered.groupby('Month').agg({
                 'Name': 'count',
                 'Runtime_mins': 'sum'
@@ -394,10 +392,10 @@ with tab4:
             ))
             fig.update_layout(
                 yaxis_title='Movies Watched',
-                height=400
+                height=500
             )
         
-        else:  # By Month
+        else:  # By Month - WITH labels
             # Show daily breakdown for selected month
             daily = time_filtered.groupby(time_filtered['Date'].dt.day).agg({
                 'Name': 'count',
@@ -417,7 +415,7 @@ with tab4:
             fig.update_layout(
                 xaxis_title='Day of Month',
                 yaxis_title='Movies Watched',
-                height=400
+                height=500
             )
         
         st.plotly_chart(fig, use_container_width=True)
@@ -426,7 +424,7 @@ with tab4:
         st.subheader("Time Spent")
         
         if view_by == "All Time":
-            # Cumulative time over months
+            # Cumulative time over months - NO labels for All Time (too messy)
             time_data = time_df.groupby('Year-Month')['Runtime_mins'].sum().reset_index()
             time_data['Cumulative_Hours'] = time_data['Runtime_mins'].cumsum() / 60
             time_data['Cumulative_Days'] = time_data['Cumulative_Hours'] / 24
@@ -435,23 +433,20 @@ with tab4:
             fig.add_trace(go.Scatter(
                 x=time_data['Year-Month'],
                 y=time_data['Cumulative_Days'],
-                mode='lines+markers+text',
+                mode='lines+markers',
                 name='Total Days',
                 line=dict(color='darkblue', width=2),
-                marker=dict(size=6),
-                text=time_data['Cumulative_Days'].apply(lambda x: f"{x:.1f}d"),
-                textposition='top center',
-                textfont=dict(size=9)
+                marker=dict(size=6)
             ))
             fig.update_layout(
                 xaxis_tickangle=45,
                 yaxis_title='Total Days',
-                height=400,
+                height=500,
                 showlegend=False
             )
             
         elif view_by == "By Year":
-            # Hours per month in selected year
+            # Hours per month in selected year - WITH labels
             fig = go.Figure()
             fig.add_trace(go.Bar(
                 x=monthly['Month_Name'],
@@ -463,7 +458,7 @@ with tab4:
             ))
             fig.update_layout(
                 yaxis_title='Hours Spent',
-                height=400,
+                height=500,
                 showlegend=False
             )
         
@@ -476,7 +471,7 @@ with tab4:
                     names=location_data.index,
                     title='Where I Watched'
                 )
-                fig.update_layout(height=400)
+                fig.update_layout(height=500)
             else:
                 # Show language distribution
                 lang_data = time_filtered['Language'].value_counts()
@@ -485,11 +480,11 @@ with tab4:
                     names=lang_data.index,
                     title='Languages Watched'
                 )
-                fig.update_layout(height=400)
+                fig.update_layout(height=500)
         
         st.plotly_chart(fig, use_container_width=True)
 
 # Footer
 st.markdown("---")
 st.markdown("🎬 **Movie recommendation database** | Curated collection")
-st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v2.6 | Optimized for recommendations</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v2.8 | Optimized for recommendations</p>", unsafe_allow_html=True)
