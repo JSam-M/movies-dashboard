@@ -424,23 +424,20 @@ with tab4:
         st.subheader("Time Spent")
         
         if view_by == "All Time":
-            # Cumulative time over months - NO labels for All Time (too messy)
+            # Hours per month - consistent with By Year view
             time_data = time_df.groupby('Year-Month')['Runtime_mins'].sum().reset_index()
-            time_data['Cumulative_Hours'] = time_data['Runtime_mins'].cumsum() / 60
-            time_data['Cumulative_Days'] = time_data['Cumulative_Hours'] / 24
+            time_data['Hours'] = time_data['Runtime_mins'] / 60
             
             fig = go.Figure()
-            fig.add_trace(go.Scatter(
+            fig.add_trace(go.Bar(
                 x=time_data['Year-Month'],
-                y=time_data['Cumulative_Days'],
-                mode='lines+markers',
-                name='Total Days',
-                line=dict(color='#FF6B6B', width=3, shape='spline'),  # Red/coral color with smooth line
-                marker=dict(size=6, color='#FF6B6B')
+                y=time_data['Hours'],
+                name='Hours',
+                marker_color='#FF6B6B'  # Coral/red color
             ))
             fig.update_layout(
                 xaxis_tickangle=45,
-                yaxis_title='Total Days',
+                yaxis_title='Hours per Month',
                 height=500,
                 showlegend=False
             )
@@ -487,4 +484,4 @@ with tab4:
 # Footer
 st.markdown("---")
 st.markdown("🎬 **Movie recommendation database** | Curated collection")
-st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v2.9 | Optimized for recommendations</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v3.0 | Optimized for recommendations</p>", unsafe_allow_html=True)
