@@ -433,7 +433,7 @@ with tab4:
                 x=time_data['Year-Month'],
                 y=time_data['Hours'],
                 name='Hours',
-                marker_color='#FF6B6B'  # Coral/red color
+                marker_color='#4ECDC4'  # Teal/green color
             ))
             fig.update_layout(
                 xaxis_tickangle=45,
@@ -449,7 +449,7 @@ with tab4:
                 x=monthly['Month_Name'],
                 y=monthly['Hours'],
                 name='Hours',
-                marker_color='#4ECDC4',  # Teal color
+                marker_color='#4ECDC4',  # Teal/green color
                 text=monthly['Hours'].apply(lambda x: f"{x:.1f}h"),
                 textposition='outside'
             ))
@@ -460,24 +460,26 @@ with tab4:
             )
         
         else:  # By Month
-            # Pie chart of viewing preferences for that month
-            if 'Location' in time_filtered.columns:
-                location_data = time_filtered['Location'].value_counts()
-                fig = px.pie(
-                    values=location_data.values,
-                    names=location_data.index,
-                    title='Where I Watched'
-                )
-                fig.update_layout(height=500)
-            else:
-                # Show language distribution
-                lang_data = time_filtered['Language'].value_counts()
-                fig = px.pie(
-                    values=lang_data.values,
-                    names=lang_data.index,
-                    title='Languages Watched'
-                )
-                fig.update_layout(height=500)
+            # Hours per day in selected month - WITH labels
+            daily_hours = time_filtered.groupby(time_filtered['Date'].dt.day)['Runtime_mins'].sum().reset_index()
+            daily_hours.columns = ['Day', 'Minutes']
+            daily_hours['Hours'] = daily_hours['Minutes'] / 60
+            
+            fig = go.Figure()
+            fig.add_trace(go.Bar(
+                x=daily_hours['Day'],
+                y=daily_hours['Hours'],
+                name='Hours',
+                marker_color='#4ECDC4',  # Teal/green color
+                text=daily_hours['Hours'].apply(lambda x: f"{x:.1f}h"),
+                textposition='outside'
+            ))
+            fig.update_layout(
+                xaxis_title='Day of Month',
+                yaxis_title='Hours Spent',
+                height=500,
+                showlegend=False
+            )
         
         st.plotly_chart(fig, use_container_width=True)
 
