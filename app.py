@@ -300,21 +300,6 @@ with tab4:
                      markers=True)
         fig.update_layout(xaxis_tickangle=45)
         st.plotly_chart(fig, use_container_width=True)
-        
-        # Total time spent
-        def parse_runtime(runtime_str):
-            if pd.isna(runtime_str):
-                return 0
-            try:
-                return int(str(runtime_str).split()[0])
-            except:
-                return 0
-        
-        total_minutes = filtered_entries['Runtime'].apply(parse_runtime).sum()
-        total_hours = total_minutes / 60
-        total_days = total_hours / 24
-        
-        st.metric("Total Time Spent", f"{total_days:.1f} days", help=f"{total_hours:.0f} hours watching movies")
     
     with col2:
         # Viewing location breakdown
@@ -324,9 +309,74 @@ with tab4:
             fig = px.pie(values=location_data.values, names=location_data.index,
                         title='Theatre vs Home')
             st.plotly_chart(fig, use_container_width=True)
-        
-        # Rewatch stats
-        st.subheader("Rewatch Statistics")
+    
+    # Time spent over months/years
+    st.subheader("Time Spent Watching Movies")
+    
+    def parse_runtime(runtime_str):
+        if pd.isna(runtime_str):
+            return 0
+        try:
+            return int(str(runtime_str).split()[0])
+        except:
+            return 0
+    
+    # Get all entries with dates and runtime
+    time_df = filtered_entries.copy()
+    time_df['Date'] = pd.to_datetime(time_df['Date'])
+    time_df['Runtime_mins'] = time_df['Runtime'].apply(parse_runtime)
+    time_df['Year-Month'] = time_df['Date'].dt.to_period('M').astype(str)
+    
+    # Calculate time per month
+    time_by_month = time_df.groupby('Year-Month')['Runtime_mins'].sum().reset_index()
+    time_by_month['Hours'] = time_by_month['Runtime_mins'] / 60
+    time_by_month['Cumulative_Hours'] = time_by_month['Hours'].cumsum()
+    time_by_month['Cumulative_Days'] = time_by_month['Cumulative_Hours'] / 24
+    
+    # Create dual-axis chart
+    fig = go.Figure()
+    
+    # Monthly hours (bars)
+    fig.add_trace(go.Bar(
+        x=time_by_month['Year-Month'],
+        y=time_by_month['Hours'],
+        name='Hours per Month',
+        marker_color='lightblue',
+        yaxis='y'
+    ))
+    
+    # Cumulative days (line)
+    fig.add_trace(go.Scatter(
+        x=time_by_month['Year-Month'],
+        y=time_by_month['Cumulative_Days'],
+        name='Cumulative Total (Days)',
+        mode='lines+markers',
+        line=dict(color='darkblue', width=3),
+        yaxis='y2'
+    ))
+    
+    fig.update_layout(
+        xaxis=dict(tickangle=45, title=''),
+        yaxis=dict(title='Hours per Month', side='left'),
+        yaxis2=dict(title='Cumulative Days', overlaying='y', side='right'),
+        hovermode='x unified',
+        height=400,
+        legend=dict(x=0.01, y=0.99)
+    )
+    
+    st.plotly_chart(fig, use_container_width=True)
+    
+    # Summary stats
+    total_minutes = time_by_month['Runtime_mins'].sum()
+    total_hours = total_minutes / 60
+    total_days = total_hours / 24
+    st.caption(f"📊 Total: {total_days:.1f} days ({total_hours:.0f} hours) spent watching movies")
+    
+    # Rewatch stats
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.subheader("Rewatch Distribution")
         rewatch_dist = df['N\'th time of watching'].value_counts().sort_index()
         rewatch_dist.index = rewatch_dist.index.map(lambda x: f"{int(x)}x" if x > 1 else "Once")
         
@@ -334,6 +384,17 @@ with tab4:
                     orientation='h',
                     labels={'x': 'Number of Movies', 'y': 'Times Watched'})
         fig.update_layout(showlegend=False)
+        st.plotly_chart(fig, use_container_width=True)
+    
+    with col2:
+        st.subheader("Average Movie Length")
+        avg_runtime = time_df['Runtime_mins'].mean()
+        st.metric("Average Runtime", f"{avg_runtime:.0f} minutes", help=f"{avg_runtime/60:.1f} hours")
+        
+        # Runtime distribution
+        fig = px.histogram(time_df, x='Runtime_mins', nbins=20,
+                          labels={'Runtime_mins': 'Runtime (minutes)'},
+                          title='Runtime Distribution')
         st.plotly_chart(fig, use_container_width=True)
 
 # Footer
