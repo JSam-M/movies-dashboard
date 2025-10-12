@@ -282,7 +282,7 @@ with tab3:
         st.dataframe(director_counts, hide_index=True, use_container_width=True, height=500)
 
 with tab4:
-    # Personal stats tab - cleaned up
+    # Personal stats tab - FIXED VERSION
     st.subheader("📊 My Viewing Patterns")
     
     # Helper function
@@ -296,35 +296,67 @@ with tab4:
     
     # Prepare time data
     time_df = filtered_entries.copy()
-    time_df['Date'] = pd.to_datetime(time_df['Date'], dayfirst=True)  # DD/MM/YYYY format
+    time_df['Date'] = pd.to_datetime(time_df['Date'], dayfirst=True)
     time_df['Runtime_mins'] = time_df['Runtime'].apply(parse_runtime)
     time_df['Year'] = time_df['Date'].dt.year
     time_df['Month'] = time_df['Date'].dt.month
+    time_df['Month_Name'] = time_df['Date'].dt.month_name()
     time_df['Year-Month'] = time_df['Date'].dt.to_period('M').astype(str)
     
     # Time period selector
-    col1, col2, col3 = st.columns([2, 2, 3])
+    view_by = st.radio("View by", ["All Time", "By Year", "By Month"], horizontal=True)
     
-    with col1:
-        view_by = st.radio("View by", ["All Time", "By Year", "By Month"], horizontal=True)
+    # Calculate stats based on view
+    if view_by == "All Time":
+        # Monthly breakdown
+        group_df = time_df.groupby('Year-Month').agg({
+            'Name': 'count',
+            'Runtime_mins': 'sum'
+        }).reset_index()
+        group_df.columns = ['Period', 'Movies', 'Minutes']
+        group_df['Hours'] = group_df['Minutes'] / 60
+        x_label = 'Month'
+        x_angle = 45
+        show_labels = False
+        
+    elif view_by == "By Year":
+        # Aggregate by YEAR (compare all years)
+        group_df = time_df.groupby('Year').agg({
+            'Name': 'count',
+            'Runtime_mins': 'sum'
+        }).reset_index()
+        group_df.columns = ['Period', 'Movies', 'Minutes']
+        group_df['Period'] = group_df['Period'].astype(str)
+        group_df['Hours'] = group_df['Minutes'] / 60
+        x_label = 'Year'
+        x_angle = 0
+        show_labels = True
+        
+    else:  # By Month
+        # Aggregate by MONTH NAME (compare Jan vs Feb vs Mar, etc.)
+        month_order = ['January', 'February', 'March', 'April', 'May', 'June', 
+                      'July', 'August', 'September', 'October', 'November', 'December']
+        
+        group_df = time_df.groupby('Month_Name').agg({
+            'Name': 'count',
+            'Runtime_mins': 'sum'
+        }).reset_index()
+        group_df.columns = ['Period', 'Movies', 'Minutes']
+        group_df['Hours'] = group_df['Minutes'] / 60
+        
+        # Sort by month order
+        group_df['Period'] = pd.Categorical(group_df['Period'], categories=month_order, ordered=True)
+        group_df = group_df.sort_values('Period')
+        x_label = 'Month'
+        x_angle = 45
+        show_labels = True
     
-    with col2:
-        if view_by == "By Year":
-            years = sorted(time_df['Year'].unique(), reverse=True)
-            selected_year = st.selectbox("Select Year", years)
-            time_filtered = time_df[time_df['Year'] == selected_year]
-        elif view_by == "By Month":
-            months = sorted(time_df['Year-Month'].unique(), reverse=True)
-            selected_month = st.selectbox("Select Month", months)
-            time_filtered = time_df[time_df['Year-Month'] == selected_month]
-        else:
-            time_filtered = time_df
-    
-    # Calculate stats for selected period
-    total_movies = len(time_filtered)
-    total_minutes = time_filtered['Runtime_mins'].sum()
+    # Calculate totals
+    total_movies = time_df['Name'].count()
+    total_minutes = time_df['Runtime_mins'].sum()
     total_hours = total_minutes / 60
     total_days = total_hours / 24
+    avg_per_movie = total_minutes / total_movies if total_movies > 0 else 0
     
     # Display stats
     st.markdown("---")
@@ -340,7 +372,6 @@ with tab4:
         st.metric("Total Days", f"{total_days:.2f}d")
     
     with col4:
-        avg_per_movie = total_minutes / total_movies if total_movies > 0 else 0
         st.metric("Avg Runtime", f"{avg_per_movie:.0f}m")
     
     st.markdown("---")
@@ -349,138 +380,41 @@ with tab4:
     col1, col2 = st.columns(2)
     
     with col1:
-        st.subheader("Viewing Activity Over Time")
+        st.subheader("Viewing Activity")
         
-        if view_by == "All Time":
-            # Show monthly data - NO labels for All Time (too messy)
-            time_data = time_df.groupby('Year-Month').agg({
-                'Name': 'count'
-            }).reset_index()
-            time_data.columns = ['Month', 'Movies']
-            
-            fig = go.Figure()
-            fig.add_trace(go.Bar(
-                x=time_data['Month'],
-                y=time_data['Movies'],
-                name='Movies',
-                marker_color='lightblue'
-            ))
-            fig.update_layout(
-                xaxis_tickangle=45,
-                yaxis_title='Movies Watched',
-                height=500
-            )
-            
-        elif view_by == "By Year":
-            # Show months within selected year - WITH labels
-            monthly = time_filtered.groupby('Month').agg({
-                'Name': 'count',
-                'Runtime_mins': 'sum'
-            }).reset_index()
-            monthly.columns = ['Month', 'Movies', 'Minutes']
-            monthly['Month_Name'] = monthly['Month'].apply(lambda x: pd.Timestamp(2000, int(x), 1).strftime('%B'))
-            monthly['Hours'] = monthly['Minutes'] / 60
-            
-            fig = go.Figure()
-            fig.add_trace(go.Bar(
-                x=monthly['Month_Name'],
-                y=monthly['Movies'],
-                name='Movies',
-                marker_color='lightblue',
-                text=monthly['Movies'],
-                textposition='outside'
-            ))
-            fig.update_layout(
-                yaxis_title='Movies Watched',
-                height=500
-            )
-        
-        else:  # By Month - WITH labels
-            # Show daily breakdown for selected month
-            daily = time_filtered.groupby(time_filtered['Date'].dt.day).agg({
-                'Name': 'count',
-                'Runtime_mins': 'sum'
-            }).reset_index()
-            daily.columns = ['Day', 'Movies', 'Minutes']
-            
-            fig = go.Figure()
-            fig.add_trace(go.Bar(
-                x=daily['Day'],
-                y=daily['Movies'],
-                name='Movies',
-                marker_color='lightblue',
-                text=daily['Movies'],
-                textposition='outside'
-            ))
-            fig.update_layout(
-                xaxis_title='Day of Month',
-                yaxis_title='Movies Watched',
-                height=500
-            )
-        
+        fig = go.Figure()
+        fig.add_trace(go.Bar(
+            x=group_df['Period'],
+            y=group_df['Movies'],
+            name='Movies',
+            marker_color='lightblue',
+            text=group_df['Movies'] if show_labels else None,
+            textposition='outside' if show_labels else None
+        ))
+        fig.update_layout(
+            xaxis=dict(tickangle=x_angle, title=x_label),
+            yaxis_title='Movies Watched',
+            height=500
+        )
         st.plotly_chart(fig, use_container_width=True)
     
     with col2:
         st.subheader("Time Spent")
         
-        if view_by == "All Time":
-            # Hours per month - consistent with By Year view
-            time_data = time_df.groupby('Year-Month')['Runtime_mins'].sum().reset_index()
-            time_data['Hours'] = time_data['Runtime_mins'] / 60
-            
-            fig = go.Figure()
-            fig.add_trace(go.Bar(
-                x=time_data['Year-Month'],
-                y=time_data['Hours'],
-                name='Hours',
-                marker_color='#4ECDC4'  # Teal/green color
-            ))
-            fig.update_layout(
-                xaxis_tickangle=45,
-                yaxis_title='Hours per Month',
-                height=500,
-                showlegend=False
-            )
-            
-        elif view_by == "By Year":
-            # Hours per month in selected year - WITH labels
-            fig = go.Figure()
-            fig.add_trace(go.Bar(
-                x=monthly['Month_Name'],
-                y=monthly['Hours'],
-                name='Hours',
-                marker_color='#4ECDC4',  # Teal/green color
-                text=monthly['Hours'].apply(lambda x: f"{x:.1f}h"),
-                textposition='outside'
-            ))
-            fig.update_layout(
-                yaxis_title='Hours Spent',
-                height=500,
-                showlegend=False
-            )
-        
-        else:  # By Month
-            # Hours per day in selected month - WITH labels
-            daily_hours = time_filtered.groupby(time_filtered['Date'].dt.day)['Runtime_mins'].sum().reset_index()
-            daily_hours.columns = ['Day', 'Minutes']
-            daily_hours['Hours'] = daily_hours['Minutes'] / 60
-            
-            fig = go.Figure()
-            fig.add_trace(go.Bar(
-                x=daily_hours['Day'],
-                y=daily_hours['Hours'],
-                name='Hours',
-                marker_color='#4ECDC4',  # Teal/green color
-                text=daily_hours['Hours'].apply(lambda x: f"{x:.1f}h"),
-                textposition='outside'
-            ))
-            fig.update_layout(
-                xaxis_title='Day of Month',
-                yaxis_title='Hours Spent',
-                height=500,
-                showlegend=False
-            )
-        
+        fig = go.Figure()
+        fig.add_trace(go.Bar(
+            x=group_df['Period'],
+            y=group_df['Hours'],
+            name='Hours',
+            marker_color='#4ECDC4',
+            text=group_df['Hours'].apply(lambda x: f"{x:.1f}h") if show_labels else None,
+            textposition='outside' if show_labels else None
+        ))
+        fig.update_layout(
+            xaxis=dict(tickangle=x_angle, title=x_label),
+            yaxis_title='Hours Spent',
+            height=500
+        )
         st.plotly_chart(fig, use_container_width=True)
 
 # Footer
