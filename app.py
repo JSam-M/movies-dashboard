@@ -282,37 +282,10 @@ with tab3:
         st.dataframe(director_counts, hide_index=True, use_container_width=True, height=500)
 
 with tab4:
-    # Personal stats tab
+    # Personal stats tab - cleaned up
     st.subheader("📊 My Viewing Patterns")
     
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        # Movies over time
-        st.subheader("Movies Watched Over Time")
-        df_time = df.copy()
-        df_time['Date'] = pd.to_datetime(df_time['Date'])
-        df_time['Year-Month'] = df_time['Date'].dt.to_period('M').astype(str)
-        time_data = df_time.groupby('Year-Month').size().reset_index(name='Count')
-        
-        fig = px.line(time_data, x='Year-Month', y='Count', 
-                     title='Viewing Activity',
-                     markers=True)
-        fig.update_layout(xaxis_tickangle=45)
-        st.plotly_chart(fig, use_container_width=True)
-    
-    with col2:
-        # Viewing location breakdown
-        st.subheader("Viewing Preferences")
-        if 'Location' in df.columns:
-            location_data = df['Location'].value_counts()
-            fig = px.pie(values=location_data.values, names=location_data.index,
-                        title='Theatre vs Home')
-            st.plotly_chart(fig, use_container_width=True)
-    
-    # Time spent over months/years
-    st.subheader("Time Spent Watching Movies")
-    
+    # Helper function
     def parse_runtime(runtime_str):
         if pd.isna(runtime_str):
             return 0
@@ -321,83 +294,184 @@ with tab4:
         except:
             return 0
     
-    # Get all entries with dates and runtime
+    # Prepare time data
     time_df = filtered_entries.copy()
     time_df['Date'] = pd.to_datetime(time_df['Date'])
     time_df['Runtime_mins'] = time_df['Runtime'].apply(parse_runtime)
+    time_df['Year'] = time_df['Date'].dt.year
+    time_df['Month'] = time_df['Date'].dt.month
     time_df['Year-Month'] = time_df['Date'].dt.to_period('M').astype(str)
     
-    # Calculate time per month
-    time_by_month = time_df.groupby('Year-Month')['Runtime_mins'].sum().reset_index()
-    time_by_month['Hours'] = time_by_month['Runtime_mins'] / 60
-    time_by_month['Cumulative_Hours'] = time_by_month['Hours'].cumsum()
-    time_by_month['Cumulative_Days'] = time_by_month['Cumulative_Hours'] / 24
+    # Time period selector
+    col1, col2, col3 = st.columns([2, 2, 3])
     
-    # Create dual-axis chart
-    fig = go.Figure()
+    with col1:
+        view_by = st.radio("View by", ["All Time", "By Year", "By Month"], horizontal=True)
     
-    # Monthly hours (bars)
-    fig.add_trace(go.Bar(
-        x=time_by_month['Year-Month'],
-        y=time_by_month['Hours'],
-        name='Hours per Month',
-        marker_color='lightblue',
-        yaxis='y'
-    ))
+    with col2:
+        if view_by == "By Year":
+            years = sorted(time_df['Year'].unique(), reverse=True)
+            selected_year = st.selectbox("Select Year", years)
+            time_filtered = time_df[time_df['Year'] == selected_year]
+        elif view_by == "By Month":
+            months = sorted(time_df['Year-Month'].unique(), reverse=True)
+            selected_month = st.selectbox("Select Month", months)
+            time_filtered = time_df[time_df['Year-Month'] == selected_month]
+        else:
+            time_filtered = time_df
     
-    # Cumulative days (line)
-    fig.add_trace(go.Scatter(
-        x=time_by_month['Year-Month'],
-        y=time_by_month['Cumulative_Days'],
-        name='Cumulative Total (Days)',
-        mode='lines+markers',
-        line=dict(color='darkblue', width=3),
-        yaxis='y2'
-    ))
-    
-    fig.update_layout(
-        xaxis=dict(tickangle=45, title=''),
-        yaxis=dict(title='Hours per Month', side='left'),
-        yaxis2=dict(title='Cumulative Days', overlaying='y', side='right'),
-        hovermode='x unified',
-        height=400,
-        legend=dict(x=0.01, y=0.99)
-    )
-    
-    st.plotly_chart(fig, use_container_width=True)
-    
-    # Summary stats
-    total_minutes = time_by_month['Runtime_mins'].sum()
+    # Calculate stats for selected period
+    total_movies = len(time_filtered)
+    total_minutes = time_filtered['Runtime_mins'].sum()
     total_hours = total_minutes / 60
     total_days = total_hours / 24
-    st.caption(f"📊 Total: {total_days:.1f} days ({total_hours:.0f} hours) spent watching movies")
     
-    # Rewatch stats
+    # Display stats
+    st.markdown("---")
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("Movies Watched", total_movies)
+    
+    with col2:
+        st.metric("Total Hours", f"{total_hours:.1f}h")
+    
+    with col3:
+        st.metric("Total Days", f"{total_days:.2f}d")
+    
+    with col4:
+        avg_per_movie = total_minutes / total_movies if total_movies > 0 else 0
+        st.metric("Avg Runtime", f"{avg_per_movie:.0f}m")
+    
+    st.markdown("---")
+    
+    # Two main visualizations
     col1, col2 = st.columns(2)
     
     with col1:
-        st.subheader("Rewatch Distribution")
-        rewatch_dist = df['N\'th time of watching'].value_counts().sort_index()
-        rewatch_dist.index = rewatch_dist.index.map(lambda x: f"{int(x)}x" if x > 1 else "Once")
+        st.subheader("Viewing Activity Over Time")
         
-        fig = px.bar(x=rewatch_dist.values, y=rewatch_dist.index, 
-                    orientation='h',
-                    labels={'x': 'Number of Movies', 'y': 'Times Watched'})
-        fig.update_layout(showlegend=False)
+        if view_by == "All Time":
+            # Show monthly data
+            time_data = time_df.groupby('Year-Month').agg({
+                'Name': 'count',
+                'Runtime_mins': 'sum'
+            }).reset_index()
+            time_data.columns = ['Month', 'Movies', 'Minutes']
+            time_data['Hours'] = time_data['Minutes'] / 60
+            
+            fig = go.Figure()
+            fig.add_trace(go.Bar(
+                x=time_data['Month'],
+                y=time_data['Movies'],
+                name='Movies',
+                marker_color='lightblue'
+            ))
+            fig.update_layout(
+                xaxis_tickangle=45,
+                yaxis_title='Movies Watched',
+                height=400
+            )
+            
+        elif view_by == "By Year":
+            # Show months within selected year
+            monthly = time_filtered.groupby('Month').agg({
+                'Name': 'count',
+                'Runtime_mins': 'sum'
+            }).reset_index()
+            monthly.columns = ['Month', 'Movies', 'Minutes']
+            monthly['Month_Name'] = monthly['Month'].apply(lambda x: pd.Timestamp(2000, int(x), 1).strftime('%B'))
+            monthly['Hours'] = monthly['Minutes'] / 60
+            
+            fig = go.Figure()
+            fig.add_trace(go.Bar(
+                x=monthly['Month_Name'],
+                y=monthly['Movies'],
+                name='Movies',
+                marker_color='lightblue',
+                text=monthly['Hours'].apply(lambda x: f"{x:.1f}h"),
+                textposition='outside'
+            ))
+            fig.update_layout(
+                yaxis_title='Movies Watched',
+                height=400
+            )
+        
+        else:  # By Month
+            # Show daily breakdown for selected month
+            daily = time_filtered.groupby(time_filtered['Date'].dt.day).agg({
+                'Name': 'count',
+                'Runtime_mins': 'sum'
+            }).reset_index()
+            daily.columns = ['Day', 'Movies', 'Minutes']
+            
+            fig = go.Figure()
+            fig.add_trace(go.Bar(
+                x=daily['Day'],
+                y=daily['Movies'],
+                name='Movies',
+                marker_color='lightblue'
+            ))
+            fig.update_layout(
+                xaxis_title='Day of Month',
+                yaxis_title='Movies Watched',
+                height=400
+            )
+        
         st.plotly_chart(fig, use_container_width=True)
     
     with col2:
-        st.subheader("Average Movie Length")
-        avg_runtime = time_df['Runtime_mins'].mean()
-        st.metric("Average Runtime", f"{avg_runtime:.0f} minutes", help=f"{avg_runtime/60:.1f} hours")
+        st.subheader("Time Spent")
         
-        # Runtime distribution
-        fig = px.histogram(time_df, x='Runtime_mins', nbins=20,
-                          labels={'Runtime_mins': 'Runtime (minutes)'},
-                          title='Runtime Distribution')
+        if view_by == "All Time":
+            # Cumulative time over months
+            time_data = time_df.groupby('Year-Month')['Runtime_mins'].sum().reset_index()
+            time_data['Cumulative_Hours'] = time_data['Runtime_mins'].cumsum() / 60
+            time_data['Cumulative_Days'] = time_data['Cumulative_Hours'] / 24
+            
+            fig = px.area(
+                time_data,
+                x='Year-Month',
+                y='Cumulative_Days',
+                labels={'Cumulative_Days': 'Total Days', 'Year-Month': ''},
+                title='Cumulative Time Spent'
+            )
+            fig.update_layout(xaxis_tickangle=45, height=400)
+            
+        elif view_by == "By Year":
+            # Hours per month in selected year
+            fig = px.bar(
+                monthly,
+                x='Month_Name',
+                y='Hours',
+                labels={'Hours': 'Hours Spent', 'Month_Name': ''},
+                title=f'Hours per Month in {selected_year}'
+            )
+            fig.update_layout(height=400)
+        
+        else:  # By Month
+            # Pie chart of viewing preferences for that month
+            if 'Location' in time_filtered.columns:
+                location_data = time_filtered['Location'].value_counts()
+                fig = px.pie(
+                    values=location_data.values,
+                    names=location_data.index,
+                    title='Where I Watched'
+                )
+                fig.update_layout(height=400)
+            else:
+                # Show language distribution
+                lang_data = time_filtered['Language'].value_counts()
+                fig = px.pie(
+                    values=lang_data.values,
+                    names=lang_data.index,
+                    title='Languages Watched'
+                )
+                fig.update_layout(height=400)
+        
         st.plotly_chart(fig, use_container_width=True)
 
 # Footer
 st.markdown("---")
 st.markdown("🎬 **Movie recommendation database** | Powered by TMDb")
-st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v2.2 | Optimized for recommendations</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v2.3 | Optimized for recommendations</p>", unsafe_allow_html=True)
