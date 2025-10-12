@@ -296,7 +296,7 @@ with tab4:
     
     # Prepare time data
     time_df = filtered_entries.copy()
-    time_df['Date'] = pd.to_datetime(time_df['Date'])
+    time_df['Date'] = pd.to_datetime(time_df['Date'], dayfirst=True)  # DD/MM/YYYY format
     time_df['Runtime_mins'] = time_df['Runtime'].apply(parse_runtime)
     time_df['Year'] = time_df['Date'].dt.year
     time_df['Month'] = time_df['Date'].dt.month
@@ -474,4 +474,4 @@ with tab4:
 # Footer
 st.markdown("---")
 st.markdown("🎬 **Movie recommendation database** | Powered by TMDb")
-st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v2.3 | Optimized for recommendations</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v2.4 | Optimized for recommendations</p>", unsafe_allow_html=True)
