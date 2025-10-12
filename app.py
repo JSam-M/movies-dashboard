@@ -486,4 +486,4 @@ with tab4:
 # Footer
 st.markdown("---")
 st.markdown("🎬 **Movie recommendation database** | Curated collection")
-st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v3.2 | Optimized for recommendations</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v3.1 | Optimized for recommendations</p>", unsafe_allow_html=True)
