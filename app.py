@@ -435,8 +435,8 @@ with tab4:
                 y=time_data['Cumulative_Days'],
                 mode='lines+markers',
                 name='Total Days',
-                line=dict(color='darkblue', width=2),
-                marker=dict(size=6)
+                line=dict(color='#FF6B6B', width=3, shape='spline'),  # Red/coral color with smooth line
+                marker=dict(size=6, color='#FF6B6B')
             ))
             fig.update_layout(
                 xaxis_tickangle=45,
@@ -452,7 +452,7 @@ with tab4:
                 x=monthly['Month_Name'],
                 y=monthly['Hours'],
                 name='Hours',
-                marker_color='darkblue',
+                marker_color='#4ECDC4',  # Teal color
                 text=monthly['Hours'].apply(lambda x: f"{x:.1f}h"),
                 textposition='outside'
             ))
@@ -487,4 +487,4 @@ with tab4:
 # Footer
 st.markdown("---")
 st.markdown("🎬 **Movie recommendation database** | Curated collection")
-st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v2.8 | Optimized for recommendations</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v2.9 | Optimized for recommendations</p>", unsafe_allow_html=True)
