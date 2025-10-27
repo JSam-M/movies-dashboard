@@ -417,7 +417,22 @@ with tab4:
         )
         st.plotly_chart(fig, use_container_width=True)
 
-# Footer
+# Footer with visit counter
 st.markdown("---")
-st.markdown("🎬 **Movie recommendation database** | Curated collection")
-st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v3.2 | Optimized for recommendations</p>", unsafe_allow_html=True)
+
+# Simple visit tracking using session state
+if 'visit_counted' not in st.session_state:
+    st.session_state.visit_counted = True
+    # In a real implementation, this would increment a database counter
+    # For now, we'll just acknowledge the visit
+
+col1, col2 = st.columns([3, 1])
+
+with col1:
+    st.markdown("🎬 **Movie recommendation database** | Curated collection")
+
+with col2:
+    st.markdown("📊 **Analytics:** [View Stats](https://share.streamlit.io/)")
+
+st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v3.3 | Optimized for recommendations</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #999; font-size: 9px;'>💡 Dashboard owner: Check Streamlit Cloud Analytics for detailed visitor stats (total views, daily visits, geographic data)</p>", unsafe_allow_html=True)
