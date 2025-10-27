@@ -420,19 +420,61 @@ with tab4:
 # Footer with visit counter
 st.markdown("---")
 
-# Simple visit tracking using session state
+# Visit counter using countapi.xyz
+import requests
+from datetime import datetime
+
+# Function to get/update visit count
+def get_visit_count():
+    try:
+        # Use a unique namespace for your dashboard
+        # Replace 'movies-dashboard-username' with something unique to you
+        namespace = 'movies-dashboard-JSam'
+        
+        # Get/increment total visits
+        response = requests.get(f'https://api.countapi.xyz/hit/{namespace}/total', timeout=2)
+        if response.status_code == 200:
+            total_visits = response.json().get('value', 0)
+        else:
+            total_visits = None
+        
+        # Get/increment today's visits (resets daily)
+        today_key = datetime.now().strftime('%Y-%m-%d')
+        response_today = requests.get(f'https://api.countapi.xyz/hit/{namespace}/{today_key}', timeout=2)
+        if response_today.status_code == 200:
+            today_visits = response_today.json().get('value', 0)
+        else:
+            today_visits = None
+        
+        return total_visits, today_visits
+    except:
+        return None, None
+
+# Only increment on first load per session
 if 'visit_counted' not in st.session_state:
     st.session_state.visit_counted = True
-    # In a real implementation, this would increment a database counter
-    # For now, we'll just acknowledge the visit
+    total, today = get_visit_count()
+    st.session_state.total_visits = total
+    st.session_state.today_visits = today
+else:
+    total = st.session_state.get('total_visits')
+    today = st.session_state.get('today_visits')
 
-col1, col2 = st.columns([3, 1])
+col1, col2, col3 = st.columns([2, 1, 1])
 
 with col1:
     st.markdown("🎬 **Movie recommendation database** | Curated collection")
 
 with col2:
-    st.markdown("📊 **Analytics:** [View Stats](https://share.streamlit.io/)")
+    if total is not None:
+        st.markdown(f"<p style='text-align: right; color: #666; font-size: 12px;'>👥 Total Visits: <strong>{total:,}</strong></p>", unsafe_allow_html=True)
+    else:
+        st.markdown("")
+
+with col3:
+    if today is not None:
+        st.markdown(f"<p style='text-align: right; color: #666; font-size: 12px;'>📅 Today: <strong>{today}</strong></p>", unsafe_allow_html=True)
+    else:
+        st.markdown("")
 
 st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v3.3 | Optimized for recommendations</p>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #999; font-size: 9px;'>💡 Dashboard owner: Check Streamlit Cloud Analytics for detailed visitor stats (total views, daily visits, geographic data)</p>", unsafe_allow_html=True)
