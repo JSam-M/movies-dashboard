@@ -11,19 +11,31 @@ st.set_page_config(
 )
 
 # Load data
-@st.cache_data
+@st.cache_data(ttl=300)
 def load_data():
     df = pd.read_csv('movies.csv')
     # Clean data
     df['TMDb_Rating'] = pd.to_numeric(df['TMDb_Rating'], errors='coerce')
     df['Release_Year'] = pd.to_numeric(df['Release_Year'], errors='coerce')
     df['N\'th time of watching'] = pd.to_numeric(df['N\'th time of watching'], errors='coerce').fillna(1)
+
+    # Parse dates robustly — try dayfirst, then fallback to general parsing
+    df['Date_Parsed'] = pd.to_datetime(df['Date'], dayfirst=True, errors='coerce')
+    mask_failed = df['Date_Parsed'].isna() & df['Date'].notna()
+    df.loc[mask_failed, 'Date_Parsed'] = pd.to_datetime(df.loc[mask_failed, 'Date'], errors='coerce')
+
+    # Ensure Year column is numeric (this is the watching year from Excel)
+    df['Year'] = pd.to_numeric(df['Year'], errors='coerce')
+
+    # Fill any missing Year from parsed date, and vice versa
+    df['Year'] = df['Year'].fillna(df['Date_Parsed'].dt.year)
     
     # Get unique movies with max rewatch count
     df_unique = df.groupby('Name', as_index=False).agg({
         'Date': 'last',
+        'Date_Parsed': 'last',
         'Language': 'first',
-        'Year': 'first',
+        'Year': 'last',
         'Good?': 'first',
         'N\'th time of watching': 'max',
         'Location': 'last',
@@ -89,16 +101,16 @@ min_rating = st.sidebar.slider(
 )
 df = df[df['TMDb_Rating'] >= min_rating]
 
-# Year range
-if df['Release_Year'].notna().any():
-    min_year = int(df['Release_Year'].min())
-    max_year = int(df['Release_Year'].max())
+# Year range — use full dataset for slider bounds so filters don't shrink the range
+if df_full['Release_Year'].notna().any():
+    full_min_year = int(df_full['Release_Year'].min())
+    full_max_year = int(df_full['Release_Year'].max())
     
-    if min_year < max_year:
+    if full_min_year < full_max_year:
         year_range = st.sidebar.slider(
             "📅 Release Year",
-            min_year, max_year,
-            (min_year, max_year)
+            full_min_year, full_max_year,
+            (full_min_year, full_max_year)
         )
         df = df[(df['Release_Year'] >= year_range[0]) & (df['Release_Year'] <= year_range[1])]
 
@@ -282,7 +294,7 @@ with tab3:
         st.dataframe(director_counts, hide_index=True, use_container_width=True, height=500)
 
 with tab4:
-    # Personal stats tab - FIXED VERSION
+    # Personal stats tab — FIXED: uses original Year column from Excel as primary source
     st.subheader("📊 My Viewing Patterns")
     
     # Helper function
@@ -294,25 +306,36 @@ with tab4:
         except:
             return 0
     
-    # Prepare time data
+    # Prepare time data from ALL entries (not deduplicated)
     time_df = filtered_entries.copy()
-    time_df['Date'] = pd.to_datetime(time_df['Date'], dayfirst=True)
     time_df['Runtime_mins'] = time_df['Runtime'].apply(parse_runtime)
-    time_df['Year'] = time_df['Date'].dt.year
-    time_df['Month'] = time_df['Date'].dt.month
-    time_df['Month_Name'] = time_df['Date'].dt.month_name()
-    time_df['Year-Month'] = time_df['Date'].dt.to_period('M').astype(str)
+
+    # Use the Year column from the CSV (sourced from your Excel) as the primary year.
+    # This is already numeric from load_data(). Fall back to date-derived year if missing.
+    time_df['Watch_Year'] = time_df['Year']
+    date_years = time_df['Date_Parsed'].dt.year
+    time_df['Watch_Year'] = time_df['Watch_Year'].fillna(date_years)
+
+    # For month-level grouping, use parsed dates
+    time_df['Month'] = time_df['Date_Parsed'].dt.month
+    time_df['Month_Name'] = time_df['Date_Parsed'].dt.month_name()
+    time_df['Year-Month'] = time_df['Date_Parsed'].dt.to_period('M').astype(str)
+    
+    # Drop entries with no usable year at all
+    time_df = time_df.dropna(subset=['Watch_Year'])
+    time_df['Watch_Year'] = time_df['Watch_Year'].astype(int)
     
     # Time period selector
     view_by = st.radio("View by", ["All Time", "By Year", "By Month"], horizontal=True)
     
     # Calculate stats based on view
     if view_by == "All Time":
-        # Monthly breakdown
-        group_df = time_df.groupby('Year-Month').agg({
-            'Name': 'count',
-            'Runtime_mins': 'sum'
-        }).reset_index()
+        # Monthly breakdown — only entries with valid parsed dates
+        monthly_df = time_df.dropna(subset=['Date_Parsed'])
+        group_df = monthly_df.groupby('Year-Month').agg(
+            Movies=('Name', 'count'),
+            Minutes=('Runtime_mins', 'sum')
+        ).reset_index()
         group_df.columns = ['Period', 'Movies', 'Minutes']
         group_df['Hours'] = group_df['Minutes'] / 60
         x_label = 'Month'
@@ -320,11 +343,11 @@ with tab4:
         show_labels = False
         
     elif view_by == "By Year":
-        # Aggregate by YEAR (compare all years)
-        group_df = time_df.groupby('Year').agg({
-            'Name': 'count',
-            'Runtime_mins': 'sum'
-        }).reset_index()
+        # Aggregate by watching year — uses the reliable Excel Year column
+        group_df = time_df.groupby('Watch_Year').agg(
+            Movies=('Name', 'count'),
+            Minutes=('Runtime_mins', 'sum')
+        ).reset_index()
         group_df.columns = ['Period', 'Movies', 'Minutes']
         group_df['Period'] = group_df['Period'].astype(str)
         group_df['Hours'] = group_df['Minutes'] / 60
@@ -333,14 +356,15 @@ with tab4:
         show_labels = True
         
     else:  # By Month
-        # Aggregate by MONTH NAME (compare Jan vs Feb vs Mar, etc.)
+        # Aggregate by month name — only entries with valid parsed dates
         month_order = ['January', 'February', 'March', 'April', 'May', 'June', 
                       'July', 'August', 'September', 'October', 'November', 'December']
         
-        group_df = time_df.groupby('Month_Name').agg({
-            'Name': 'count',
-            'Runtime_mins': 'sum'
-        }).reset_index()
+        monthly_df = time_df.dropna(subset=['Month_Name'])
+        group_df = monthly_df.groupby('Month_Name').agg(
+            Movies=('Name', 'count'),
+            Minutes=('Runtime_mins', 'sum')
+        ).reset_index()
         group_df.columns = ['Period', 'Movies', 'Minutes']
         group_df['Hours'] = group_df['Minutes'] / 60
         
@@ -352,7 +376,7 @@ with tab4:
         show_labels = True
     
     # Calculate totals
-    total_movies = time_df['Name'].count()
+    total_movies = len(time_df)
     total_minutes = time_df['Runtime_mins'].sum()
     total_hours = total_minutes / 60
     total_days = total_hours / 24
@@ -392,7 +416,7 @@ with tab4:
             textposition='outside' if show_labels else None
         ))
         fig.update_layout(
-            xaxis=dict(tickangle=x_angle, title=x_label),
+            xaxis=dict(tickangle=x_angle, title=x_label, type='category'),
             yaxis_title='Movies Watched',
             height=500
         )
@@ -411,70 +435,21 @@ with tab4:
             textposition='outside' if show_labels else None
         ))
         fig.update_layout(
-            xaxis=dict(tickangle=x_angle, title=x_label),
+            xaxis=dict(tickangle=x_angle, title=x_label, type='category'),
             yaxis_title='Hours Spent',
             height=500
         )
         st.plotly_chart(fig, use_container_width=True)
 
-# Footer with visit counter
+# Footer
 st.markdown("---")
 
-# Visit counter using countapi.xyz
-import requests
-from datetime import datetime
-
-# Function to get/update visit count
-def get_visit_count():
-    try:
-        # Use a unique namespace for your dashboard
-        # Replace 'movies-dashboard-username' with something unique to you
-        namespace = 'movies-dashboard-JSam'
-        
-        # Get/increment total visits
-        response = requests.get(f'https://api.countapi.xyz/hit/{namespace}/total', timeout=2)
-        if response.status_code == 200:
-            total_visits = response.json().get('value', 0)
-        else:
-            total_visits = None
-        
-        # Get/increment today's visits (resets daily)
-        today_key = datetime.now().strftime('%Y-%m-%d')
-        response_today = requests.get(f'https://api.countapi.xyz/hit/{namespace}/{today_key}', timeout=2)
-        if response_today.status_code == 200:
-            today_visits = response_today.json().get('value', 0)
-        else:
-            today_visits = None
-        
-        return total_visits, today_visits
-    except:
-        return None, None
-
-# Only increment on first load per session
-if 'visit_counted' not in st.session_state:
-    st.session_state.visit_counted = True
-    total, today = get_visit_count()
-    st.session_state.total_visits = total
-    st.session_state.today_visits = today
-else:
-    total = st.session_state.get('total_visits')
-    today = st.session_state.get('today_visits')
-
-col1, col2, col3 = st.columns([2, 1, 1])
+col1, col2 = st.columns([3, 1])
 
 with col1:
     st.markdown("🎬 **Movie recommendation database** | Curated collection")
 
 with col2:
-    if total is not None:
-        st.markdown(f"<p style='text-align: right; color: #666; font-size: 12px;'>👥 Total Visits: <strong>{total:,}</strong></p>", unsafe_allow_html=True)
-    else:
-        st.markdown("")
+    st.markdown(f"<p style='text-align: right; color: #666; font-size: 12px;'>🎥 {original_count} movies tracked</p>", unsafe_allow_html=True)
 
-with col3:
-    if today is not None:
-        st.markdown(f"<p style='text-align: right; color: #666; font-size: 12px;'>📅 Today: <strong>{today}</strong></p>", unsafe_allow_html=True)
-    else:
-        st.markdown("")
-
-st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v3.3 | Optimized for recommendations</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #666; font-size: 10px; margin-top: 20px;'>Dashboard v3.4 | Optimized for recommendations</p>", unsafe_allow_html=True)
