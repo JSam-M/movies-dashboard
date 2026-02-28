@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Film Collection &amp; Recommendations</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' rx='2' fill='%231a1a2e'/></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Source+Sans+Pro:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+/* ── Reset & Base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 15px; -webkit-font-smoothing: antialiased; }
+body {
+  font-family: 'Source Sans Pro', 'Segoe UI', sans-serif;
+  background: #fafbfc; color: #2d2d3f;
+  line-height: 1.5; min-height: 100vh;
+}
+
+/* ── Layout ── */
+.layout { display: flex; min-height: 100vh; }
+.sidebar {
+  width: 280px; min-width: 280px; background: #fff;
+  border-right: 1px solid #e5e7eb; padding: 24px 20px;
+  overflow-y: auto; position: sticky; top: 0; height: 100vh;
+}
+.main { flex: 1; padding: 32px 40px; max-width: 1200px; margin: 0 auto; overflow-x: hidden; }
+
+/* ── Typography ── */
+.serif { font-family: 'Playfair Display', Georgia, serif; }
+.section-label {
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.12em; color: #6b7280; margin-bottom: 4px;
+}
+.section-title {
+  font-family: 'Playfair Display', Georgia, serif; font-size: 1.4rem;
+  font-weight: 600; color: #1a1a2e; margin-bottom: 4px; letter-spacing: -0.02em;
+}
+.section-subtitle {
+  font-size: 0.88rem; color: #6b7280; margin-bottom: 20px; line-height: 1.5;
+}
+.page-title {
+  font-family: 'Playfair Display', Georgia, serif; font-size: 2.1rem;
+  font-weight: 600; color: #1a1a2e; letter-spacing: -0.02em;
+}
+
+/* ── Divider ── */
+.divider { border: none; border-top: 1px solid #e5e7eb; margin: 24px 0; }
+
+/* ── Card ── */
+.card {
+  background: #fff; border: 1px solid #e5e7eb; border-radius: 8px;
+  padding: 20px 28px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 16px;
+}
+
+/* ── KPI ── */
+.kpi-row { display: flex; gap: 32px; flex-wrap: wrap; }
+.kpi-item { flex: 1; min-width: 90px; }
+.stat-highlight {
+  font-size: 2.2rem; font-weight: 700; color: #1e3a5f; line-height: 1;
+}
+.stat-highlight .unit { font-size: 1rem; color: #6b7280; }
+.stat-label {
+  font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: #9ca3af; margin-top: 2px;
+}
+
+/* ── Tabs ── */
+.tabs { display: flex; border-bottom: 2px solid #e5e7eb; margin-bottom: 24px; gap: 0; }
+.tab-btn {
+  font-family: 'Source Sans Pro', sans-serif; font-weight: 600; font-size: 0.82rem;
+  text-transform: uppercase; letter-spacing: 0.06em; color: #6b7280;
+  background: none; border: none; border-bottom: 2px solid transparent;
+  padding: 12px 24px; margin-bottom: -2px; cursor: pointer; transition: all 0.2s;
+}
+.tab-btn:hover { color: #1e3a5f; border-bottom-color: #93c5fd; }
+.tab-btn.active { color: #1e3a5f; border-bottom-color: #1e3a5f; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── Sidebar Elements ── */
+.sidebar-label {
+  font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: #1a1a2e; margin-bottom: 6px; margin-top: 16px;
+}
+.sidebar input[type="text"] {
+  width: 100%; padding: 8px 12px; border: 1px solid #e5e7eb;
+  border-radius: 6px; font-family: inherit; font-size: 0.88rem;
+  outline: none; transition: border 0.2s;
+}
+.sidebar input[type="text"]:focus { border-color: #3b82f6; }
+.sidebar input[type="text"]::placeholder { color: #9ca3af; }
+
+/* Multi-select dropdown */
+.multi-select { position: relative; margin-bottom: 4px; }
+.multi-select-display {
+  width: 100%; padding: 7px 12px; border: 1px solid #e5e7eb;
+  border-radius: 6px; font-size: 0.85rem; cursor: pointer;
+  background: #fff; display: flex; align-items: center; justify-content: space-between;
+  min-height: 36px; color: #2d2d3f; user-select: none;
+}
+.multi-select-display:hover { border-color: #93c5fd; }
+.multi-select-display .arrow { font-size: 0.6rem; color: #9ca3af; }
+.multi-select-dropdown {
+  display: none; position: absolute; top: 100%; left: 0; right: 0;
+  background: #fff; border: 1px solid #e5e7eb; border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1); z-index: 100; max-height: 240px;
+  overflow-y: auto; margin-top: 2px;
+}
+.multi-select-dropdown.open { display: block; }
+.multi-select-dropdown label {
+  display: flex; align-items: center; padding: 6px 12px; font-size: 0.84rem;
+  cursor: pointer; gap: 8px; transition: background 0.1s;
+}
+.multi-select-dropdown label:hover { background: #f3f4f6; }
+.multi-select-dropdown input[type="checkbox"] { accent-color: #1e3a5f; }
+
+/* Range slider */
+.range-group { margin-bottom: 4px; }
+.range-values {
+  display: flex; justify-content: space-between; font-size: 0.78rem;
+  color: #6b7280; margin-bottom: 2px;
+}
+.range-group input[type="range"] {
+  width: 100%; accent-color: #1e3a5f; height: 4px; cursor: pointer;
+}
+
+/* Radio */
+.radio-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 4px; }
+.radio-group label {
+  display: flex; align-items: center; gap: 8px; font-size: 0.84rem;
+  cursor: pointer; padding: 4px 0;
+}
+.radio-group input[type="radio"] { accent-color: #1e3a5f; }
+
+.filter-count {
+  font-size: 0.82rem; color: #6b7280; margin-top: 8px;
+}
+.filter-count strong { color: #1a1a2e; }
+
+/* ── Aggregate radio (horizontal) ── */
+.h-radio { display: flex; gap: 4px; margin-bottom: 16px; }
+.h-radio label {
+  padding: 8px 20px; border: 1px solid #e5e7eb; border-radius: 6px;
+  font-size: 0.84rem; font-weight: 600; cursor: pointer; transition: all 0.15s;
+  color: #6b7280; background: #fff; user-select: none;
+}
+.h-radio input { display: none; }
+.h-radio input:checked + label {
+  background: #1e3a5f; color: #fff; border-color: #1e3a5f;
+}
+
+/* ── Table ── */
+.data-table-wrap {
+  border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; max-height: 600px; overflow-y: auto;
+}
+.data-table {
+  width: 100%; border-collapse: collapse; font-size: 0.84rem;
+}
+.data-table thead { position: sticky; top: 0; z-index: 2; }
+.data-table th {
+  background: #f8f9fa; padding: 10px 14px; text-align: left;
+  font-weight: 600; font-size: 0.75rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: #4a4a5e; border-bottom: 2px solid #e5e7eb;
+  cursor: pointer; user-select: none; white-space: nowrap;
+}
+.data-table th:hover { background: #eef0f2; }
+.data-table th .sort-icon { margin-left: 4px; font-size: 0.65rem; color: #9ca3af; }
+.data-table th.sorted .sort-icon { color: #1e3a5f; }
+.data-table td {
+  padding: 9px 14px; border-bottom: 1px solid #f0f0f0; color: #2d2d3f;
+}
+.data-table tbody tr:hover { background: #f8fafc; }
+.pick-star { color: #d97706; font-weight: 700; }
+
+/* ── Two-col grid ── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+.grid-2-1 { display: grid; grid-template-columns: 2.2fr 1fr; gap: 32px; }
+
+/* ── Director table (small) ── */
+.dir-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+.dir-table th {
+  text-align: left; padding: 8px 12px; font-weight: 600; font-size: 0.75rem;
+  text-transform: uppercase; letter-spacing: 0.06em; color: #4a4a5e;
+  border-bottom: 2px solid #e5e7eb; background: #f8f9fa;
+}
+.dir-table td { padding: 7px 12px; border-bottom: 1px solid #f0f0f0; }
+
+/* ── Loading ── */
+.loading {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 60vh; gap: 16px;
+}
+.loading-spinner {
+  width: 36px; height: 36px; border: 3px solid #e5e7eb;
+  border-top-color: #1e3a5f; border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-size: 0.9rem; color: #6b7280; }
+
+/* ── Footer ── */
+.footer { font-size: 0.75rem; color: #9ca3af; text-align: center; padding: 24px 0 8px; letter-spacing: 0.04em; }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .sidebar { display: none; }
+  .main { padding: 20px 16px; }
+  .grid-2, .grid-2-1 { grid-template-columns: 1fr; }
+  .kpi-row { gap: 16px; }
+  .kpi-item { min-width: 70px; }
+  .stat-highlight { font-size: 1.6rem; }
+  .tab-btn { padding: 10px 14px; font-size: 0.75rem; }
+}
+
+/* ── Sidebar toggle for mobile ── */
+.mobile-toggle {
+  display: none; position: fixed; bottom: 20px; right: 20px;
+  width: 48px; height: 48px; border-radius: 50%; background: #1e3a5f;
+  color: #fff; border: none; font-size: 1.3rem; cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 200;
+}
+@media (max-width: 900px) {
+  .mobile-toggle { display: flex; align-items: center; justify-content: center; }
+  .sidebar.open { display: block; position: fixed; z-index: 150; top: 0; left: 0; height: 100vh; width: 280px; }
+}
+
+/* Plotly responsive */
+.js-plotly-plot .plotly { width: 100% !important; }
+</style>
+</head>
+<body>
+
+<button class="mobile-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')" aria-label="Toggle filters">☰</button>
+
+<div class="layout">
+<!-- ════════ SIDEBAR ════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="section-label" style="margin-top:0">FILTERS</div>
+
+  <div class="sidebar-label">Search</div>
+  <input type="text" id="searchInput" placeholder="Film title…" oninput="applyFilters()">
+
+  <div class="sidebar-label">Language</div>
+  <div class="multi-select" id="langSelect"></div>
+
+  <div class="sidebar-label">Genre</div>
+  <div class="multi-select" id="genreSelect"></div>
+
+  <div class="sidebar-label">Director</div>
+  <div class="multi-select" id="dirSelect"></div>
+
+  <div class="sidebar-label">Minimum TMDb Rating</div>
+  <div class="range-group">
+    <div class="range-values"><span id="ratingVal">0.0</span><span>10.0</span></div>
+    <input type="range" id="ratingSlider" min="0" max="10" step="0.5" value="0" oninput="document.getElementById('ratingVal').textContent=parseFloat(this.value).toFixed(1); applyFilters()">
+  </div>
+
+  <div class="sidebar-label">Release Year</div>
+  <div class="range-group">
+    <div class="range-values"><span id="relMinVal">-</span><span id="relMaxVal">-</span></div>
+    <input type="range" id="relMinSlider" min="1900" max="2026" value="1900" oninput="syncRelRange(); applyFilters()">
+    <input type="range" id="relMaxSlider" min="1900" max="2026" value="2026" oninput="syncRelRange(); applyFilters()">
+  </div>
+
+  <div class="sidebar-label">Watch Year</div>
+  <div class="range-group">
+    <div class="range-values"><span id="watchMinVal">-</span><span id="watchMaxVal">-</span></div>
+    <input type="range" id="watchMinSlider" min="2000" max="2026" value="2000" oninput="syncWatchRange(); applyFilters()">
+    <input type="range" id="watchMaxSlider" min="2000" max="2026" value="2026" oninput="syncWatchRange(); applyFilters()">
+  </div>
+
+  <hr class="divider">
+  <div class="section-label">RECOMMENDATION</div>
+  <div class="radio-group" id="recFilter">
+    <label><input type="radio" name="rec" value="all" checked onchange="applyFilters()"> All Films</label>
+    <label><input type="radio" name="rec" value="rec" onchange="applyFilters()"> Recommended (Rewatched)</label>
+    <label><input type="radio" name="rec" value="first" onchange="applyFilters()"> First Watch Only</label>
+  </div>
+
+  <hr class="divider">
+  <div class="filter-count" id="filterCount">Loading…</div>
+</aside>
+
+<!-- ════════ MAIN ════════ -->
+<main class="main">
+  <div id="loadingScreen" class="loading">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Loading film collection…</div>
+  </div>
+
+  <div id="appContent" style="display:none">
+    <!-- Header -->
+    <div style="margin-bottom:8px">
+      <p class="section-label">PERSONAL COLLECTION</p>
+      <p class="page-title">Film Collection &amp; Recommendations</p>
+      <p class="section-subtitle" style="margin-bottom:0">A curated catalogue of films — rated, reviewed, and personally recommended.</p>
+    </div>
+    <hr class="divider">
+
+    <!-- KPIs -->
+    <div class="card" id="kpiBar"></div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('browse',this)">Browse</button>
+      <button class="tab-btn" onclick="switchTab('topPicks',this)">Top Picks</button>
+      <button class="tab-btn" onclick="switchTab('category',this)">By Category</button>
+      <button class="tab-btn" onclick="switchTab('stats',this)">Viewing Stats</button>
+    </div>
+
+    <!-- Tab: Browse -->
+    <div class="tab-panel active" id="tab-browse">
+      <p class="section-label">CATALOGUE</p>
+      <p class="section-title">Browse All Films</p>
+      <p class="section-subtitle">Complete collection sorted by rating. Films marked ★ are personally recommended rewatches.</p>
+      <div class="data-table-wrap">
+        <table class="data-table" id="browseTable">
+          <thead>
+            <tr>
+              <th data-col="Name" data-type="string" onclick="sortTable(this)">Film <span class="sort-icon">▼</span></th>
+              <th data-col="Release_Year" data-type="number" onclick="sortTable(this)">Year <span class="sort-icon">▼</span></th>
+              <th data-col="TMDb_Rating" data-type="number" onclick="sortTable(this)">Rating <span class="sort-icon">▼</span></th>
+              <th data-col="Rewatches" data-type="number" onclick="sortTable(this)">Watches <span class="sort-icon">▼</span></th>
+              <th data-col="Pick" data-type="string">Pick</th>
+              <th data-col="Genre" data-type="string" onclick="sortTable(this)">Genre <span class="sort-icon">▼</span></th>
+              <th data-col="Director" data-type="string" onclick="sortTable(this)">Director <span class="sort-icon">▼</span></th>
+              <th data-col="Runtime" data-type="string" onclick="sortTable(this)">Runtime <span class="sort-icon">▼</span></th>
+              <th data-col="Language" data-type="string" onclick="sortTable(this)">Language <span class="sort-icon">▼</span></th>
+            </tr>
+          </thead>
+          <tbody id="browseBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab: Top Picks -->
+    <div class="tab-panel" id="tab-topPicks">
+      <div class="grid-2">
+        <div>
+          <p class="section-label">BY RATING</p>
+          <p class="section-title">Highest Rated</p>
+          <p class="section-subtitle">Top 10 films by TMDb community rating.</p>
+          <div id="chartTopRated"></div>
+        </div>
+        <div>
+          <p class="section-label">PERSONAL PICKS</p>
+          <p class="section-title">Most Rewatched</p>
+          <p class="section-subtitle">Films watched more than once — strongest personal endorsements.</p>
+          <div id="chartRewatched"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: By Category -->
+    <div class="tab-panel" id="tab-category">
+      <div class="grid-2">
+        <div>
+          <p class="section-label">LANGUAGE</p>
+          <p class="section-title">Distribution by Language</p>
+          <div id="chartLanguage"></div>
+        </div>
+        <div>
+          <p class="section-label">GENRE</p>
+          <p class="section-title">Top Genres</p>
+          <div id="chartGenre"></div>
+        </div>
+      </div>
+      <hr class="divider">
+      <p class="section-label">FILMMAKERS</p>
+      <p class="section-title">Top Directors in Collection</p>
+      <p class="section-subtitle">Directors with the most films in the catalogue.</p>
+      <div class="grid-2-1">
+        <div id="chartDirectors"></div>
+        <div id="directorTable"></div>
+      </div>
+    </div>
+
+    <!-- Tab: Viewing Stats -->
+    <div class="tab-panel" id="tab-stats">
+      <p class="section-label">ANALYTICS</p>
+      <p class="section-title">Viewing Patterns</p>
+      <p class="section-subtitle">Personal viewing history derived from watch dates — how many films and hours across time.</p>
+
+      <div class="h-radio">
+        <input type="radio" name="agg" id="aggYear" value="year" checked onchange="renderStats()"><label for="aggYear">Year</label>
+        <input type="radio" name="agg" id="aggMonth" value="month" onchange="renderStats()"><label for="aggMonth">Month</label>
+        <input type="radio" name="agg" id="aggAll" value="all" onchange="renderStats()"><label for="aggAll">All Time</label>
+      </div>
+
+      <hr class="divider">
+      <div class="card" id="statsKpi"></div>
+      <div style="height:16px"></div>
+      <div class="grid-2">
+        <div>
+          <p class="section-label">VOLUME</p>
+          <p style="font-weight:700;margin-bottom:8px">Viewing Activity</p>
+          <div id="chartVolume"></div>
+        </div>
+        <div>
+          <p class="section-label">DURATION</p>
+          <p style="font-weight:700;margin-bottom:8px">Time Invested</p>
+          <div id="chartDuration"></div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider">
+    <div class="footer" id="footerText"></div>
+  </div>
+</main>
+</div>
+
+<script>
+// ════════════════════════════════════════
+// GLOBALS
+// ════════════════════════════════════════
+const CSV_URL = 'https://raw.githubusercontent.com/JSam-M/movies-dashboard/main/movies.csv';
+const COLORS = {
+  ink:'#1a1a2e', charcoal:'#2d2d3f', steel:'#6b7280', navy:'#1e3a5f',
+  accent:'#2563eb', accent_light:'#3b82f6', teal:'#0d9488', teal_light:'#14b8a6',
+};
+const CHART_QUAL = ['#1e3a5f','#0d9488','#d97706','#7c3aed','#e11d48','#059669','#ea580c','#4f46e5'];
+const PLOTLY_CFG = {responsive:true, displayModeBar:false};
+const PLOTLY_LAYOUT_BASE = {
+  font:{family:"'Source Sans Pro', sans-serif", color:COLORS.charcoal},
+  paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)',
+  margin:{l:0,r:20,t:10,b:30},
+  hoverlabel:{bgcolor:COLORS.ink, font:{size:13, family:"'Source Sans Pro'", color:'#fff'}},
+};
+
+let rawData = [];      // all rows from CSV
+let uniqueData = [];   // deduplicated (one per movie)
+let filteredUnique = [];
+let filteredAll = [];
+let tableSortCol = 'TMDb_Rating';
+let tableSortAsc = false;
+
+// ════════════════════════════════════════
+// DATA LOADING & PARSING
+// ════════════════════════════════════════
+function parseDate(str) {
+  if (!str) return null;
+  // Try DD/MM/YYYY first
+  const dmy = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+  if (dmy) {
+    const d = new Date(+dmy[3], +dmy[2]-1, +dmy[1]);
+    if (!isNaN(d)) return d;
+  }
+  const d = new Date(str);
+  return isNaN(d) ? null : d;
+}
+
+function parseRuntime(str) {
+  if (!str) return 0;
+  const m = String(str).match(/(\d+)/);
+  return m ? parseInt(m[1]) : 0;
+}
+
+function loadData() {
+  Papa.parse(CSV_URL, {
+    download: true, header: true, skipEmptyLines: true,
+    complete: function(results) {
+      rawData = results.data.map(r => {
+        const dp = parseDate(r.Date);
+        return {
+          ...r,
+          TMDb_Rating: parseFloat(r.TMDb_Rating) || 0,
+          Release_Year: parseInt(r.Release_Year) || 0,
+          Rewatches: parseFloat(r["N'th time of watching"]) || 1,
+          Date_Parsed: dp,
+          Watch_Year: dp ? dp.getFullYear() : null,
+          Runtime_mins: parseRuntime(r.Runtime),
+          Year_num: parseInt(r.Year) || 0,
+        };
+      });
+
+      // Deduplicate: one row per movie, max rewatches
+      const map = {};
+      rawData.forEach(r => {
+        if (!map[r.Name]) { map[r.Name] = {...r}; }
+        else {
+          if (r.Rewatches > map[r.Name].Rewatches) map[r.Name].Rewatches = r.Rewatches;
+          if (r.Date_Parsed && (!map[r.Name].Date_Parsed || r.Date_Parsed > map[r.Name].Date_Parsed)) {
+            map[r.Name].Date = r.Date;
+            map[r.Name].Date_Parsed = r.Date_Parsed;
+            map[r.Name].Watch_Year = r.Watch_Year;
+            map[r.Name].Location = r.Location;
+          }
+        }
+      });
+      uniqueData = Object.values(map);
+
+      initFilters();
+      applyFilters();
+      document.getElementById('loadingScreen').style.display = 'none';
+      document.getElementById('appContent').style.display = 'block';
+    },
+    error: function() {
+      document.querySelector('.loading-text').textContent = 'Failed to load data. Check your connection.';
+    }
+  });
+}
+
+// ════════════════════════════════════════
+// MULTI-SELECT COMPONENT
+// ════════════════════════════════════════
+function createMultiSelect(containerId, options, onChange) {
+  const container = document.getElementById(containerId);
+  const display = document.createElement('div');
+  display.className = 'multi-select-display';
+  display.innerHTML = '<span>All</span><span class="arrow">▾</span>';
+
+  const dropdown = document.createElement('div');
+  dropdown.className = 'multi-select-dropdown';
+
+  // "All" option
+  const allLabel = document.createElement('label');
+  const allCb = document.createElement('input');
+  allCb.type = 'checkbox'; allCb.checked = true; allCb.value = '__ALL__';
+  allLabel.appendChild(allCb);
+  allLabel.appendChild(document.createTextNode(' All'));
+  dropdown.appendChild(allLabel);
+
+  options.forEach(opt => {
+    const label = document.createElement('label');
+    const cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.value = opt;
+    label.appendChild(cb);
+    label.appendChild(document.createTextNode(' ' + opt));
+    dropdown.appendChild(label);
+  });
+
+  container.appendChild(display);
+  container.appendChild(dropdown);
+
+  display.addEventListener('click', (e) => {
+    e.stopPropagation();
+    // Close all other dropdowns
+    document.querySelectorAll('.multi-select-dropdown.open').forEach(d => {
+      if (d !== dropdown) d.classList.remove('open');
+    });
+    dropdown.classList.toggle('open');
+  });
+
+  dropdown.addEventListener('change', (e) => {
+    const cbs = dropdown.querySelectorAll('input[type="checkbox"]:not([value="__ALL__"])');
+    if (e.target.value === '__ALL__') {
+      cbs.forEach(cb => cb.checked = false);
+    } else {
+      allCb.checked = false;
+      // If nothing is checked, re-check All
+      if (![...cbs].some(cb => cb.checked)) allCb.checked = true;
+    }
+    // Update display text
+    const sel = getMultiSelectValues(containerId);
+    display.querySelector('span').textContent = sel.length === 0 ? 'All' : sel.length <= 2 ? sel.join(', ') : sel.length + ' selected';
+    onChange();
+  });
+}
+
+function getMultiSelectValues(containerId) {
+  const cbs = document.querySelectorAll(`#${containerId} input[type="checkbox"]:checked`);
+  const vals = [];
+  cbs.forEach(cb => { if (cb.value !== '__ALL__') vals.push(cb.value); });
+  return vals;
+}
+
+// Close dropdowns on outside click
+document.addEventListener('click', () => {
+  document.querySelectorAll('.multi-select-dropdown.open').forEach(d => d.classList.remove('open'));
+});
+
+// ════════════════════════════════════════
+// FILTER INIT
+// ════════════════════════════════════════
+function initFilters() {
+  // Languages
+  const langs = [...new Set(uniqueData.map(r=>r.Language).filter(Boolean))].sort();
+  createMultiSelect('langSelect', langs, applyFilters);
+
+  // Genres
+  const genreSet = new Set();
+  uniqueData.forEach(r => { if (r.Genre) r.Genre.split(',').forEach(g => genreSet.add(g.trim())); });
+  createMultiSelect('genreSelect', [...genreSet].sort(), applyFilters);
+
+  // Directors
+  const dirs = [...new Set(uniqueData.map(r=>r.Director).filter(Boolean))].sort();
+  createMultiSelect('dirSelect', dirs, applyFilters);
+
+  // Release year range
+  const relYears = uniqueData.map(r=>r.Release_Year).filter(y=>y>0);
+  const relMin = Math.min(...relYears), relMax = Math.max(...relYears);
+  const rs1 = document.getElementById('relMinSlider'), rs2 = document.getElementById('relMaxSlider');
+  rs1.min = rs2.min = relMin; rs1.max = rs2.max = relMax;
+  rs1.value = relMin; rs2.value = relMax;
+  syncRelRange();
+
+  // Watch year range
+  const wYears = uniqueData.map(r=>r.Watch_Year).filter(y=>y);
+  const wMin = Math.min(...wYears), wMax = Math.max(...wYears);
+  const ws1 = document.getElementById('watchMinSlider'), ws2 = document.getElementById('watchMaxSlider');
+  ws1.min = ws2.min = wMin; ws1.max = ws2.max = wMax;
+  ws1.value = wMin; ws2.value = wMax;
+  syncWatchRange();
+}
+
+function syncRelRange() {
+  const v1 = +document.getElementById('relMinSlider').value, v2 = +document.getElementById('relMaxSlider').value;
+  document.getElementById('relMinVal').textContent = Math.min(v1,v2);
+  document.getElementById('relMaxVal').textContent = Math.max(v1,v2);
+}
+function syncWatchRange() {
+  const v1 = +document.getElementById('watchMinSlider').value, v2 = +document.getElementById('watchMaxSlider').value;
+  document.getElementById('watchMinVal').textContent = Math.min(v1,v2);
+  document.getElementById('watchMaxVal').textContent = Math.max(v1,v2);
+}
+
+// ════════════════════════════════════════
+// FILTER APPLICATION
+// ════════════════════════════════════════
+function applyFilters() {
+  let data = [...uniqueData];
+
+  // Search
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  if (search) data = data.filter(r => r.Name && r.Name.toLowerCase().includes(search));
+
+  // Language
+  const selLang = getMultiSelectValues('langSelect');
+  if (selLang.length > 0) data = data.filter(r => selLang.includes(r.Language));
+
+  // Genre
+  const selGenre = getMultiSelectValues('genreSelect');
+  if (selGenre.length > 0) data = data.filter(r => r.Genre && selGenre.some(g => r.Genre.includes(g)));
+
+  // Director
+  const selDir = getMultiSelectValues('dirSelect');
+  if (selDir.length > 0) data = data.filter(r => selDir.includes(r.Director));
+
+  // Rating
+  const minRating = parseFloat(document.getElementById('ratingSlider').value);
+  if (minRating > 0) data = data.filter(r => r.TMDb_Rating >= minRating);
+
+  // Release year
+  const relMin = Math.min(+document.getElementById('relMinSlider').value, +document.getElementById('relMaxSlider').value);
+  const relMax = Math.max(+document.getElementById('relMinSlider').value, +document.getElementById('relMaxSlider').value);
+  data = data.filter(r => r.Release_Year >= relMin && r.Release_Year <= relMax);
+
+  // Watch year
+  const wMin = Math.min(+document.getElementById('watchMinSlider').value, +document.getElementById('watchMaxSlider').value);
+  const wMax = Math.max(+document.getElementById('watchMinSlider').value, +document.getElementById('watchMaxSlider').value);
+  data = data.filter(r => !r.Watch_Year || (r.Watch_Year >= wMin && r.Watch_Year <= wMax));
+
+  // Recommendation
+  const rec = document.querySelector('input[name="rec"]:checked').value;
+  if (rec === 'rec') data = data.filter(r => r.Rewatches >= 2);
+  else if (rec === 'first') data = data.filter(r => r.Rewatches <= 1);
+
+  filteredUnique = data;
+
+  // Get all entries for filtered movies (for stats)
+  const names = new Set(data.map(r => r.Name));
+  filteredAll = rawData.filter(r => names.has(r.Name));
+
+  // Update count
+  document.getElementById('filterCount').innerHTML = `Showing <strong>${data.length}</strong> of ${uniqueData.length} films`;
+  document.getElementById('footerText').textContent = `${uniqueData.length} films catalogued · Dashboard v4.0`;
+
+  renderAll();
+}
+
+// ════════════════════════════════════════
+// RENDER ALL
+// ════════════════════════════════════════
+function renderAll() {
+  renderKPIs();
+  renderBrowseTable();
+  renderTopPicks();
+  renderCategory();
+  renderStats();
+}
+
+// ════════════════════════════════════════
+// KPIs
+// ════════════════════════════════════════
+function renderKPIs() {
+  const d = filteredUnique;
+  const ratings = d.map(r=>r.TMDb_Rating).filter(v=>v>0);
+  const avg = ratings.length ? (ratings.reduce((a,b)=>a+b,0)/ratings.length).toFixed(1) : '0.0';
+  const max = ratings.length ? Math.max(...ratings).toFixed(1) : '0.0';
+  const langs = new Set(d.map(r=>r.Language).filter(Boolean)).size;
+  const genreSet = new Set(); d.forEach(r => { if (r.Genre) r.Genre.split(',').forEach(g => genreSet.add(g.trim())); });
+  const rec = d.filter(r=>r.Rewatches>=2).length;
+
+  document.getElementById('kpiBar').innerHTML = `
+    <div class="kpi-row">
+      <div class="kpi-item"><div class="stat-highlight">${d.length}</div><div class="stat-label">Films</div></div>
+      <div class="kpi-item"><div class="stat-highlight">${langs}</div><div class="stat-label">Languages</div></div>
+      <div class="kpi-item"><div class="stat-highlight">${avg}</div><div class="stat-label">Avg Rating</div></div>
+      <div class="kpi-item"><div class="stat-highlight">${max}</div><div class="stat-label">Top Rating</div></div>
+      <div class="kpi-item"><div class="stat-highlight">${genreSet.size}</div><div class="stat-label">Genres</div></div>
+      <div class="kpi-item"><div class="stat-highlight" style="color:#0d9488">${rec}</div><div class="stat-label">Recommended</div></div>
+    </div>`;
+}
+
+// ════════════════════════════════════════
+// BROWSE TABLE
+// ════════════════════════════════════════
+function renderBrowseTable() {
+  const sorted = [...filteredUnique].sort((a,b) => {
+    let va = a[tableSortCol], vb = b[tableSortCol];
+    if (typeof va === 'string') { va = (va||'').toLowerCase(); vb = (vb||'').toLowerCase(); }
+    if (va < vb) return tableSortAsc ? -1 : 1;
+    if (va > vb) return tableSortAsc ? 1 : -1;
+    return 0;
+  });
+
+  const tbody = document.getElementById('browseBody');
+  tbody.innerHTML = sorted.map(r => `
+    <tr>
+      <td>${esc(r.Name)}</td>
+      <td>${r.Release_Year||''}</td>
+      <td>${r.TMDb_Rating ? r.TMDb_Rating.toFixed(1) : ''}</td>
+      <td>${Math.round(r.Rewatches)}</td>
+      <td class="pick-star">${r.Rewatches >= 2 ? '★' : ''}</td>
+      <td>${esc(r.Genre||'')}</td>
+      <td>${esc(r.Director||'')}</td>
+      <td>${esc(r.Runtime||'')}</td>
+      <td>${esc(r.Language||'')}</td>
+    </tr>`).join('');
+}
+
+function sortTable(th) {
+  const col = th.dataset.col;
+  if (tableSortCol === col) tableSortAsc = !tableSortAsc;
+  else { tableSortCol = col; tableSortAsc = th.dataset.type === 'string'; }
+  // Visual
+  document.querySelectorAll('#browseTable th').forEach(t => t.classList.remove('sorted'));
+  th.classList.add('sorted');
+  th.querySelector('.sort-icon').textContent = tableSortAsc ? '▲' : '▼';
+  renderBrowseTable();
+}
+
+function esc(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+// ════════════════════════════════════════
+// TOP PICKS
+// ════════════════════════════════════════
+function renderTopPicks() {
+  // Top rated
+  const top = [...filteredUnique].sort((a,b) => b.TMDb_Rating - a.TMDb_Rating).slice(0,10);
+  if (top.length) {
+    const labels = top.map(r => r.Name + '  (' + (r.Release_Year||'') + ')').reverse();
+    const vals = top.map(r => r.TMDb_Rating).reverse();
+    Plotly.newPlot('chartTopRated', [{
+      type:'bar', orientation:'h', x:vals, y:labels,
+      marker:{color:vals.map(v => {
+        const t = (v - Math.min(...vals)) / (Math.max(...vals) - Math.min(...vals) || 1);
+        return lerpColor(COLORS.accent_light, COLORS.navy, t);
+      }), cornerradius:3},
+      text:vals.map(v=>v.toFixed(1)), textposition:'outside',
+      textfont:{size:12, color:COLORS.charcoal, family:"Source Sans Pro"},
+      hovertemplate:'<b>%{y}</b><br>Rating: %{x:.1f}<extra></extra>',
+    }], {
+      ...PLOTLY_LAYOUT_BASE, height:440,
+      xaxis:{title:'TMDb Rating', range:[0, Math.max(...vals)*1.12], showgrid:false, zeroline:false},
+      yaxis:{title:'', showgrid:false, zeroline:false, tickfont:{size:11}},
+    }, PLOTLY_CFG);
+  }
+
+  // Most rewatched
+  const rw = [...filteredUnique].filter(r=>r.Rewatches>1).sort((a,b)=>b.Rewatches-a.Rewatches).slice(0,10);
+  if (rw.length) {
+    const labels = rw.map(r => r.Name + '  (' + (r.Release_Year||'') + ')').reverse();
+    const vals = rw.map(r => r.Rewatches).reverse();
+    Plotly.newPlot('chartRewatched', [{
+      type:'bar', orientation:'h', x:vals, y:labels,
+      marker:{color:vals.map(v => {
+        const t = (v - Math.min(...vals)) / (Math.max(...vals) - Math.min(...vals) || 1);
+        return lerpColor(COLORS.teal_light, COLORS.teal, t);
+      }), cornerradius:3},
+      text:vals.map(v=>Math.round(v)+'x'), textposition:'outside',
+      textfont:{size:12, color:COLORS.charcoal, family:"Source Sans Pro"},
+      hovertemplate:'<b>%{y}</b><br>Watches: %{x}<extra></extra>',
+    }], {
+      ...PLOTLY_LAYOUT_BASE, height:440,
+      xaxis:{title:'Times Watched', range:[0, Math.max(...vals)*1.2], showgrid:false, zeroline:false},
+      yaxis:{title:'', showgrid:false, zeroline:false, tickfont:{size:11}},
+    }, PLOTLY_CFG);
+  } else {
+    document.getElementById('chartRewatched').innerHTML = '<p style="color:#6b7280;padding:40px 0">No rewatched films in current selection.</p>';
+  }
+}
+
+// ════════════════════════════════════════
+// BY CATEGORY
+// ════════════════════════════════════════
+function renderCategory() {
+  // Language donut
+  const langCount = {};
+  filteredUnique.forEach(r => { if (r.Language) langCount[r.Language] = (langCount[r.Language]||0)+1; });
+  const langLabels = Object.keys(langCount).sort((a,b)=>langCount[b]-langCount[a]);
+  const langVals = langLabels.map(l=>langCount[l]);
+  Plotly.newPlot('chartLanguage', [{
+    type:'pie', labels:langLabels, values:langVals, hole:0.52,
+    marker:{colors:CHART_QUAL},
+    textinfo:'label+percent', textfont:{size:12, family:"Source Sans Pro"},
+    hovertemplate:'<b>%{label}</b><br>Films: %{value}<br>Share: %{percent}<extra></extra>',
+  }], {...PLOTLY_LAYOUT_BASE, height:400, showlegend:false}, PLOTLY_CFG);
+
+  // Genre
+  const genreCount = {};
+  filteredUnique.forEach(r => { if (r.Genre) r.Genre.split(',').forEach(g => { g=g.trim(); genreCount[g]=(genreCount[g]||0)+1; }); });
+  const genreSorted = Object.entries(genreCount).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const gLabels = genreSorted.map(e=>e[0]).reverse();
+  const gVals = genreSorted.map(e=>e[1]).reverse();
+  Plotly.newPlot('chartGenre', [{
+    type:'bar', orientation:'h', x:gVals, y:gLabels,
+    marker:{color:COLORS.navy, cornerradius:3},
+    text:gVals, textposition:'outside',
+    textfont:{size:11, color:COLORS.charcoal, family:"Source Sans Pro"},
+    hovertemplate:'<b>%{y}</b><br>Films: %{x}<extra></extra>',
+  }], {
+    ...PLOTLY_LAYOUT_BASE, height:400,
+    xaxis:{title:'Films', range:[0, Math.max(...gVals)*1.18], showgrid:false, zeroline:false},
+    yaxis:{title:'', showgrid:false, zeroline:false, tickfont:{size:11}},
+  }, PLOTLY_CFG);
+
+  // Directors
+  const dirCount = {};
+  filteredUnique.forEach(r => { if (r.Director) dirCount[r.Director]=(dirCount[r.Director]||0)+1; });
+  const dirSorted = Object.entries(dirCount).sort((a,b)=>b[1]-a[1]).slice(0,15);
+  const dLabels = dirSorted.map(e=>e[0]).reverse();
+  const dVals = dirSorted.map(e=>e[1]).reverse();
+  Plotly.newPlot('chartDirectors', [{
+    type:'bar', orientation:'h', x:dVals, y:dLabels,
+    marker:{color:COLORS.accent, cornerradius:3},
+    text:dVals, textposition:'outside',
+    textfont:{size:11, color:COLORS.charcoal, family:"Source Sans Pro"},
+    hovertemplate:'<b>%{y}</b><br>Films: %{x}<extra></extra>',
+  }], {
+    ...PLOTLY_LAYOUT_BASE, height:480,
+    xaxis:{title:'Films', range:[0, Math.max(...dVals)*1.2], showgrid:false, zeroline:false},
+    yaxis:{title:'', showgrid:false, zeroline:false, tickfont:{size:11}},
+  }, PLOTLY_CFG);
+
+  // Director table
+  const tbl = dirSorted.reverse();
+  document.getElementById('directorTable').innerHTML = `
+    <table class="dir-table">
+      <thead><tr><th>Director</th><th>Films</th></tr></thead>
+      <tbody>${tbl.map(([d,c])=>`<tr><td>${esc(d)}</td><td>${c}</td></tr>`).join('')}</tbody>
+    </table>`;
+}
+
+// ════════════════════════════════════════
+// VIEWING STATS
+// ════════════════════════════════════════
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function renderStats() {
+  const agg = document.querySelector('input[name="agg"]:checked').value;
+  const entries = filteredAll.filter(r => r.Watch_Year);
+
+  // Aggregate
+  let groups = {};
+  entries.forEach(r => {
+    let key;
+    if (agg === 'year') key = String(r.Watch_Year);
+    else if (agg === 'month') key = r.Date_Parsed ? MONTHS[r.Date_Parsed.getMonth()] : null;
+    else key = r.Date_Parsed ? r.Date_Parsed.getFullYear()+'-'+String(r.Date_Parsed.getMonth()+1).padStart(2,'0') : null;
+    if (!key) return;
+    if (!groups[key]) groups[key] = {movies:0, minutes:0};
+    groups[key].movies++;
+    groups[key].minutes += r.Runtime_mins;
+  });
+
+  // Sort keys
+  let keys;
+  if (agg === 'month') keys = MONTHS.filter(m => groups[m]);
+  else keys = Object.keys(groups).sort();
+
+  const movies = keys.map(k => groups[k].movies);
+  const hours = keys.map(k => (groups[k].minutes/60));
+  const showLabels = agg !== 'all';
+  const tickAngle = agg === 'year' ? 0 : 45;
+
+  // KPI
+  const totM = entries.length;
+  const totMin = entries.reduce((a,r)=>a+r.Runtime_mins, 0);
+  const totH = totMin/60, totD = totH/24;
+  const avgRt = totM ? totMin/totM : 0;
+  document.getElementById('statsKpi').innerHTML = `
+    <div class="kpi-row">
+      <div class="kpi-item"><div class="stat-highlight">${totM}</div><div class="stat-label">Total Watches</div></div>
+      <div class="kpi-item"><div class="stat-highlight">${Math.round(totH)}<span class="unit">h</span></div><div class="stat-label">Hours Spent</div></div>
+      <div class="kpi-item"><div class="stat-highlight">${totD.toFixed(1)}<span class="unit">d</span></div><div class="stat-label">Days Spent</div></div>
+      <div class="kpi-item"><div class="stat-highlight">${Math.round(avgRt)}<span class="unit">m</span></div><div class="stat-label">Avg Runtime</div></div>
+    </div>`;
+
+  // Charts
+  const maxM = movies.length ? Math.max(...movies) : 1;
+  const maxH = hours.length ? Math.max(...hours) : 1;
+
+  Plotly.newPlot('chartVolume', [{
+    type:'bar', x:keys, y:movies,
+    marker:{color:COLORS.navy, cornerradius:3},
+    text: showLabels ? movies : null,
+    textposition: showLabels ? 'outside' : undefined,
+    textfont:{size:11, color:COLORS.charcoal, family:"Source Sans Pro"},
+    hovertemplate:'<b>%{x}</b><br>Films: %{y}<extra></extra>',
+  }], {
+    ...PLOTLY_LAYOUT_BASE, height:460,
+    xaxis:{type:'category', tickangle:tickAngle, title:agg==='year'?'Year':'Month', showgrid:false, zeroline:false},
+    yaxis:{title:'Films Watched', showgrid:true, gridcolor:'rgba(229,231,235,0.6)', zeroline:false,
+           range: showLabels ? [0, maxM*1.18] : undefined},
+  }, PLOTLY_CFG);
+
+  Plotly.newPlot('chartDuration', [{
+    type:'bar', x:keys, y:hours,
+    marker:{color:COLORS.teal, cornerradius:3},
+    text: showLabels ? hours.map(v=>Math.round(v)+'h') : null,
+    textposition: showLabels ? 'outside' : undefined,
+    textfont:{size:11, color:COLORS.charcoal, family:"Source Sans Pro"},
+    hovertemplate:'<b>%{x}</b><br>Hours: %{y:.1f}<extra></extra>',
+  }], {
+    ...PLOTLY_LAYOUT_BASE, height:460,
+    xaxis:{type:'category', tickangle:tickAngle, title:agg==='year'?'Year':'Month', showgrid:false, zeroline:false},
+    yaxis:{title:'Hours', showgrid:true, gridcolor:'rgba(229,231,235,0.6)', zeroline:false,
+           range: showLabels ? [0, maxH*1.18] : undefined},
+  }, PLOTLY_CFG);
+}
+
+// ════════════════════════════════════════
+// TAB SWITCHING
+// ════════════════════════════════════════
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+  // Trigger resize so Plotly reflows
+  window.dispatchEvent(new Event('resize'));
+}
+
+// ════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════
+function lerpColor(a, b, t) {
+  const ah = parseInt(a.slice(1),16), bh = parseInt(b.slice(1),16);
+  const ar=(ah>>16)&0xff, ag=(ah>>8)&0xff, ab=ah&0xff;
+  const br=(bh>>16)&0xff, bg=(bh>>8)&0xff, bb=bh&0xff;
+  const rr=Math.round(ar+(br-ar)*t), rg=Math.round(ag+(bg-ag)*t), rb=Math.round(ab+(bb-ab)*t);
+  return '#'+((1<<24)+(rr<<16)+(rg<<8)+rb).toString(16).slice(1);
+}
+
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
+loadData();
+</script>
+</body>
+</html>
