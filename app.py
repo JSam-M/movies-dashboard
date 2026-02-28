@@ -60,7 +60,7 @@ st.markdown("""
     .stApp { background-color: #fafbfc; }
     #MainMenu, footer { visibility: hidden; }
     .stDeployButton { display: none; }
-    .block-container { padding-top: 2rem; padding-bottom: 2rem; max-width: 1200px; }
+    .block-container { padding-top: 3.5rem; padding-bottom: 2rem; max-width: 1200px; }
 
     h1 {
         font-family: 'Playfair Display', Georgia, serif !important;
