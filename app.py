@@ -15,158 +15,214 @@ st.set_page_config(
 )
 
 # ──────────────────────────────────────────────
-# DESIGN SYSTEM — McKinsey / HBR Editorial Style
+# THEME STATE
 # ──────────────────────────────────────────────
-COLORS = {
-    "ink": "#1a1a2e",
-    "charcoal": "#2d2d3f",
-    "slate": "#4a4a5e",
-    "steel": "#6b7280",
-    "silver": "#9ca3af",
-    "mist": "#e5e7eb",
-    "cloud": "#f3f4f6",
-    "white": "#ffffff",
-    "navy": "#1e3a5f",
-    "accent": "#2563eb",
-    "accent_light": "#3b82f6",
-    "teal": "#0d9488",
-    "teal_light": "#14b8a6",
-    "amber": "#d97706",
-    "rose": "#e11d48",
-}
+if 'dark_mode' not in st.session_state:
+    st.session_state.dark_mode = False
 
-CHART_QUAL = ["#1e3a5f", "#0d9488", "#d97706", "#7c3aed", "#e11d48", "#059669", "#ea580c", "#4f46e5"]
+dark = st.session_state.dark_mode
+
+# ──────────────────────────────────────────────
+# DESIGN TOKENS
+# ──────────────────────────────────────────────
+if dark:
+    T = dict(
+        bg="#0e1117", bg_card="#1a1d26", bg_sidebar="#12151c",
+        border="#2a2d38", border_light="#22252e",
+        text_primary="#e8eaed", text_heading="#f0f2f5",
+        text_secondary="#9ca3af", text_muted="#6b7280",
+        accent="#60a5fa", accent_deep="#3b82f6",
+        navy="#60a5fa", teal="#2dd4bf", teal_light="#5eead4",
+        grid="rgba(255,255,255,0.06)", hover_row="#1f2330",
+        tab_active="#60a5fa", tab_border="#2a2d38",
+        stat_color="#93c5fd", rec_color="#2dd4bf",
+        chart_font="#9ca3af", chart_text="#d1d5db",
+    )
+    CHART_QUAL = ["#60a5fa","#2dd4bf","#fbbf24","#a78bfa","#fb7185","#34d399","#fb923c","#818cf8"]
+else:
+    T = dict(
+        bg="#fafbfc", bg_card="#ffffff", bg_sidebar="#ffffff",
+        border="#e5e7eb", border_light="#f0f0f0",
+        text_primary="#2d2d3f", text_heading="#1a1a2e",
+        text_secondary="#6b7280", text_muted="#9ca3af",
+        accent="#2563eb", accent_deep="#1e3a5f",
+        navy="#1e3a5f", teal="#0d9488", teal_light="#14b8a6",
+        grid="rgba(229,231,235,0.6)", hover_row="#f8fafc",
+        tab_active="#1e3a5f", tab_border="#e5e7eb",
+        stat_color="#1e3a5f", rec_color="#0d9488",
+        chart_font="#6b7280", chart_text="#2d2d3f",
+    )
+    CHART_QUAL = ["#1e3a5f","#0d9488","#d97706","#7c3aed","#e11d48","#059669","#ea580c","#4f46e5"]
 
 PLOTLY_LAYOUT = dict(
-    font=dict(family="'Source Sans Pro', 'Segoe UI', sans-serif", color=COLORS["charcoal"]),
+    font=dict(family="'Source Sans Pro', 'Segoe UI', sans-serif", color=T["chart_font"]),
     paper_bgcolor="rgba(0,0,0,0)",
     plot_bgcolor="rgba(0,0,0,0)",
     margin=dict(l=0, r=20, t=30, b=20),
     hoverlabel=dict(
-        bgcolor=COLORS["ink"],
+        bgcolor="#1a1a2e" if not dark else "#2a2d38",
         font_size=13,
         font_family="'Source Sans Pro', sans-serif",
-        font_color=COLORS["white"],
+        font_color="#ffffff",
     ),
 )
 
 # ──────────────────────────────────────────────
-# CUSTOM CSS
+# CSS — driven by theme tokens
 # ──────────────────────────────────────────────
-st.markdown("""
+st.markdown(f"""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Source+Sans+Pro:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Source+Sans+Pro:wght@300;400;600;700&display=swap');
 
-    .stApp { background-color: #fafbfc; }
-    #MainMenu, footer { visibility: hidden; }
-    .stDeployButton { display: none; }
-    .block-container { padding-top: 3.5rem; padding-bottom: 2rem; max-width: 1200px; }
+    .stApp {{ background-color: {T['bg']}; }}
+    #MainMenu, footer {{ visibility: hidden; }}
+    .stDeployButton {{ display: none; }}
+    .block-container {{ padding-top: 3.5rem; padding-bottom: 2rem; max-width: 1200px; }}
 
-    h1 {
+    h1 {{
         font-family: 'Playfair Display', Georgia, serif !important;
-        font-weight: 600 !important; color: #1a1a2e !important;
+        font-weight: 600 !important; color: {T['text_heading']} !important;
         font-size: 2.1rem !important; letter-spacing: -0.02em !important;
         margin-bottom: 0 !important;
-    }
-    h2, .stTabs [data-baseweb="tab-list"] button [data-testid="stMarkdownContainer"] p {
+    }}
+    h2, .stTabs [data-baseweb="tab-list"] button [data-testid="stMarkdownContainer"] p {{
         font-family: 'Playfair Display', Georgia, serif !important;
-        font-weight: 500 !important; color: #1a1a2e !important;
+        font-weight: 500 !important; color: {T['text_heading']} !important;
         font-size: 1.3rem !important; letter-spacing: -0.01em !important;
-    }
-    h3 {
+    }}
+    h3 {{
         font-family: 'Source Sans Pro', sans-serif !important;
-        font-weight: 600 !important; color: #2d2d3f !important;
+        font-weight: 600 !important; color: {T['text_primary']} !important;
         font-size: 1.05rem !important; text-transform: uppercase !important;
         letter-spacing: 0.08em !important;
-    }
-    p, li, span, div { font-family: 'Source Sans Pro', sans-serif; }
+    }}
+    p, li, span, div {{ font-family: 'Source Sans Pro', sans-serif; }}
 
-    [data-testid="stMetric"] {
-        background: white; border: 1px solid #e5e7eb;
+    [data-testid="stMetric"] {{
+        background: {T['bg_card']}; border: 1px solid {T['border']};
         border-radius: 8px; padding: 16px 20px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-    }
-    [data-testid="stMetricLabel"] {
+        box-shadow: 0 1px 3px rgba(0,0,0,{'0.15' if dark else '0.04'});
+    }}
+    [data-testid="stMetricLabel"] {{
         font-family: 'Source Sans Pro', sans-serif !important;
         font-size: 0.75rem !important; font-weight: 600 !important;
         text-transform: uppercase !important; letter-spacing: 0.1em !important;
-        color: #6b7280 !important;
-    }
-    [data-testid="stMetricValue"] {
+        color: {T['text_secondary']} !important;
+    }}
+    [data-testid="stMetricValue"] {{
         font-family: 'Source Sans Pro', sans-serif !important;
-        font-weight: 700 !important; color: #1a1a2e !important;
+        font-weight: 700 !important; color: {T['text_heading']} !important;
         font-size: 1.7rem !important;
-    }
+    }}
 
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 0; border-bottom: 2px solid #e5e7eb; background: transparent;
-    }
-    .stTabs [data-baseweb="tab"] {
+    .stTabs [data-baseweb="tab-list"] {{
+        gap: 0; border-bottom: 2px solid {T['tab_border']}; background: transparent;
+    }}
+    .stTabs [data-baseweb="tab"] {{
         font-family: 'Source Sans Pro', sans-serif !important;
         font-weight: 600; font-size: 0.85rem;
         text-transform: uppercase; letter-spacing: 0.06em;
-        color: #6b7280; border: none;
+        color: {T['text_secondary']}; border: none;
         border-bottom: 2px solid transparent;
         padding: 12px 24px; margin-bottom: -2px; background: transparent;
-    }
-    .stTabs [data-baseweb="tab"]:hover {
-        color: #1e3a5f; border-bottom-color: #93c5fd;
-    }
-    .stTabs [aria-selected="true"] {
-        color: #1e3a5f !important; border-bottom-color: #1e3a5f !important;
+    }}
+    .stTabs [data-baseweb="tab"]:hover {{
+        color: {T['tab_active']}; border-bottom-color: {T['accent']};
+    }}
+    .stTabs [aria-selected="true"] {{
+        color: {T['tab_active']} !important; border-bottom-color: {T['tab_active']} !important;
         background: transparent !important;
-    }
+    }}
 
-    [data-testid="stSidebar"] { background: #ffffff; border-right: 1px solid #e5e7eb; }
-    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2 {
+    [data-testid="stSidebar"] {{ background: {T['bg_sidebar']}; border-right: 1px solid {T['border']}; }}
+    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2 {{
         font-family: 'Source Sans Pro', sans-serif !important;
         font-weight: 700 !important; font-size: 0.85rem !important;
         text-transform: uppercase !important; letter-spacing: 0.1em !important;
-        color: #1a1a2e !important;
-    }
+        color: {T['text_heading']} !important;
+    }}
 
-    [data-testid="stDataFrame"] {
-        border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;
-    }
-    .stRadio > div { gap: 0.3rem; }
-    .stRadio [data-testid="stMarkdownContainer"] p { font-size: 0.85rem; }
-    hr { border: none; border-top: 1px solid #e5e7eb; margin: 1.5rem 0; }
+    [data-testid="stDataFrame"] {{
+        border: 1px solid {T['border']}; border-radius: 8px; overflow: hidden;
+    }}
+    .stRadio > div {{ gap: 0.3rem; }}
+    .stRadio [data-testid="stMarkdownContainer"] p {{ font-size: 0.85rem; }}
+    hr {{ border: none; border-top: 1px solid {T['border']}; margin: 1.5rem 0; }}
 
-    .card {
-        background: white; border: 1px solid #e5e7eb;
+    .card {{
+        background: {T['bg_card']}; border: 1px solid {T['border']};
         border-radius: 8px; padding: 24px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 16px;
-    }
-    .section-label {
+        box-shadow: 0 1px 3px rgba(0,0,0,{'0.15' if dark else '0.04'}); margin-bottom: 16px;
+    }}
+    .section-label {{
         font-family: 'Source Sans Pro', sans-serif; font-size: 0.7rem;
         font-weight: 600; text-transform: uppercase;
-        letter-spacing: 0.12em; color: #6b7280; margin-bottom: 4px;
-    }
-    .section-title {
+        letter-spacing: 0.12em; color: {T['text_secondary']}; margin-bottom: 4px;
+    }}
+    .section-title {{
         font-family: 'Playfair Display', Georgia, serif; font-size: 1.4rem;
-        font-weight: 600; color: #1a1a2e; margin-bottom: 4px;
+        font-weight: 600; color: {T['text_heading']}; margin-bottom: 4px;
         letter-spacing: -0.02em;
-    }
-    .section-subtitle {
+    }}
+    .section-subtitle {{
         font-family: 'Source Sans Pro', sans-serif; font-size: 0.88rem;
-        color: #6b7280; margin-bottom: 20px; line-height: 1.5;
-    }
-    .stat-highlight {
+        color: {T['text_secondary']}; margin-bottom: 20px; line-height: 1.5;
+    }}
+    .stat-highlight {{
         font-family: 'Source Sans Pro', sans-serif; font-size: 2.2rem;
-        font-weight: 700; color: #1e3a5f; line-height: 1;
-    }
-    .stat-label {
+        font-weight: 700; color: {T['stat_color']}; line-height: 1;
+    }}
+    .stat-label {{
         font-family: 'Source Sans Pro', sans-serif; font-size: 0.72rem;
         font-weight: 600; text-transform: uppercase;
-        letter-spacing: 0.1em; color: #9ca3af; margin-top: 2px;
-    }
-    .footer-text {
+        letter-spacing: 0.1em; color: {T['text_muted']}; margin-top: 2px;
+    }}
+    .footer-text {{
         font-family: 'Source Sans Pro', sans-serif; font-size: 0.75rem;
-        color: #9ca3af; text-align: center;
+        color: {T['text_muted']}; text-align: center;
         padding: 24px 0 8px 0; letter-spacing: 0.04em;
-    }
-    .kpi-row { display: flex; gap: 32px; flex-wrap: wrap; }
-    .kpi-item { flex: 1; min-width: 100px; }
+    }}
+    .kpi-row {{ display: flex; gap: 32px; flex-wrap: wrap; }}
+    .kpi-item {{ flex: 1; min-width: 100px; }}
+
+    /* Toggle styling */
+    .theme-label {{
+        font-family: 'Source Sans Pro', sans-serif;
+        font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
+        letter-spacing: 0.1em; color: {T['text_secondary']};
+    }}
+
+    /* Streamlit widget overrides for dark mode */
+    {f"""
+    .stApp p, .stApp span, .stApp label, .stApp div {{
+        color: {T['text_primary']};
+    }}
+    [data-testid="stSidebar"] p, [data-testid="stSidebar"] span,
+    [data-testid="stSidebar"] label {{
+        color: {T['text_primary']} !important;
+    }}
+    .stSlider [data-testid="stTickBarMin"], .stSlider [data-testid="stTickBarMax"] {{
+        color: {T['text_secondary']} !important;
+    }}
+    .stTextInput input {{
+        background: {T['bg_card']} !important;
+        color: {T['text_primary']} !important;
+        border-color: {T['border']} !important;
+    }}
+    .stMultiSelect [data-baseweb="tag"] {{
+        background-color: {T['accent_deep']} !important;
+    }}
+    .stRadio label span {{
+        color: {T['text_primary']} !important;
+    }}
+    [data-testid="stMarkdownContainer"] p {{
+        color: {T['text_primary']};
+    }}
+    [data-testid="stMarkdownContainer"] strong {{
+        color: {T['text_heading']};
+    }}
+    """ if dark else ""}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -181,12 +237,10 @@ def load_data():
     df['Release_Year'] = pd.to_numeric(df['Release_Year'], errors='coerce')
     df['N\'th time of watching'] = pd.to_numeric(df['N\'th time of watching'], errors='coerce').fillna(1)
 
-    # Parse dates robustly
     df['Date_Parsed'] = pd.to_datetime(df['Date'], dayfirst=True, errors='coerce')
     mask = df['Date_Parsed'].isna() & df['Date'].notna()
     df.loc[mask, 'Date_Parsed'] = pd.to_datetime(df.loc[mask, 'Date'], errors='coerce')
 
-    # ★ Watching year comes from the DATE the film was watched, not the Year column
     df['Watch_Year'] = df['Date_Parsed'].dt.year
     df['Year'] = pd.to_numeric(df['Year'], errors='coerce')
 
@@ -207,10 +261,10 @@ original_count = len(df)
 def style_fig(fig, height=420, show_grid_y=True):
     fig.update_layout(
         **PLOTLY_LAYOUT, height=height,
-        xaxis=dict(showgrid=False, gridcolor="rgba(229,231,235,0.6)",
-                   zeroline=False, tickfont=dict(size=11, color=COLORS["steel"])),
-        yaxis=dict(showgrid=show_grid_y, gridcolor="rgba(229,231,235,0.6)",
-                   zeroline=False, tickfont=dict(size=11, color=COLORS["steel"])),
+        xaxis=dict(showgrid=False, gridcolor=T["grid"],
+                   zeroline=False, tickfont=dict(size=11, color=T["chart_font"])),
+        yaxis=dict(showgrid=show_grid_y, gridcolor=T["grid"],
+                   zeroline=False, tickfont=dict(size=11, color=T["chart_font"])),
     )
     return fig
 
@@ -236,7 +290,15 @@ st.markdown("---")
 # ──────────────────────────────────────────────
 # SIDEBAR
 # ──────────────────────────────────────────────
-st.sidebar.markdown('<p class="section-label" style="margin-top:8px;">FILTERS</p>', unsafe_allow_html=True)
+# Theme toggle at top
+st.sidebar.markdown('<p class="theme-label" style="margin-top:0;">APPEARANCE</p>', unsafe_allow_html=True)
+theme_toggle = st.sidebar.toggle("Dark Mode", value=st.session_state.dark_mode, key="theme_toggle")
+if theme_toggle != st.session_state.dark_mode:
+    st.session_state.dark_mode = theme_toggle
+    st.rerun()
+
+st.sidebar.markdown("---")
+st.sidebar.markdown(f'<p class="section-label" style="margin-top:0;">FILTERS</p>', unsafe_allow_html=True)
 df_full, _ = load_data()
 
 search = st.sidebar.text_input("Search", placeholder="Film title…")
@@ -270,7 +332,6 @@ if df_full['Release_Year'].notna().any():
         yr_range = st.sidebar.slider("Release Year", yr_lo, yr_hi, (yr_lo, yr_hi))
         df = df[(df['Release_Year'] >= yr_range[0]) & (df['Release_Year'] <= yr_range[1])]
 
-# Watch year filter
 if df_full['Watch_Year'].notna().any():
     wy_lo, wy_hi = int(df_full['Watch_Year'].min()), int(df_full['Watch_Year'].max())
     if wy_lo < wy_hi:
@@ -278,7 +339,7 @@ if df_full['Watch_Year'].notna().any():
         df = df[(df['Watch_Year'] >= wy_range[0]) & (df['Watch_Year'] <= wy_range[1])]
 
 st.sidebar.markdown("---")
-st.sidebar.markdown('<p class="section-label">RECOMMENDATION</p>', unsafe_allow_html=True)
+st.sidebar.markdown(f'<p class="section-label">RECOMMENDATION</p>', unsafe_allow_html=True)
 rw_opt = st.sidebar.radio("Filter by", ["All Films", "Recommended (Rewatched)", "First Watch Only"],
                            label_visibility="collapsed")
 if rw_opt == "Recommended (Rewatched)":
@@ -288,8 +349,8 @@ elif rw_opt == "First Watch Only":
 
 st.sidebar.markdown("---")
 st.sidebar.markdown(
-    f'<p style="font-family:Source Sans Pro;font-size:0.82rem;color:#6b7280;">'
-    f'Showing <strong style="color:#1a1a2e;">{len(df)}</strong> of {original_count} films</p>',
+    f'<p style="font-family:Source Sans Pro;font-size:0.82rem;color:{T["text_secondary"]};">'
+    f'Showing <strong style="color:{T["text_heading"]};">{len(df)}</strong> of {original_count} films</p>',
     unsafe_allow_html=True)
 
 
@@ -312,7 +373,7 @@ st.markdown(f"""
     <div class="kpi-item"><div class="stat-highlight">{avg_r:.1f}</div><div class="stat-label">Avg Rating</div></div>
     <div class="kpi-item"><div class="stat-highlight">{max_r:.1f}</div><div class="stat-label">Top Rating</div></div>
     <div class="kpi-item"><div class="stat-highlight">{n_genres}</div><div class="stat-label">Genres</div></div>
-    <div class="kpi-item"><div class="stat-highlight" style="color:#0d9488;">{n_rec}</div><div class="stat-label">Recommended</div></div>
+    <div class="kpi-item"><div class="stat-highlight" style="color:{T['rec_color']};">{n_rec}</div><div class="stat-label">Recommended</div></div>
   </div>
 </div>
 """, unsafe_allow_html=True)
@@ -362,10 +423,10 @@ with tab2:
         fig = go.Figure(go.Bar(
             x=top['TMDb_Rating'], y=top['Label'], orientation='h',
             marker=dict(color=top['TMDb_Rating'],
-                        colorscale=[[0,COLORS["accent_light"]],[1,COLORS["navy"]]], cornerradius=3),
+                        colorscale=[[0,T["accent"]],[1,T["accent_deep"]]], cornerradius=3),
             text=top['TMDb_Rating'].apply(lambda v: f"{v:.1f}"),
             textposition='outside',
-            textfont=dict(size=12, color=COLORS["charcoal"], family="Source Sans Pro"),
+            textfont=dict(size=12, color=T["chart_text"], family="Source Sans Pro"),
             hovertemplate='<b>%{y}</b><br>Rating: %{x:.1f}<extra></extra>',
         ))
         fig.update_layout(yaxis=dict(categoryorder='total ascending', title=''),
@@ -387,10 +448,10 @@ with tab2:
             fig = go.Figure(go.Bar(
                 x=rw['N\'th time of watching'], y=rw['Label'], orientation='h',
                 marker=dict(color=rw['N\'th time of watching'],
-                            colorscale=[[0,COLORS["teal_light"]],[1,COLORS["teal"]]], cornerradius=3),
+                            colorscale=[[0,T["teal_light"]],[1,T["teal"]]], cornerradius=3),
                 text=rw['N\'th time of watching'].astype(int).astype(str)+'x',
                 textposition='outside',
-                textfont=dict(size=12, color=COLORS["charcoal"], family="Source Sans Pro"),
+                textfont=dict(size=12, color=T["chart_text"], family="Source Sans Pro"),
                 hovertemplate='<b>%{y}</b><br>Watches: %{x}<extra></extra>',
             ))
             fig.update_layout(yaxis=dict(categoryorder='total ascending', title=''),
@@ -416,7 +477,7 @@ with tab3:
             labels=ld['Language'], values=ld['Count'], hole=0.52,
             marker=dict(colors=CHART_QUAL),
             textinfo='label+percent',
-            textfont=dict(size=12, family="Source Sans Pro"),
+            textfont=dict(size=12, family="Source Sans Pro", color=T["chart_text"]),
             hovertemplate='<b>%{label}</b><br>Films: %{value}<br>Share: %{percent}<extra></extra>',
         ))
         fig.update_layout(**PLOTLY_LAYOUT, height=400, showlegend=False)
@@ -434,9 +495,9 @@ with tab3:
         gdf = pd.DataFrame(list(gc.items()), columns=['Genre','Count']).sort_values('Count', ascending=False).head(10)
         fig = go.Figure(go.Bar(
             x=gdf['Count'], y=gdf['Genre'], orientation='h',
-            marker=dict(color=COLORS["navy"], cornerradius=3),
+            marker=dict(color=T["navy"], cornerradius=3),
             text=gdf['Count'], textposition='outside',
-            textfont=dict(size=11, color=COLORS["charcoal"], family="Source Sans Pro"),
+            textfont=dict(size=11, color=T["chart_text"], family="Source Sans Pro"),
             hovertemplate='<b>%{y}</b><br>Films: %{x}<extra></extra>',
         ))
         fig.update_layout(yaxis=dict(categoryorder='total ascending', title=''),
@@ -457,9 +518,9 @@ with tab3:
     with cc:
         fig = go.Figure(go.Bar(
             x=dc['Films'], y=dc['Director'], orientation='h',
-            marker=dict(color=COLORS["accent"], cornerradius=3),
+            marker=dict(color=T["accent"], cornerradius=3),
             text=dc['Films'], textposition='outside',
-            textfont=dict(size=11, color=COLORS["charcoal"], family="Source Sans Pro"),
+            textfont=dict(size=11, color=T["chart_text"], family="Source Sans Pro"),
             hovertemplate='<b>%{y}</b><br>Films: %{x}<extra></extra>',
         ))
         fig.update_layout(yaxis=dict(categoryorder='total ascending', title=''),
@@ -481,7 +542,6 @@ with tab4:
     tdf = filtered_entries.copy()
     tdf['Runtime_mins'] = tdf['Runtime'].apply(parse_runtime)
 
-    # ★ CRITICAL FIX: use Date_Parsed for the year the film was WATCHED (not Year column = release year)
     tdf['Watch_Year'] = tdf['Date_Parsed'].dt.year
     tdf['Month_Name'] = tdf['Date_Parsed'].dt.month_name()
     tdf['Year-Month'] = tdf['Date_Parsed'].dt.to_period('M').astype(str)
@@ -508,7 +568,7 @@ with tab4:
         gdf = gdf.sort_values('Period')
         x_lbl, x_ang, show_lbl = 'Month', 45, True
 
-    else:  # All Time
+    else:
         gdf = tdf.groupby('Year-Month').agg(Movies=('Name','count'), Minutes=('Runtime_mins','sum')).reset_index()
         gdf.columns = ['Period','Movies','Minutes']
         gdf['Hours'] = gdf['Minutes']/60
@@ -525,9 +585,9 @@ with tab4:
     <div class="card" style="padding:18px 28px;">
       <div class="kpi-row">
         <div class="kpi-item"><div class="stat-highlight">{tot_m}</div><div class="stat-label">Total Watches</div></div>
-        <div class="kpi-item"><div class="stat-highlight">{tot_h:.0f}<span style="font-size:1rem;color:#6b7280;">h</span></div><div class="stat-label">Hours Spent</div></div>
-        <div class="kpi-item"><div class="stat-highlight">{tot_d:.1f}<span style="font-size:1rem;color:#6b7280;">d</span></div><div class="stat-label">Days Spent</div></div>
-        <div class="kpi-item"><div class="stat-highlight">{avg_rt:.0f}<span style="font-size:1rem;color:#6b7280;">m</span></div><div class="stat-label">Avg Runtime</div></div>
+        <div class="kpi-item"><div class="stat-highlight">{tot_h:.0f}<span style="font-size:1rem;color:{T['text_secondary']};">h</span></div><div class="stat-label">Hours Spent</div></div>
+        <div class="kpi-item"><div class="stat-highlight">{tot_d:.1f}<span style="font-size:1rem;color:{T['text_secondary']};">d</span></div><div class="stat-label">Days Spent</div></div>
+        <div class="kpi-item"><div class="stat-highlight">{avg_rt:.0f}<span style="font-size:1rem;color:{T['text_secondary']};">m</span></div><div class="stat-label">Avg Runtime</div></div>
       </div>
     </div>
     """, unsafe_allow_html=True)
@@ -536,14 +596,14 @@ with tab4:
     cl, cr = st.columns(2, gap="large")
 
     with cl:
-        st.markdown('<p class="section-label" style="margin-top:8px;">VOLUME</p>', unsafe_allow_html=True)
+        st.markdown(f'<p class="section-label" style="margin-top:8px;">VOLUME</p>', unsafe_allow_html=True)
         st.markdown("**Viewing Activity**")
         fig = go.Figure(go.Bar(
             x=gdf['Period'], y=gdf['Movies'],
-            marker=dict(color=COLORS["navy"], cornerradius=3),
+            marker=dict(color=T["navy"], cornerradius=3),
             text=gdf['Movies'] if show_lbl else None,
             textposition='outside' if show_lbl else None,
-            textfont=dict(size=11, color=COLORS["charcoal"], family="Source Sans Pro"),
+            textfont=dict(size=11, color=T["chart_text"], family="Source Sans Pro"),
             hovertemplate='<b>%{x}</b><br>Films: %{y}<extra></extra>',
         ))
         fig.update_layout(xaxis=dict(tickangle=x_ang, title=x_lbl, type='category'),
@@ -554,14 +614,14 @@ with tab4:
         st.plotly_chart(fig, use_container_width=True)
 
     with cr:
-        st.markdown('<p class="section-label" style="margin-top:8px;">DURATION</p>', unsafe_allow_html=True)
+        st.markdown(f'<p class="section-label" style="margin-top:8px;">DURATION</p>', unsafe_allow_html=True)
         st.markdown("**Time Invested**")
         fig = go.Figure(go.Bar(
             x=gdf['Period'], y=gdf['Hours'],
-            marker=dict(color=COLORS["teal"], cornerradius=3),
+            marker=dict(color=T["teal"], cornerradius=3),
             text=gdf['Hours'].apply(lambda v: f"{v:.0f}h") if show_lbl else None,
             textposition='outside' if show_lbl else None,
-            textfont=dict(size=11, color=COLORS["charcoal"], family="Source Sans Pro"),
+            textfont=dict(size=11, color=T["chart_text"], family="Source Sans Pro"),
             hovertemplate='<b>%{x}</b><br>Hours: %{y:.1f}<extra></extra>',
         ))
         fig.update_layout(xaxis=dict(tickangle=x_ang, title=x_lbl, type='category'),
@@ -576,5 +636,5 @@ with tab4:
 # FOOTER
 # ──────────────────────────────────────────────
 st.markdown("---")
-st.markdown(f'<p class="footer-text">{original_count} films catalogued&ensp;·&ensp;Dashboard v4.0</p>',
+st.markdown(f'<p class="footer-text">{original_count} films catalogued&ensp;·&ensp;Dashboard v4.1</p>',
             unsafe_allow_html=True)
