@@ -58,7 +58,7 @@ st.markdown("""
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Source+Sans+Pro:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
     .stApp { background-color: #fafbfc; }
-    #MainMenu, footer, header { visibility: hidden; }
+    #MainMenu, footer { visibility: hidden; }
     .stDeployButton { display: none; }
     .block-container { padding-top: 2rem; padding-bottom: 2rem; max-width: 1200px; }
 
