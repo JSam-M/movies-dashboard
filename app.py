@@ -270,6 +270,13 @@ if df_full['Release_Year'].notna().any():
         yr_range = st.sidebar.slider("Release Year", yr_lo, yr_hi, (yr_lo, yr_hi))
         df = df[(df['Release_Year'] >= yr_range[0]) & (df['Release_Year'] <= yr_range[1])]
 
+# Watch year filter
+if df_full['Watch_Year'].notna().any():
+    wy_lo, wy_hi = int(df_full['Watch_Year'].min()), int(df_full['Watch_Year'].max())
+    if wy_lo < wy_hi:
+        wy_range = st.sidebar.slider("Watch Year", wy_lo, wy_hi, (wy_lo, wy_hi))
+        df = df[(df['Watch_Year'] >= wy_range[0]) & (df['Watch_Year'] <= wy_range[1])]
+
 st.sidebar.markdown("---")
 st.sidebar.markdown('<p class="section-label">RECOMMENDATION</p>', unsafe_allow_html=True)
 rw_opt = st.sidebar.radio("Filter by", ["All Films", "Recommended (Rewatched)", "First Watch Only"],
@@ -481,22 +488,16 @@ with tab4:
     tdf = tdf.dropna(subset=['Watch_Year'])
     tdf['Watch_Year'] = tdf['Watch_Year'].astype(int)
 
-    view_by = st.radio("Aggregate by", ["All Time", "Year", "Month"], horizontal=True)
+    view_by = st.radio("Aggregate by", ["Year", "Month", "All Time"], horizontal=True)
 
-    if view_by == "All Time":
-        gdf = tdf.groupby('Year-Month').agg(Movies=('Name','count'), Minutes=('Runtime_mins','sum')).reset_index()
-        gdf.columns = ['Period','Movies','Minutes']
-        gdf['Hours'] = gdf['Minutes']/60
-        x_lbl, x_ang, show_lbl = 'Month', 45, False
-
-    elif view_by == "Year":
+    if view_by == "Year":
         gdf = tdf.groupby('Watch_Year').agg(Movies=('Name','count'), Minutes=('Runtime_mins','sum')).reset_index()
         gdf.columns = ['Period','Movies','Minutes']
         gdf['Period'] = gdf['Period'].astype(str)
         gdf['Hours'] = gdf['Minutes']/60
         x_lbl, x_ang, show_lbl = 'Year', 0, True
 
-    else:
+    elif view_by == "Month":
         mo = ['January','February','March','April','May','June',
               'July','August','September','October','November','December']
         tmp = tdf.dropna(subset=['Month_Name'])
@@ -506,6 +507,12 @@ with tab4:
         gdf['Period'] = pd.Categorical(gdf['Period'], categories=mo, ordered=True)
         gdf = gdf.sort_values('Period')
         x_lbl, x_ang, show_lbl = 'Month', 45, True
+
+    else:  # All Time
+        gdf = tdf.groupby('Year-Month').agg(Movies=('Name','count'), Minutes=('Runtime_mins','sum')).reset_index()
+        gdf.columns = ['Period','Movies','Minutes']
+        gdf['Hours'] = gdf['Minutes']/60
+        x_lbl, x_ang, show_lbl = 'Month', 45, False
 
     tot_m = len(tdf)
     tot_min = tdf['Runtime_mins'].sum()
