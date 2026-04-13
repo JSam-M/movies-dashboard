@@ -8,33 +8,52 @@ st.set_page_config(
     page_title="Film Collection",
     page_icon="◼",
     layout="wide",
-    initial_sidebar_state="collapsed"   # hidden by default
+    initial_sidebar_state="collapsed"
 )
 
-# ── DESIGN TOKENS ─────────────────────────────────────────────
-BG      = "#0D1117"
-SURFACE = "#161B22"
-BORDER  = "#21262D"
-TEXT    = "#E6EDF3"
-SUB     = "#8B949E"
-MUTED   = "#484F58"
-BLUE    = "#58A6FF"
-BLUE_D  = "#1F6FEB"
-BLUE_DIM= "#0D2D5E"
-AMBER   = "#E3B341"
-WHITE   = "#FFFFFF"
-NTH     = "N'th time of watching"
+# ── THEME STATE ───────────────────────────────────────────────
+if "dark" not in st.session_state:
+    st.session_state.dark = True
 
-QUAL = [BLUE, AMBER, "#3FB950", "#A371F7", "#F78166",
-        "#56D364", "#79C0FF", "#FFA657"]
+dark = st.session_state.dark
+
+# ── DESIGN TOKENS (switch on theme) ───────────────────────────
+if dark:
+    BG      = "#0D1117"
+    SURFACE = "#161B22"
+    BORDER  = "#21262D"
+    TEXT    = "#E6EDF3"
+    SUB     = "#8B949E"
+    MUTED   = "#484F58"
+    BLUE    = "#58A6FF"
+    AMBER   = "#E3B341"
+    TOGGLE  = "☀"
+else:
+    BG      = "#FFFFFF"
+    SURFACE = "#F8FAFC"
+    BORDER  = "#E2E8F0"
+    TEXT    = "#1A2332"
+    SUB     = "#64748B"
+    MUTED   = "#94A3B8"
+    BLUE    = "#1B5EC7"
+    AMBER   = "#E0951A"
+    TOGGLE  = "🌙"
+
+NTH  = "N'th time of watching"
+QUAL = [BLUE, AMBER, "#3FB950" if dark else "#2CA89A",
+        "#A371F7", "#F78166", "#56D364", "#79C0FF", "#FFA657"]
 
 PLOTLY = dict(
     font=dict(family="'DM Sans', 'Helvetica Neue', sans-serif", color=SUB, size=11),
     paper_bgcolor="rgba(0,0,0,0)",
     plot_bgcolor="rgba(0,0,0,0)",
     margin=dict(l=0, r=24, t=32, b=0),
-    hoverlabel=dict(bgcolor="#2D333B", font_size=12,
-                    font_family="'DM Sans', sans-serif", font_color=TEXT),
+    hoverlabel=dict(
+        bgcolor=SURFACE,
+        font_size=12,
+        font_family="'DM Sans', sans-serif",
+        font_color=TEXT
+    ),
 )
 
 
@@ -47,51 +66,37 @@ st.markdown(f"""
 #MainMenu, footer, .stDeployButton {{ visibility: hidden; display: none; }}
 .block-container {{ padding: 2.5rem 3rem 2rem 3rem !important; max-width: 1300px; }}
 
-/* ── Force dark everywhere ── */
+/* ── App background ── */
 html, body, .stApp, [data-testid="stAppViewContainer"],
-[data-testid="stMain"], [data-testid="block-container"] {{
-    background-color: {BG} !important;
-    color: {TEXT} !important;
-}}
+[data-testid="stMain"], .main {{ background-color: {BG} !important; }}
 header[data-testid="stHeader"] {{
     background-color: {BG} !important;
     border-bottom: 1px solid {BORDER} !important;
 }}
-.main .block-container {{ background-color: {BG} !important; }}
 
 /* ── Sidebar ── */
 [data-testid="stSidebar"] {{
     background-color: {SURFACE} !important;
     border-right: 1px solid {BORDER} !important;
 }}
-[data-testid="stSidebar"] * {{
-    font-family: 'DM Sans', sans-serif !important;
-    color: {TEXT} !important;
-}}
-[data-testid="stSidebar"] label {{
-    color: {SUB} !important; font-size: 0.78rem !important; font-weight: 500 !important;
-}}
-[data-testid="stSidebar"] .stTextInput > div > input {{
-    background-color: {BG} !important; border-color: {BORDER} !important; color: {TEXT} !important;
-}}
+[data-testid="stSidebar"] * {{ color: {TEXT} !important; }}
+[data-testid="stSidebar"] label {{ color: {SUB} !important; font-size: 0.78rem !important; }}
 
-/* ── Sidebar toggle arrow — make it visible and styled ── */
+/* ── Sidebar toggle: hide the ugly icon text, show a clean arrow ── */
 [data-testid="collapsedControl"] {{
     background-color: {SURFACE} !important;
     border: 1px solid {BORDER} !important;
-    border-radius: 0 4px 4px 0 !important;
+    border-left: none !important;
     color: {SUB} !important;
-    top: 50% !important;
+    width: 24px !important;
 }}
-[data-testid="collapsedControl"]:hover {{
-    background-color: {BORDER} !important;
-    color: {TEXT} !important;
+[data-testid="collapsedControl"] span[data-testid="tooltipHoverTarget"] {{
+    display: none !important;
 }}
+[data-testid="collapsedControl"]:hover {{ background-color: {BORDER} !important; }}
 
 /* ── Typography ── */
-p, li, span, div, label, input {{
-    font-family: 'DM Sans', sans-serif !important;
-}}
+p, li, span, div, label {{ font-family: 'DM Sans', sans-serif !important; }}
 h1 {{
     font-family: 'Libre Baskerville', Georgia, serif !important;
     font-size: 2rem !important; font-weight: 700 !important;
@@ -99,9 +104,9 @@ h1 {{
     line-height: 1.15 !important; margin: 0 !important;
 }}
 h2 {{
-    font-family: 'Libre Baskerville', Georgia, serif !important;
+    font-family: 'Libre Baskerville', serif !important;
     font-size: 1.15rem !important; font-weight: 400 !important;
-    color: {TEXT} !important;
+    color: {TEXT} !important; margin: 0 !important;
 }}
 h3 {{
     font-family: 'DM Sans', sans-serif !important;
@@ -112,8 +117,7 @@ h3 {{
 
 /* ── Tabs ── */
 .stTabs [data-baseweb="tab-list"] {{
-    gap: 0; border-bottom: 1px solid {BORDER} !important;
-    background: transparent !important;
+    gap: 0; border-bottom: 1px solid {BORDER} !important; background: transparent !important;
 }}
 .stTabs [data-baseweb="tab"] {{
     font-family: 'DM Sans', sans-serif !important;
@@ -126,76 +130,57 @@ h3 {{
 }}
 .stTabs [data-baseweb="tab"]:hover {{ color: {TEXT} !important; }}
 .stTabs [aria-selected="true"] {{
-    color: {TEXT} !important;
-    border-bottom-color: {BLUE} !important;
+    color: {TEXT} !important; border-bottom-color: {BLUE} !important;
 }}
-
-/* ── Dataframe ── */
-[data-testid="stDataFrame"] {{
-    border: 1px solid {BORDER} !important; border-radius: 0 !important;
-}}
-[data-testid="stDataFrame"] * {{
-    background-color: {SURFACE} !important;
-    color: {TEXT} !important;
-    border-color: {BORDER} !important;
-}}
-
-/* ── Inputs / sliders ── */
-[data-testid="stMultiSelect"] > div {{
-    background-color: {SURFACE} !important; border-color: {BORDER} !important;
-}}
-.stSlider [data-testid="stTickBar"] {{ background: {BORDER}; }}
-[data-baseweb="slider"] [data-testid="stSlider"] {{ background: {BLUE}; }}
 
 /* ── Radio ── */
 .stRadio label {{ font-size: 0.8rem !important; color: {SUB} !important; }}
 
+/* ── Theme toggle button ── */
+.theme-btn button {{
+    background: {SURFACE} !important;
+    border: 1px solid {BORDER} !important;
+    color: {TEXT} !important;
+    border-radius: 6px !important;
+    font-size: 1rem !important;
+    padding: 4px 10px !important;
+    min-height: unset !important;
+    height: 36px !important;
+}}
+.theme-btn button:hover {{ background: {BORDER} !important; }}
+
 /* ── Divider ── */
 hr {{ border: none !important; border-top: 1px solid {BORDER} !important; margin: 2rem 0 !important; }}
 
-/* ── Custom Classes ── */
+/* ── Custom classes ── */
 .eyebrow {{
-    display: block;
-    font-family: 'DM Sans', sans-serif;
+    display: block; font-family: 'DM Sans', sans-serif;
     font-size: 0.62rem; font-weight: 600;
-    text-transform: uppercase; letter-spacing: 0.14em;
-    color: {MUTED}; margin-bottom: 6px;
+    text-transform: uppercase; letter-spacing: 0.14em; color: {MUTED}; margin-bottom: 6px;
 }}
 .chart-title {{
-    display: block;
-    font-family: 'Libre Baskerville', Georgia, serif;
+    display: block; font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 1.1rem; font-weight: 400; color: {TEXT};
     letter-spacing: -0.02em; line-height: 1.3; margin: 0 0 18px 0;
 }}
 .chart-sub {{
-    display: block;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.8rem; color: {SUB};
-    line-height: 1.55; margin: -10px 0 18px 0;
+    display: block; font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem; color: {SUB}; line-height: 1.55; margin: -10px 0 18px 0;
 }}
-.kpi-wrap {{
-    border-top: 2px solid {BLUE};
-    padding: 18px 0 12px 0;
-}}
+.kpi-wrap {{ border-top: 2px solid {BLUE}; padding: 18px 0 12px 0; }}
 .kpi-num {{
     font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 2.5rem; font-weight: 700;
     color: {TEXT}; line-height: 1; letter-spacing: -0.03em;
 }}
-.kpi-unit {{
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.95rem; color: {MUTED}; font-weight: 400; margin-left: 2px;
-}}
+.kpi-unit {{ font-family: 'DM Sans', sans-serif; font-size: 0.95rem; color: {MUTED}; }}
 .kpi-lbl {{
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.62rem; font-weight: 600;
-    text-transform: uppercase; letter-spacing: 0.12em;
-    color: {MUTED}; margin-top: 6px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.62rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.12em; color: {MUTED}; margin-top: 6px;
 }}
 .divider {{ border-top: 1px solid {BORDER}; margin: 28px 0; }}
 .footer-line {{
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.7rem; color: {MUTED};
+    font-family: 'DM Sans', sans-serif; font-size: 0.7rem; color: {MUTED};
     text-align: center; padding: 28px 0 8px; letter-spacing: 0.06em;
 }}
 </style>
@@ -206,7 +191,7 @@ hr {{ border: none !important; border-top: 1px solid {BORDER} !important; margin
 @st.cache_data(ttl=300)
 def load_data():
     df = pd.read_csv('movies.csv')
-    df['TMDb_Rating']  = pd.to_numeric(df['TMDb_Rating'], errors='coerce')
+    df['TMDb_Rating']  = pd.to_numeric(df['TMDb_Rating'],  errors='coerce')
     df['Release_Year'] = pd.to_numeric(df['Release_Year'], errors='coerce')
     df[NTH] = pd.to_numeric(df[NTH], errors='coerce').fillna(1)
     df['Date_Parsed'] = pd.to_datetime(df['Date'], dayfirst=True, errors='coerce')
@@ -217,9 +202,8 @@ def load_data():
     df_unique = df.groupby('Name', as_index=False).agg({
         'Date': 'first', 'Date_Parsed': 'first', 'Language': 'first',
         'Year': 'first', 'Watch_Year': 'first', 'Good?': 'first',
-        NTH: 'max', 'Location': 'first',
-        'Director': 'first', 'Runtime': 'first', 'Genre': 'first',
-        'TMDb_Rating': 'first', 'Release_Year': 'first',
+        NTH: 'max', 'Location': 'first', 'Director': 'first', 'Runtime': 'first',
+        'Genre': 'first', 'TMDb_Rating': 'first', 'Release_Year': 'first',
         'Overview': 'first', 'API_Status': 'first'
     })
     return df_unique, df
@@ -239,27 +223,37 @@ def style_fig(fig, height=380, y_grid=False):
         xaxis=dict(showgrid=False, zeroline=False, showline=False,
                    tickfont=dict(size=10, color=SUB)),
         yaxis=dict(showgrid=y_grid, zeroline=False, showline=False,
-                   gridcolor=BORDER,
-                   tickfont=dict(size=10, color=SUB)),
+                   gridcolor=BORDER, tickfont=dict(size=10, color=SUB)),
     )
     return fig
 
 
 # ── HEADER ────────────────────────────────────────────────────
-st.markdown(f"""
-<div style="padding:0 0 32px 0; border-bottom:1px solid {BORDER}; margin-bottom:36px;">
-    <span class="eyebrow">Personal Archive · {datetime.now().year}</span>
-    <h1>Film Collection</h1>
-    <p style="font-family:'DM Sans',sans-serif; font-size:0.88rem; color:{SUB};
-              margin:10px 0 0 0; max-width:480px; line-height:1.6;">
-        A curated catalogue of every film watched, rated, and logged since 2019.
-    </p>
-</div>
-""", unsafe_allow_html=True)
+hcol, tcol = st.columns([11, 1])
+with hcol:
+    st.markdown(f"""
+    <div style="padding:0 0 32px 0; border-bottom:1px solid {BORDER}; margin-bottom:36px;">
+        <span class="eyebrow">Personal Archive · {datetime.now().year}</span>
+        <h1>Film Collection</h1>
+        <p style="font-family:'DM Sans',sans-serif; font-size:0.88rem; color:{SUB};
+                  margin:10px 0 0 0; max-width:480px; line-height:1.6;">
+            A curated catalogue of every film watched, rated, and logged since 2019.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+with tcol:
+    st.markdown('<div class="theme-btn" style="padding-top:8px;">', unsafe_allow_html=True)
+    if st.button(TOGGLE, help="Toggle light / dark mode"):
+        st.session_state.dark = not st.session_state.dark
+        st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
 
 
 # ── SIDEBAR ───────────────────────────────────────────────────
-st.sidebar.markdown(f'<h3 style="padding:8px 0 12px; color:{MUTED}; font-family:DM Sans,sans-serif; font-size:0.62rem; font-weight:600; letter-spacing:0.14em; text-transform:uppercase;">Filters</h3>', unsafe_allow_html=True)
+st.sidebar.markdown(
+    f'<p style="font-family:DM Sans,sans-serif; font-size:0.62rem; font-weight:600; '
+    f'letter-spacing:0.14em; text-transform:uppercase; color:{MUTED}; '
+    f'padding:8px 0 12px;">Filters</p>', unsafe_allow_html=True)
 df_full, _ = load_data()
 
 search = st.sidebar.text_input("Search", placeholder="Film title…")
@@ -289,16 +283,14 @@ min_rating = st.sidebar.slider("Min TMDb Rating", 0.0, 10.0, 0.0, 0.5)
 df = df[df['TMDb_Rating'] >= min_rating]
 
 if df_full['Release_Year'].notna().any():
-    yr_lo = int(df_full['Release_Year'].min())
-    yr_hi = int(df_full['Release_Year'].max())
+    yr_lo, yr_hi = int(df_full['Release_Year'].min()), int(df_full['Release_Year'].max())
     if yr_lo < yr_hi:
         yr_range = st.sidebar.slider("Release Year", yr_lo, yr_hi, (yr_lo, yr_hi))
         df = df[(df['Release_Year'] >= yr_range[0]) & (df['Release_Year'] <= yr_range[1])]
 
 wy_range = None
 if df_full['Watch_Year'].notna().any():
-    wy_lo = int(df_full['Watch_Year'].min())
-    wy_hi = int(df_full['Watch_Year'].max())
+    wy_lo, wy_hi = int(df_full['Watch_Year'].min()), int(df_full['Watch_Year'].max())
     if wy_lo < wy_hi:
         wy_range = st.sidebar.slider("Watch Year", wy_lo, wy_hi, (wy_lo, wy_hi))
         df = df[(df['Watch_Year'] >= wy_range[0]) & (df['Watch_Year'] <= wy_range[1])]
@@ -307,10 +299,8 @@ st.sidebar.markdown("---")
 rw_opt = st.sidebar.radio(
     "View", ["All Films", "Rewatched Only", "First Watch Only"],
     label_visibility="collapsed")
-if rw_opt == "Rewatched Only":
-    df = df[df[NTH] >= 2]
-elif rw_opt == "First Watch Only":
-    df = df[df[NTH] <= 1]
+if rw_opt == "Rewatched Only":   df = df[df[NTH] >= 2]
+elif rw_opt == "First Watch Only": df = df[df[NTH] <= 1]
 
 st.sidebar.markdown("---")
 st.sidebar.markdown(
@@ -333,13 +323,12 @@ avg_r = df['TMDb_Rating'].mean() if df['TMDb_Rating'].notna().any() else 0
 n_rec = (df[NTH] >= 2).sum()
 
 k1, k2, k3, k4 = st.columns(4, gap="large")
-for col, num, lbl in [
-    (k1, str(len(df)),           "Films"),
-    (k2, f"{avg_r:.1f}",         "Avg TMDb Rating"),
-    (k3, f"{total_hours:.0f}",   "Hours Watched"),
-    (k4, str(n_rec),             "Rewatched"),
+for col, num, unit, lbl in [
+    (k1, str(len(df)),          "",  "Films"),
+    (k2, f"{avg_r:.1f}",        "",  "Avg TMDb Rating"),
+    (k3, f"{total_hours:.0f}",  "h", "Hours Watched"),
+    (k4, str(n_rec),            "",  "Rewatched"),
 ]:
-    unit = "h" if lbl == "Hours Watched" else ""
     with col:
         st.markdown(
             f'<div class="kpi-wrap">'
@@ -356,7 +345,7 @@ tab1, tab2, tab3, tab4 = st.tabs(["CATALOGUE", "RANKINGS", "COMPOSITION", "TREND
 
 # ── TAB 1: CATALOGUE ─────────────────────────────────────────
 with tab1:
-    st.markdown(f"""
+    st.markdown("""
     <span class="eyebrow">Browse</span>
     <span class="chart-title">Complete Film Catalogue</span>
     <span class="chart-sub">All films sorted by TMDb rating. ★ denotes a personal rewatch.</span>
@@ -386,7 +375,6 @@ with tab2:
         <span class="eyebrow">By Rating</span>
         <span class="chart-title">Highest-Rated Films</span>
         """, unsafe_allow_html=True)
-
         top = df.nlargest(10, 'TMDb_Rating')[
             ['Name','Release_Year','TMDb_Rating']].reset_index(drop=True)
         top['Label'] = top['Name'] + '  (' + top['Release_Year'].astype(int).astype(str) + ')'
@@ -394,8 +382,7 @@ with tab2:
             x=top['TMDb_Rating'], y=top['Label'], orientation='h',
             marker=dict(color=BLUE),
             text=top['TMDb_Rating'].apply(lambda v: f"{v:.1f}"),
-            textposition='outside',
-            textfont=dict(size=11, color=SUB),
+            textposition='outside', textfont=dict(size=11, color=SUB),
             hovertemplate='<b>%{y}</b><br>%{x:.1f}<extra></extra>',
         ))
         fig.update_layout(
@@ -409,7 +396,6 @@ with tab2:
         <span class="eyebrow">Personal Picks</span>
         <span class="chart-title">Most Rewatched Films</span>
         """, unsafe_allow_html=True)
-
         rw = df[df[NTH] > 1].nlargest(10, NTH)[
             ['Name','Release_Year',NTH]].reset_index(drop=True)
         if len(rw) > 0:
@@ -418,8 +404,7 @@ with tab2:
                 x=rw[NTH], y=rw['Label'], orientation='h',
                 marker=dict(color=AMBER),
                 text=rw[NTH].astype(int).astype(str) + '×',
-                textposition='outside',
-                textfont=dict(size=11, color=SUB),
+                textposition='outside', textfont=dict(size=11, color=SUB),
                 hovertemplate='<b>%{y}</b><br>%{x}×<extra></extra>',
             ))
             fig.update_layout(
@@ -440,7 +425,6 @@ with tab3:
         <span class="eyebrow">Language</span>
         <span class="chart-title">Distribution by Language</span>
         """, unsafe_allow_html=True)
-
         ld = df['Language'].value_counts().reset_index()
         ld.columns = ['Language','Count']
         fig = go.Figure(go.Pie(
@@ -458,7 +442,6 @@ with tab3:
         <span class="eyebrow">Genre</span>
         <span class="chart-title">Top Genres</span>
         """, unsafe_allow_html=True)
-
         gc = {}
         for gs in df['Genre'].dropna():
             for g in str(gs).split(','):
@@ -483,14 +466,13 @@ with tab3:
     <span class="eyebrow">Filmmakers</span>
     <span class="chart-title">Top Directors in Collection</span>
     """, unsafe_allow_html=True)
-
-    dc  = df['Director'].value_counts().head(15).reset_index()
+    dc = df['Director'].value_counts().head(15).reset_index()
     dc.columns = ['Director','Films']
     cc, ct = st.columns([2.2, 1], gap="large")
     with cc:
         fig = go.Figure(go.Bar(
             x=dc['Films'], y=dc['Director'], orientation='h',
-            marker=dict(color="#79C0FF"),
+            marker=dict(color=BLUE),
             text=dc['Films'], textposition='outside',
             textfont=dict(size=10, color=SUB),
             hovertemplate='<b>%{y}</b><br>%{x} films<extra></extra>',
@@ -526,20 +508,18 @@ with tab4:
             Movies=('Name','count'), Minutes=('Runtime_mins','sum')).reset_index()
         gdf.columns = ['Period','Movies','Minutes']
         gdf['Period'] = gdf['Period'].astype(str)
-        gdf['Hours']  = gdf['Minutes'] / 60
+        gdf['Hours'] = gdf['Minutes'] / 60
         x_ang, show_lbl = 0, True
-
     elif view_by == "Month":
         mo = ['January','February','March','April','May','June',
               'July','August','September','October','November','December']
         gdf = tdf.dropna(subset=['Month_Name']).groupby('Month_Name').agg(
             Movies=('Name','count'), Minutes=('Runtime_mins','sum')).reset_index()
         gdf.columns = ['Period','Movies','Minutes']
-        gdf['Hours']  = gdf['Minutes'] / 60
+        gdf['Hours'] = gdf['Minutes'] / 60
         gdf['Period'] = pd.Categorical(gdf['Period'], categories=mo, ordered=True)
         gdf = gdf.sort_values('Period')
         x_ang, show_lbl = 45, True
-
     else:
         gdf = tdf.groupby('Year-Month').agg(
             Movies=('Name','count'), Minutes=('Runtime_mins','sum')).reset_index()
@@ -569,20 +549,16 @@ with tab4:
 
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
     cl, cr = st.columns(2, gap="large")
-
     with cl:
         st.markdown('<span class="eyebrow">Volume</span>', unsafe_allow_html=True)
         fig = go.Figure(go.Bar(
-            x=gdf['Period'], y=gdf['Movies'],
-            marker=dict(color=BLUE),
+            x=gdf['Period'], y=gdf['Movies'], marker=dict(color=BLUE),
             text=gdf['Movies'] if show_lbl else None,
-            textposition='outside',
-            textfont=dict(size=10, color=SUB),
+            textposition='outside', textfont=dict(size=10, color=SUB),
             hovertemplate='<b>%{x}</b><br>%{y} films<extra></extra>',
         ))
         fig.update_layout(xaxis=dict(tickangle=x_ang, type='category'), yaxis=dict(title=''))
-        if show_lbl:
-            fig.update_layout(yaxis=dict(range=[0, gdf['Movies'].max() * 1.2]))
+        if show_lbl: fig.update_layout(yaxis=dict(range=[0, gdf['Movies'].max() * 1.2]))
         style_fig(fig, 400, y_grid=True)
         st.plotly_chart(fig, use_container_width=True)
 
@@ -590,15 +566,13 @@ with tab4:
         st.markdown('<span class="eyebrow">Duration</span>', unsafe_allow_html=True)
         fig = go.Figure(go.Bar(
             x=gdf['Period'], y=gdf['Hours'],
-            marker=dict(color="#79C0FF"),
+            marker=dict(color=AMBER),
             text=gdf['Hours'].apply(lambda v: f"{v:.0f}h") if show_lbl else None,
-            textposition='outside',
-            textfont=dict(size=10, color=SUB),
+            textposition='outside', textfont=dict(size=10, color=SUB),
             hovertemplate='<b>%{x}</b><br>%{y:.1f}h<extra></extra>',
         ))
         fig.update_layout(xaxis=dict(tickangle=x_ang, type='category'), yaxis=dict(title=''))
-        if show_lbl:
-            fig.update_layout(yaxis=dict(range=[0, gdf['Hours'].max() * 1.2]))
+        if show_lbl: fig.update_layout(yaxis=dict(range=[0, gdf['Hours'].max() * 1.2]))
         style_fig(fig, 400, y_grid=True)
         st.plotly_chart(fig, use_container_width=True)
 
@@ -607,6 +581,6 @@ with tab4:
 st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
 st.markdown(
     f'<p class="footer-line">{original_count} films catalogued'
-    f'&ensp;·&ensp;Dashboard v2.1'
+    f'&ensp;·&ensp;Dashboard v2.2'
     f'&ensp;·&ensp;Updated {datetime.now().strftime("%B %Y")}</p>',
     unsafe_allow_html=True)
