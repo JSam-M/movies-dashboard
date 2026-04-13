@@ -235,9 +235,9 @@ def load_data():
     df['Year'] = pd.to_numeric(df['Year'], errors='coerce')
 
     df_unique = df.groupby('Name', as_index=False).agg({
-        'Date': 'last', 'Date_Parsed': 'last', 'Language': 'first',
-        'Year': 'first', 'Watch_Year': 'last', 'Good?': 'first',
-        'N\'th time of watching': 'max', 'Location': 'last',
+        'Date': 'first', 'Date_Parsed': 'first', 'Language': 'first',
+        'Year': 'first', 'Watch_Year': 'first', 'Good?': 'first',
+        'N\'th time of watching': 'max', 'Location': 'first',
         'Director': 'first', 'Runtime': 'first', 'Genre': 'first',
         'TMDb_Rating': 'first', 'Release_Year': 'first',
         'Overview': 'first', 'API_Status': 'first'
