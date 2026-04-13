@@ -316,6 +316,7 @@ if df_full['Release_Year'].notna().any():
 
 if df_full['Watch_Year'].notna().any():
     wy_lo, wy_hi = int(df_full['Watch_Year'].min()), int(df_full['Watch_Year'].max())
+    wy_range = None
     if wy_lo < wy_hi:
         wy_range = st.sidebar.slider("Watch Year", wy_lo, wy_hi, (wy_lo, wy_hi))
         df = df[(df['Watch_Year'] >= wy_range[0]) & (df['Watch_Year'] <= wy_range[1])]
@@ -341,6 +342,12 @@ st.sidebar.markdown(
 # ──────────────────────────────────────────────
 filtered_names = df['Name'].tolist()
 filtered_entries = df_original[df_original['Name'].isin(filtered_names)]
+# Apply Watch Year filter to raw entries too, so Tab 4 stats reflect the selected year only
+if 'wy_range' in dir() and wy_range is not None:
+    filtered_entries = filtered_entries[
+        (filtered_entries['Watch_Year'] >= wy_range[0]) &
+        (filtered_entries['Watch_Year'] <= wy_range[1])
+    ]
 
 avg_r = df['TMDb_Rating'].mean() if df['TMDb_Rating'].notna().any() else 0
 max_r = df['TMDb_Rating'].max() if df['TMDb_Rating'].notna().any() else 0
