@@ -8,167 +8,196 @@ st.set_page_config(
     page_title="Film Collection",
     page_icon="◼",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"   # hidden by default
 )
 
 # ── DESIGN TOKENS ─────────────────────────────────────────────
-NAVY   = "#051C2C"
-BLUE   = "#1B5EC7"
-BLUE_M = "#4E87DA"
-BLUE_L = "#A8C8F0"
-AMBER  = "#E0951A"
-TEXT   = "#1A2332"
-SUB    = "#64748B"
-MUTED  = "#94A3B8"
-BORDER = "#E2E8F0"
-BG     = "#FFFFFF"
-BG_ALT = "#F8FAFC"
-NTH    = "N'th time of watching"
+BG      = "#0D1117"
+SURFACE = "#161B22"
+BORDER  = "#21262D"
+TEXT    = "#E6EDF3"
+SUB     = "#8B949E"
+MUTED   = "#484F58"
+BLUE    = "#58A6FF"
+BLUE_D  = "#1F6FEB"
+BLUE_DIM= "#0D2D5E"
+AMBER   = "#E3B341"
+WHITE   = "#FFFFFF"
+NTH     = "N'th time of watching"
 
-QUAL = [BLUE, AMBER, "#2CA89A", "#7C3AED", "#DC4444",
-        BLUE_M, "#10B981", "#F59E0B", "#6366F1"]
+QUAL = [BLUE, AMBER, "#3FB950", "#A371F7", "#F78166",
+        "#56D364", "#79C0FF", "#FFA657"]
 
 PLOTLY = dict(
     font=dict(family="'DM Sans', 'Helvetica Neue', sans-serif", color=SUB, size=11),
     paper_bgcolor="rgba(0,0,0,0)",
     plot_bgcolor="rgba(0,0,0,0)",
     margin=dict(l=0, r=24, t=32, b=0),
-    hoverlabel=dict(bgcolor=NAVY, font_size=12,
-                    font_family="'DM Sans', sans-serif", font_color="#ffffff"),
+    hoverlabel=dict(bgcolor="#2D333B", font_size=12,
+                    font_family="'DM Sans', sans-serif", font_color=TEXT),
 )
 
 
 # ── CSS ──────────────────────────────────────────────────────
-st.markdown("""
+st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
 
-#MainMenu, footer, .stDeployButton { visibility: hidden; display: none; }
-.block-container { padding: 2.5rem 3rem 2rem 3rem !important; max-width: 1300px; }
+/* ── Reset ── */
+#MainMenu, footer, .stDeployButton {{ visibility: hidden; display: none; }}
+.block-container {{ padding: 2.5rem 3rem 2rem 3rem !important; max-width: 1300px; }}
 
-/* Force light mode */
-.stApp { background: #FFFFFF !important; }
-[data-testid="stAppViewContainer"] { background: #FFFFFF !important; }
-header[data-testid="stHeader"] { background: #FFFFFF !important; border-bottom: 1px solid #E2E8F0 !important; }
+/* ── Force dark everywhere ── */
+html, body, .stApp, [data-testid="stAppViewContainer"],
+[data-testid="stMain"], [data-testid="block-container"] {{
+    background-color: {BG} !important;
+    color: {TEXT} !important;
+}}
+header[data-testid="stHeader"] {{
+    background-color: {BG} !important;
+    border-bottom: 1px solid {BORDER} !important;
+}}
+.main .block-container {{ background-color: {BG} !important; }}
 
-/* Base typography */
-p, li, span, div, label, input {
-    font-family: 'DM Sans', 'Helvetica Neue', sans-serif !important;
-}
+/* ── Sidebar ── */
+[data-testid="stSidebar"] {{
+    background-color: {SURFACE} !important;
+    border-right: 1px solid {BORDER} !important;
+}}
+[data-testid="stSidebar"] * {{
+    font-family: 'DM Sans', sans-serif !important;
+    color: {TEXT} !important;
+}}
+[data-testid="stSidebar"] label {{
+    color: {SUB} !important; font-size: 0.78rem !important; font-weight: 500 !important;
+}}
+[data-testid="stSidebar"] .stTextInput > div > input {{
+    background-color: {BG} !important; border-color: {BORDER} !important; color: {TEXT} !important;
+}}
 
-/* Headings */
-h1 {
+/* ── Sidebar toggle arrow — make it visible and styled ── */
+[data-testid="collapsedControl"] {{
+    background-color: {SURFACE} !important;
+    border: 1px solid {BORDER} !important;
+    border-radius: 0 4px 4px 0 !important;
+    color: {SUB} !important;
+    top: 50% !important;
+}}
+[data-testid="collapsedControl"]:hover {{
+    background-color: {BORDER} !important;
+    color: {TEXT} !important;
+}}
+
+/* ── Typography ── */
+p, li, span, div, label, input {{
+    font-family: 'DM Sans', sans-serif !important;
+}}
+h1 {{
     font-family: 'Libre Baskerville', Georgia, serif !important;
     font-size: 2rem !important; font-weight: 700 !important;
-    color: #051C2C !important; letter-spacing: -0.03em !important;
+    color: {TEXT} !important; letter-spacing: -0.03em !important;
     line-height: 1.15 !important; margin: 0 !important;
-}
-h2 {
+}}
+h2 {{
     font-family: 'Libre Baskerville', Georgia, serif !important;
     font-size: 1.15rem !important; font-weight: 400 !important;
-    color: #051C2C !important; letter-spacing: -0.01em !important;
-    margin: 0 !important;
-}
-h3 {
+    color: {TEXT} !important;
+}}
+h3 {{
     font-family: 'DM Sans', sans-serif !important;
     font-size: 0.62rem !important; font-weight: 600 !important;
-    color: #94A3B8 !important; letter-spacing: 0.14em !important;
-    text-transform: uppercase !important; margin: 0 0 4px 0 !important;
-}
+    color: {MUTED} !important; letter-spacing: 0.14em !important;
+    text-transform: uppercase !important; margin: 0 !important;
+}}
 
-/* Sidebar */
-[data-testid="stSidebar"] {
-    background: #F8FAFC !important;
-    border-right: 1px solid #E2E8F0 !important;
-}
-[data-testid="stSidebar"] * { font-family: 'DM Sans', sans-serif !important; }
-[data-testid="stSidebar"] label {
-    color: #64748B !important; font-size: 0.78rem !important; font-weight: 500 !important;
-}
-[data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2 {
-    font-family: 'DM Sans', sans-serif !important; font-size: 0.62rem !important;
-    font-weight: 600 !important; letter-spacing: 0.14em !important;
-    text-transform: uppercase !important; color: #94A3B8 !important;
-}
-
-/* Tabs */
-.stTabs [data-baseweb="tab-list"] {
-    gap: 0; border-bottom: 1px solid #E2E8F0 !important; background: transparent !important;
-}
-.stTabs [data-baseweb="tab"] {
+/* ── Tabs ── */
+.stTabs [data-baseweb="tab-list"] {{
+    gap: 0; border-bottom: 1px solid {BORDER} !important;
+    background: transparent !important;
+}}
+.stTabs [data-baseweb="tab"] {{
     font-family: 'DM Sans', sans-serif !important;
     font-size: 0.68rem !important; font-weight: 600 !important;
     text-transform: uppercase !important; letter-spacing: 0.1em !important;
-    color: #94A3B8 !important; border: none !important;
+    color: {MUTED} !important; border: none !important;
     border-bottom: 2px solid transparent !important;
     padding: 14px 28px !important; margin-bottom: -1px !important;
     background: transparent !important;
-}
-.stTabs [data-baseweb="tab"]:hover { color: #051C2C !important; }
-.stTabs [aria-selected="true"] {
-    color: #051C2C !important;
-    border-bottom-color: #1B5EC7 !important;
-}
+}}
+.stTabs [data-baseweb="tab"]:hover {{ color: {TEXT} !important; }}
+.stTabs [aria-selected="true"] {{
+    color: {TEXT} !important;
+    border-bottom-color: {BLUE} !important;
+}}
 
-/* Metrics — hidden, we use custom HTML */
-[data-testid="stMetric"] { display: none; }
+/* ── Dataframe ── */
+[data-testid="stDataFrame"] {{
+    border: 1px solid {BORDER} !important; border-radius: 0 !important;
+}}
+[data-testid="stDataFrame"] * {{
+    background-color: {SURFACE} !important;
+    color: {TEXT} !important;
+    border-color: {BORDER} !important;
+}}
 
-/* Dataframe */
-[data-testid="stDataFrame"] {
-    border: 1px solid #E2E8F0 !important; border-radius: 0 !important;
-}
+/* ── Inputs / sliders ── */
+[data-testid="stMultiSelect"] > div {{
+    background-color: {SURFACE} !important; border-color: {BORDER} !important;
+}}
+.stSlider [data-testid="stTickBar"] {{ background: {BORDER}; }}
+[data-baseweb="slider"] [data-testid="stSlider"] {{ background: {BLUE}; }}
 
-/* Radio */
-.stRadio label { font-size: 0.8rem !important; color: #64748B !important; }
+/* ── Radio ── */
+.stRadio label {{ font-size: 0.8rem !important; color: {SUB} !important; }}
 
-/* Divider */
-hr { border: none !important; border-top: 1px solid #E2E8F0 !important; margin: 2rem 0 !important; }
+/* ── Divider ── */
+hr {{ border: none !important; border-top: 1px solid {BORDER} !important; margin: 2rem 0 !important; }}
 
 /* ── Custom Classes ── */
-.eyebrow {
+.eyebrow {{
     display: block;
     font-family: 'DM Sans', sans-serif;
     font-size: 0.62rem; font-weight: 600;
     text-transform: uppercase; letter-spacing: 0.14em;
-    color: #94A3B8; margin-bottom: 6px;
-}
-.chart-title {
+    color: {MUTED}; margin-bottom: 6px;
+}}
+.chart-title {{
     display: block;
     font-family: 'Libre Baskerville', Georgia, serif;
-    font-size: 1.1rem; font-weight: 400; color: #051C2C;
+    font-size: 1.1rem; font-weight: 400; color: {TEXT};
     letter-spacing: -0.02em; line-height: 1.3; margin: 0 0 18px 0;
-}
-.chart-sub {
+}}
+.chart-sub {{
     display: block;
     font-family: 'DM Sans', sans-serif;
-    font-size: 0.8rem; color: #64748B;
+    font-size: 0.8rem; color: {SUB};
     line-height: 1.55; margin: -10px 0 18px 0;
-}
-.kpi-wrap {
-    border-top: 2px solid #1B5EC7;
+}}
+.kpi-wrap {{
+    border-top: 2px solid {BLUE};
     padding: 18px 0 12px 0;
-}
-.kpi-num {
+}}
+.kpi-num {{
     font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 2.5rem; font-weight: 700;
-    color: #051C2C; line-height: 1; letter-spacing: -0.03em;
-}
-.kpi-unit {
+    color: {TEXT}; line-height: 1; letter-spacing: -0.03em;
+}}
+.kpi-unit {{
     font-family: 'DM Sans', sans-serif;
-    font-size: 0.95rem; color: #94A3B8; font-weight: 400; margin-left: 2px;
-}
-.kpi-lbl {
+    font-size: 0.95rem; color: {MUTED}; font-weight: 400; margin-left: 2px;
+}}
+.kpi-lbl {{
     font-family: 'DM Sans', sans-serif;
     font-size: 0.62rem; font-weight: 600;
     text-transform: uppercase; letter-spacing: 0.12em;
-    color: #94A3B8; margin-top: 6px;
-}
-.divider { border-top: 1px solid #E2E8F0; margin: 28px 0; }
-.footer-line {
+    color: {MUTED}; margin-top: 6px;
+}}
+.divider {{ border-top: 1px solid {BORDER}; margin: 28px 0; }}
+.footer-line {{
     font-family: 'DM Sans', sans-serif;
-    font-size: 0.7rem; color: #CBD5E1;
+    font-size: 0.7rem; color: {MUTED};
     text-align: center; padding: 28px 0 8px; letter-spacing: 0.06em;
-}
+}}
 </style>
 """, unsafe_allow_html=True)
 
@@ -177,7 +206,7 @@ hr { border: none !important; border-top: 1px solid #E2E8F0 !important; margin: 
 @st.cache_data(ttl=300)
 def load_data():
     df = pd.read_csv('movies.csv')
-    df['TMDb_Rating'] = pd.to_numeric(df['TMDb_Rating'], errors='coerce')
+    df['TMDb_Rating']  = pd.to_numeric(df['TMDb_Rating'], errors='coerce')
     df['Release_Year'] = pd.to_numeric(df['Release_Year'], errors='coerce')
     df[NTH] = pd.to_numeric(df[NTH], errors='coerce').fillna(1)
     df['Date_Parsed'] = pd.to_datetime(df['Date'], dayfirst=True, errors='coerce')
@@ -196,7 +225,7 @@ def load_data():
     return df_unique, df
 
 df, df_original = load_data()
-original_count = len(df)
+original_count  = len(df)
 
 
 def parse_runtime(val):
@@ -210,7 +239,7 @@ def style_fig(fig, height=380, y_grid=False):
         xaxis=dict(showgrid=False, zeroline=False, showline=False,
                    tickfont=dict(size=10, color=SUB)),
         yaxis=dict(showgrid=y_grid, zeroline=False, showline=False,
-                   gridcolor="#F1F5F9",
+                   gridcolor=BORDER,
                    tickfont=dict(size=10, color=SUB)),
     )
     return fig
@@ -218,11 +247,11 @@ def style_fig(fig, height=380, y_grid=False):
 
 # ── HEADER ────────────────────────────────────────────────────
 st.markdown(f"""
-<div style="padding: 0 0 32px 0; border-bottom: 1px solid #E2E8F0; margin-bottom: 36px;">
+<div style="padding:0 0 32px 0; border-bottom:1px solid {BORDER}; margin-bottom:36px;">
     <span class="eyebrow">Personal Archive · {datetime.now().year}</span>
     <h1>Film Collection</h1>
-    <p style="font-family: 'DM Sans', sans-serif; font-size: 0.88rem; color: #64748B;
-              margin: 10px 0 0 0; max-width: 480px; line-height: 1.6;">
+    <p style="font-family:'DM Sans',sans-serif; font-size:0.88rem; color:{SUB};
+              margin:10px 0 0 0; max-width:480px; line-height:1.6;">
         A curated catalogue of every film watched, rated, and logged since 2019.
     </p>
 </div>
@@ -230,7 +259,7 @@ st.markdown(f"""
 
 
 # ── SIDEBAR ───────────────────────────────────────────────────
-st.sidebar.markdown('<h3 style="padding: 8px 0 12px;">Filters</h3>', unsafe_allow_html=True)
+st.sidebar.markdown(f'<h3 style="padding:8px 0 12px; color:{MUTED}; font-family:DM Sans,sans-serif; font-size:0.62rem; font-weight:600; letter-spacing:0.14em; text-transform:uppercase;">Filters</h3>', unsafe_allow_html=True)
 df_full, _ = load_data()
 
 search = st.sidebar.text_input("Search", placeholder="Film title…")
@@ -238,7 +267,7 @@ if search:
     df = df[df['Name'].str.contains(search, case=False, na=False)]
 
 languages = ['All'] + sorted(df_full['Language'].dropna().unique().tolist())
-sel_lang = st.sidebar.multiselect("Language", languages, default=['All'])
+sel_lang  = st.sidebar.multiselect("Language", languages, default=['All'])
 if 'All' not in sel_lang and sel_lang:
     df = df[df['Language'].isin(sel_lang)]
 
@@ -252,7 +281,7 @@ if 'All' not in sel_genres and sel_genres:
         lambda x: any(g in str(x) for g in sel_genres) if pd.notna(x) else False)]
 
 directors = ['All'] + sorted(df_full['Director'].dropna().unique().tolist())
-sel_dir = st.sidebar.multiselect("Director", directors, default=['All'])
+sel_dir   = st.sidebar.multiselect("Director", directors, default=['All'])
 if 'All' not in sel_dir and sel_dir:
     df = df[df['Director'].isin(sel_dir)]
 
@@ -285,41 +314,38 @@ elif rw_opt == "First Watch Only":
 
 st.sidebar.markdown("---")
 st.sidebar.markdown(
-    f'<p style="font-family: DM Sans, sans-serif; font-size: 0.76rem; color: #94A3B8;">'
-    f'Showing <strong style="color:#1A2332;">{len(df)}</strong> of {original_count} films</p>',
+    f'<p style="font-family:DM Sans,sans-serif; font-size:0.76rem; color:{MUTED};">'
+    f'Showing <strong style="color:{TEXT};">{len(df)}</strong> of {original_count} films</p>',
     unsafe_allow_html=True)
 
 
 # ── KPI BAR ───────────────────────────────────────────────────
 filtered_names   = df['Name'].tolist()
-filtered_entries = df_original[df_original['Name'].isin(filtered_names)]
+filtered_entries = df_original[df_original['Name'].isin(filtered_names)].copy()
 if wy_range is not None:
     filtered_entries = filtered_entries[
         (filtered_entries['Watch_Year'] >= wy_range[0]) &
         (filtered_entries['Watch_Year'] <= wy_range[1])
     ]
-
-filtered_entries = filtered_entries.copy()
 filtered_entries['Runtime_mins'] = filtered_entries['Runtime'].apply(parse_runtime)
 total_hours = filtered_entries['Runtime_mins'].sum() / 60
-avg_r  = df['TMDb_Rating'].mean() if df['TMDb_Rating'].notna().any() else 0
-n_rec  = (df[NTH] >= 2).sum()
-n_lang = df['Language'].nunique()
+avg_r = df['TMDb_Rating'].mean() if df['TMDb_Rating'].notna().any() else 0
+n_rec = (df[NTH] >= 2).sum()
 
 k1, k2, k3, k4 = st.columns(4, gap="large")
-with k1:
-    st.markdown(f'<div class="kpi-wrap"><div class="kpi-num">{len(df)}</div>'
-                f'<div class="kpi-lbl">Films</div></div>', unsafe_allow_html=True)
-with k2:
-    st.markdown(f'<div class="kpi-wrap"><div class="kpi-num">{avg_r:.1f}</div>'
-                f'<div class="kpi-lbl">Avg TMDb Rating</div></div>', unsafe_allow_html=True)
-with k3:
-    st.markdown(f'<div class="kpi-wrap">'
-                f'<div class="kpi-num">{total_hours:.0f}<span class="kpi-unit">h</span></div>'
-                f'<div class="kpi-lbl">Hours Watched</div></div>', unsafe_allow_html=True)
-with k4:
-    st.markdown(f'<div class="kpi-wrap"><div class="kpi-num">{n_rec}</div>'
-                f'<div class="kpi-lbl">Rewatched</div></div>', unsafe_allow_html=True)
+for col, num, lbl in [
+    (k1, str(len(df)),           "Films"),
+    (k2, f"{avg_r:.1f}",         "Avg TMDb Rating"),
+    (k3, f"{total_hours:.0f}",   "Hours Watched"),
+    (k4, str(n_rec),             "Rewatched"),
+]:
+    unit = "h" if lbl == "Hours Watched" else ""
+    with col:
+        st.markdown(
+            f'<div class="kpi-wrap">'
+            f'<div class="kpi-num">{num}<span class="kpi-unit">{unit}</span></div>'
+            f'<div class="kpi-lbl">{lbl}</div></div>',
+            unsafe_allow_html=True)
 
 st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
 
@@ -330,13 +356,13 @@ tab1, tab2, tab3, tab4 = st.tabs(["CATALOGUE", "RANKINGS", "COMPOSITION", "TREND
 
 # ── TAB 1: CATALOGUE ─────────────────────────────────────────
 with tab1:
-    st.markdown("""
+    st.markdown(f"""
     <span class="eyebrow">Browse</span>
     <span class="chart-title">Complete Film Catalogue</span>
     <span class="chart-sub">All films sorted by TMDb rating. ★ denotes a personal rewatch.</span>
     """, unsafe_allow_html=True)
 
-    disp = df[['Name','Release_Year','TMDb_Rating', NTH,
+    disp = df[['Name','Release_Year','TMDb_Rating',NTH,
                'Genre','Director','Runtime','Language']].copy()
     disp.columns = ['Film','Year','Rating','Watches','Genre','Director','Runtime','Language']
     disp['★'] = disp['Watches'].apply(lambda x: '★' if x >= 2 else '')
@@ -385,7 +411,7 @@ with tab2:
         """, unsafe_allow_html=True)
 
         rw = df[df[NTH] > 1].nlargest(10, NTH)[
-            ['Name','Release_Year', NTH,'TMDb_Rating']].reset_index(drop=True)
+            ['Name','Release_Year',NTH]].reset_index(drop=True)
         if len(rw) > 0:
             rw['Label'] = rw['Name'] + '  (' + rw['Release_Year'].astype(int).astype(str) + ')'
             fig = go.Figure(go.Bar(
@@ -416,12 +442,12 @@ with tab3:
         """, unsafe_allow_html=True)
 
         ld = df['Language'].value_counts().reset_index()
-        ld.columns = ['Language', 'Count']
+        ld.columns = ['Language','Count']
         fig = go.Figure(go.Pie(
             labels=ld['Language'], values=ld['Count'], hole=0.62,
-            marker=dict(colors=QUAL, line=dict(color='white', width=2)),
+            marker=dict(colors=QUAL, line=dict(color=BG, width=2)),
             textinfo='label+percent',
-            textfont=dict(size=11, family="DM Sans"),
+            textfont=dict(size=11, family="DM Sans", color=TEXT),
             hovertemplate='<b>%{label}</b><br>%{value} films · %{percent}<extra></extra>',
         ))
         fig.update_layout(**PLOTLY, height=380, showlegend=False)
@@ -458,13 +484,13 @@ with tab3:
     <span class="chart-title">Top Directors in Collection</span>
     """, unsafe_allow_html=True)
 
-    dc = df['Director'].value_counts().head(15).reset_index()
+    dc  = df['Director'].value_counts().head(15).reset_index()
     dc.columns = ['Director','Films']
     cc, ct = st.columns([2.2, 1], gap="large")
     with cc:
         fig = go.Figure(go.Bar(
             x=dc['Films'], y=dc['Director'], orientation='h',
-            marker=dict(color=BLUE_M),
+            marker=dict(color="#79C0FF"),
             text=dc['Films'], textposition='outside',
             textfont=dict(size=10, color=SUB),
             hovertemplate='<b>%{y}</b><br>%{x} films<extra></extra>',
@@ -487,9 +513,9 @@ with tab4:
     """, unsafe_allow_html=True)
 
     tdf = filtered_entries.copy()
-    tdf['Watch_Year']  = tdf['Date_Parsed'].dt.year
-    tdf['Month_Name']  = tdf['Date_Parsed'].dt.month_name()
-    tdf['Year-Month']  = tdf['Date_Parsed'].dt.to_period('M').astype(str)
+    tdf['Watch_Year'] = tdf['Date_Parsed'].dt.year
+    tdf['Month_Name'] = tdf['Date_Parsed'].dt.month_name()
+    tdf['Year-Month'] = tdf['Date_Parsed'].dt.to_period('M').astype(str)
     tdf = tdf.dropna(subset=['Watch_Year'])
     tdf['Watch_Year'] = tdf['Watch_Year'].astype(int)
 
@@ -500,7 +526,7 @@ with tab4:
             Movies=('Name','count'), Minutes=('Runtime_mins','sum')).reset_index()
         gdf.columns = ['Period','Movies','Minutes']
         gdf['Period'] = gdf['Period'].astype(str)
-        gdf['Hours'] = gdf['Minutes'] / 60
+        gdf['Hours']  = gdf['Minutes'] / 60
         x_ang, show_lbl = 0, True
 
     elif view_by == "Month":
@@ -509,7 +535,7 @@ with tab4:
         gdf = tdf.dropna(subset=['Month_Name']).groupby('Month_Name').agg(
             Movies=('Name','count'), Minutes=('Runtime_mins','sum')).reset_index()
         gdf.columns = ['Period','Movies','Minutes']
-        gdf['Hours'] = gdf['Minutes'] / 60
+        gdf['Hours']  = gdf['Minutes'] / 60
         gdf['Period'] = pd.Categorical(gdf['Period'], categories=mo, ordered=True)
         gdf = gdf.sort_values('Period')
         x_ang, show_lbl = 45, True
@@ -528,21 +554,18 @@ with tab4:
 
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
     m1, m2, m3, m4 = st.columns(4, gap="large")
-    with m1:
-        st.markdown(f'<div class="kpi-wrap"><div class="kpi-num">{tot_m}</div>'
-                    f'<div class="kpi-lbl">Total Watches</div></div>', unsafe_allow_html=True)
-    with m2:
-        st.markdown(f'<div class="kpi-wrap">'
-                    f'<div class="kpi-num">{tot_h:.0f}<span class="kpi-unit">h</span></div>'
-                    f'<div class="kpi-lbl">Hours Spent</div></div>', unsafe_allow_html=True)
-    with m3:
-        st.markdown(f'<div class="kpi-wrap">'
-                    f'<div class="kpi-num">{days:.1f}<span class="kpi-unit">d</span></div>'
-                    f'<div class="kpi-lbl">Days Spent</div></div>', unsafe_allow_html=True)
-    with m4:
-        st.markdown(f'<div class="kpi-wrap">'
-                    f'<div class="kpi-num">{avg_rt:.0f}<span class="kpi-unit">m</span></div>'
-                    f'<div class="kpi-lbl">Avg Runtime</div></div>', unsafe_allow_html=True)
+    for col, num, unit, lbl in [
+        (m1, str(tot_m),        "",  "Total Watches"),
+        (m2, f"{tot_h:.0f}",    "h", "Hours Spent"),
+        (m3, f"{days:.1f}",     "d", "Days Spent"),
+        (m4, f"{avg_rt:.0f}",   "m", "Avg Runtime"),
+    ]:
+        with col:
+            st.markdown(
+                f'<div class="kpi-wrap">'
+                f'<div class="kpi-num">{num}<span class="kpi-unit">{unit}</span></div>'
+                f'<div class="kpi-lbl">{lbl}</div></div>',
+                unsafe_allow_html=True)
 
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
     cl, cr = st.columns(2, gap="large")
@@ -567,7 +590,7 @@ with tab4:
         st.markdown('<span class="eyebrow">Duration</span>', unsafe_allow_html=True)
         fig = go.Figure(go.Bar(
             x=gdf['Period'], y=gdf['Hours'],
-            marker=dict(color=BLUE_L),
+            marker=dict(color="#79C0FF"),
             text=gdf['Hours'].apply(lambda v: f"{v:.0f}h") if show_lbl else None,
             textposition='outside',
             textfont=dict(size=10, color=SUB),
@@ -584,6 +607,6 @@ with tab4:
 st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
 st.markdown(
     f'<p class="footer-line">{original_count} films catalogued'
-    f'&ensp;·&ensp;Dashboard v2.0'
+    f'&ensp;·&ensp;Dashboard v2.1'
     f'&ensp;·&ensp;Updated {datetime.now().strftime("%B %Y")}</p>',
     unsafe_allow_html=True)
