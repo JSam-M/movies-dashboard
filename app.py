@@ -21,7 +21,7 @@ st.markdown("""
 
 /* ── Reset ── */
 #MainMenu, footer, .stDeployButton, header[data-testid="stHeader"] { display:none !important; }
-.block-container { padding: 0 !important; max-width: 100% !important; overflow-x: hidden; }
+.block-container { padding: 3rem 5rem 5rem 5rem !important; max-width: 1400px !important; overflow-x: hidden; }
 * { box-sizing: border-box; }
 
 /* ── Root canvas ── */
@@ -191,7 +191,7 @@ html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
 .div-line { border: none; border-top: 1px solid rgba(255,255,255,.07); margin: 0; }
 
 /* ── Page wrapper ── */
-.page { max-width: 1380px; margin: 0 auto; padding: 48px 56px 80px 56px; position: relative; z-index: 1; }
+.page { max-width: 100%; position: relative; z-index: 1; }
 </style>
 """, unsafe_allow_html=True)
 
