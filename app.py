@@ -245,12 +245,13 @@ def glass_fig(fig, height=360):
         xaxis=dict(
             showgrid=False, zeroline=False, showline=False,
             tickfont=dict(size=10, color="rgba(240,237,232,.3)"),
-            tickcolor="transparent"
+            ticks="",
         ),
         yaxis=dict(
             showgrid=True, zeroline=False, showline=False,
             gridcolor="rgba(255,255,255,.05)",
-            tickfont=dict(size=10, color="rgba(240,237,232,.3)")
+            tickfont=dict(size=10, color="rgba(240,237,232,.3)"),
+            ticks="",
         ),
     )
     return fig
