@@ -238,7 +238,7 @@ def glass_fig(fig, height=360):
         margin=dict(l=8, r=28, t=24, b=8),
         hoverlabel=dict(
             bgcolor="rgba(20,20,28,.95)",
-            font_size=12, font_family="'Geist', sans-serif",
+            font_size=12, font_family="sans-serif",
             font_color="#f0ede8",
             bordercolor="rgba(255,255,255,.12)"
         ),
@@ -495,11 +495,11 @@ with tab3:
             labels=ld['Language'], values=ld['Count'], hole=0.68,
             marker=dict(colors=GLASS_COLORS, line=dict(color='rgba(8,9,10,1)', width=2)),
             textinfo='label+percent',
-            textfont=dict(size=10, family="Geist", color='rgba(240,237,232,.6)'),
+            textfont=dict(size=10, color='rgba(240,237,232,.6)'),
             hovertemplate='<b>%{label}</b><br>%{value} films<extra></extra>',
         ))
         fig.update_layout(
-            font=dict(family="'Geist',sans-serif", color='rgba(240,237,232,.4)', size=10),
+            font=dict(family="sans-serif", size=10),
             paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
             height=380, showlegend=False,
             margin=dict(l=0,r=0,t=24,b=0),
