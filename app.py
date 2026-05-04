@@ -231,7 +231,7 @@ GLASS_COLORS = ["#a78bfa","#67e8f9","#fbbf24","#f472b6","#34d399","#fb923c","#60
 
 def glass_fig(fig, height=360):
     fig.update_layout(
-        font=dict(family="Geist, sans-serif", size=10),
+        font=dict(family="sans-serif", size=10),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         height=height,
