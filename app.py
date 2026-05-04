@@ -21,7 +21,7 @@ st.markdown("""
 
 /* ── Reset ── */
 #MainMenu, footer, .stDeployButton, header[data-testid="stHeader"] { display:none !important; }
-.block-container { padding: 0 !important; max-width: 100% !important; }
+.block-container { padding: 0 !important; max-width: 100% !important; overflow-x: hidden; }
 * { box-sizing: border-box; }
 
 /* ── Root canvas ── */
@@ -191,7 +191,7 @@ html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
 .div-line { border: none; border-top: 1px solid rgba(255,255,255,.07); margin: 0; }
 
 /* ── Page wrapper ── */
-.page { max-width: 1380px; margin: 0 auto; padding: 48px 48px 80px; position: relative; z-index: 1; }
+.page { max-width: 1380px; margin: 0 auto; padding: 48px 56px 80px 56px; position: relative; z-index: 1; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -231,11 +231,11 @@ GLASS_COLORS = ["#a78bfa","#67e8f9","#fbbf24","#f472b6","#34d399","#fb923c","#60
 
 def glass_fig(fig, height=360):
     fig.update_layout(
-        font=dict(family="'Geist', sans-serif", color="rgba(240,237,232,.45)", size=10),
+        font=dict(family="Geist, sans-serif", size=10),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         height=height,
-        margin=dict(l=0, r=20, t=24, b=0),
+        margin=dict(l=8, r=28, t=24, b=8),
         hoverlabel=dict(
             bgcolor="rgba(20,20,28,.95)",
             font_size=12, font_family="'Geist', sans-serif",
