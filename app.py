@@ -7,7 +7,7 @@ st.set_page_config(
     page_title="Films",
     page_icon="◼",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded"
 )
 
 NTH = "N'th time of watching"
@@ -81,9 +81,17 @@ html, body, .stApp,
     border-radius: 10px !important; color: #1d1d1f !important;
 }
 [data-testid="collapsedControl"] {
-    background: rgba(255,255,255,.8) !important;
-    border: 1px solid rgba(0,0,0,.08) !important;
+    background: rgba(255,255,255,.9) !important;
+    border: 1px solid rgba(0,0,0,.12) !important;
+    border-left: none !important;
     backdrop-filter: blur(20px) !important;
+    box-shadow: 2px 0 8px rgba(0,0,0,.08) !important;
+    width: 28px !important;
+    color: #1d1d1f !important;
+}
+[data-testid="collapsedControl"]:hover {
+    background: rgba(0,113,227,.08) !important;
+    border-color: rgba(0,113,227,.3) !important;
 }
 
 /* ── Tabs ── */
