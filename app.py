@@ -7,7 +7,7 @@ st.set_page_config(
     page_title="Films",
     page_icon="◼",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 NTH = "N'th time of watching"
@@ -81,18 +81,19 @@ html, body, .stApp,
     border-radius: 10px !important; color: #1d1d1f !important;
 }
 [data-testid="collapsedControl"] {
-    background: rgba(255,255,255,.9) !important;
-    border: 1px solid rgba(0,0,0,.12) !important;
-    border-left: none !important;
-    backdrop-filter: blur(20px) !important;
-    box-shadow: 2px 0 8px rgba(0,0,0,.08) !important;
-    width: 28px !important;
-    color: #1d1d1f !important;
+    background: #0071e3 !important;
+    border: none !important;
+    border-radius: 0 20px 20px 0 !important;
+    box-shadow: 0 4px 12px rgba(0,113,227,.35) !important;
+    width: 32px !important;
+    color: white !important;
+    top: 50% !important;
 }
 [data-testid="collapsedControl"]:hover {
-    background: rgba(0,113,227,.08) !important;
-    border-color: rgba(0,113,227,.3) !important;
+    background: #0077ed !important;
+    box-shadow: 0 6px 16px rgba(0,113,227,.45) !important;
 }
+[data-testid="collapsedControl"] svg { fill: white !important; }
 
 /* ── Tabs ── */
 .stTabs [data-baseweb="tab-list"] {
@@ -339,6 +340,30 @@ n_langs     = df['Language'].nunique()
 
 # ── HERO ──────────────────────────────────────────────────────
 h_left, h_right = st.columns([3, 1], gap="large")
+
+# JS to click the hidden sidebar toggle
+st.markdown("""
+<script>
+function openSidebar() {
+    const btn = window.parent.document.querySelector('[data-testid="collapsedControl"]');
+    if (btn) btn.click();
+}
+</script>
+<style>
+.filter-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #0071e3; color: white !important;
+    border: none; border-radius: 980px;
+    padding: 8px 18px; font-family: 'Inter', sans-serif;
+    font-size: 0.78rem; font-weight: 500; letter-spacing: .01em;
+    cursor: pointer; box-shadow: 0 2px 8px rgba(0,113,227,.3);
+    text-decoration: none;
+    margin-bottom: 32px; margin-top: 4px;
+}
+.filter-btn:hover { background: #0077ed; box-shadow: 0 4px 12px rgba(0,113,227,.4); }
+</style>
+<button class="filter-btn" onclick="openSidebar()">⟐ Filters</button>
+""", unsafe_allow_html=True)
 
 with h_left:
     st.markdown(f"""
