@@ -280,50 +280,44 @@ def apple_fig(fig, height=360, dark_bg=False):
     return fig
 
 
-# ── SIDEBAR ───────────────────────────────────────────────────
+# ── FILTERS (inline expander) ─────────────────────────────────
 df_full, _ = load_data()
-st.sidebar.markdown('<p class="t-eyebrow" style="padding:12px 0 16px; color:#6e6e73;">Refine</p>', unsafe_allow_html=True)
 
-search = st.sidebar.text_input("", placeholder="Search films…", label_visibility="collapsed")
-if search: df = df[df['Name'].str.contains(search, case=False, na=False)]
-
-langs = ['All'] + sorted(df_full['Language'].dropna().unique().tolist())
-sel_lang = st.sidebar.multiselect("Language", langs, default=['All'])
-if 'All' not in sel_lang and sel_lang: df = df[df['Language'].isin(sel_lang)]
-
-all_genres = set()
-for g in df_full['Genre'].dropna(): all_genres.update([x.strip() for x in str(g).split(',')])
-sel_genre = st.sidebar.multiselect("Genre", ['All']+sorted(all_genres), default=['All'])
-if 'All' not in sel_genre and sel_genre:
-    df = df[df['Genre'].apply(lambda x: any(g in str(x) for g in sel_genre) if pd.notna(x) else False)]
-
-sel_dir = st.sidebar.multiselect("Director", ['All']+sorted(df_full['Director'].dropna().unique().tolist()), default=['All'])
-if 'All' not in sel_dir and sel_dir: df = df[df['Director'].isin(sel_dir)]
-
-min_r = st.sidebar.slider("Min Rating", 0.0, 10.0, 0.0, 0.5)
-df = df[df['TMDb_Rating'] >= min_r]
-
-if df_full['Release_Year'].notna().any():
-    yl, yh = int(df_full['Release_Year'].min()), int(df_full['Release_Year'].max())
-    if yl < yh:
-        yr_range = st.sidebar.slider("Release Year", yl, yh, (yl, yh))
-        df = df[(df['Release_Year'] >= yr_range[0]) & (df['Release_Year'] <= yr_range[1])]
-
-wy_range = None
-if df_full['Watch_Year'].notna().any():
-    wl, wh = int(df_full['Watch_Year'].min()), int(df_full['Watch_Year'].max())
-    if wl < wh:
-        wy_range = st.sidebar.slider("Watch Year", wl, wh, (wl, wh))
-        df = df[(df['Watch_Year'] >= wy_range[0]) & (df['Watch_Year'] <= wy_range[1])]
-
-st.sidebar.markdown("---")
-rw = st.sidebar.radio("", ["All", "Rewatched", "First watch"], label_visibility="collapsed")
-if rw == "Rewatched":     df = df[df[NTH] >= 2]
-elif rw == "First watch": df = df[df[NTH] <= 1]
-
-st.sidebar.markdown(
-    f'<p style="font-size:.7rem;color:#86868b;margin-top:12px;">{len(df)} of {original_count} films</p>',
-    unsafe_allow_html=True)
+with st.expander("⟐  Filters", expanded=False):
+    fc1, fc2, fc3, fc4 = st.columns(4, gap="medium")
+    with fc1:
+        search = st.text_input("Search", placeholder="Film title…")
+        if search: df = df[df['Name'].str.contains(search, case=False, na=False)]
+        langs = ['All'] + sorted(df_full['Language'].dropna().unique().tolist())
+        sel_lang = st.multiselect("Language", langs, default=['All'])
+        if 'All' not in sel_lang and sel_lang: df = df[df['Language'].isin(sel_lang)]
+    with fc2:
+        all_genres = set()
+        for g in df_full['Genre'].dropna(): all_genres.update([x.strip() for x in str(g).split(',')])
+        sel_genre = st.multiselect("Genre", ['All']+sorted(all_genres), default=['All'])
+        if 'All' not in sel_genre and sel_genre:
+            df = df[df['Genre'].apply(lambda x: any(g in str(x) for g in sel_genre) if pd.notna(x) else False)]
+        sel_dir = st.multiselect("Director", ['All']+sorted(df_full['Director'].dropna().unique().tolist()), default=['All'])
+        if 'All' not in sel_dir and sel_dir: df = df[df['Director'].isin(sel_dir)]
+    with fc3:
+        min_r = st.slider("Min TMDb Rating", 0.0, 10.0, 0.0, 0.5)
+        df = df[df['TMDb_Rating'] >= min_r]
+        if df_full['Release_Year'].notna().any():
+            yl, yh = int(df_full['Release_Year'].min()), int(df_full['Release_Year'].max())
+            if yl < yh:
+                yr_range = st.slider("Release Year", yl, yh, (yl, yh))
+                df = df[(df['Release_Year'] >= yr_range[0]) & (df['Release_Year'] <= yr_range[1])]
+    with fc4:
+        wy_range = None
+        if df_full['Watch_Year'].notna().any():
+            wl, wh = int(df_full['Watch_Year'].min()), int(df_full['Watch_Year'].max())
+            if wl < wh:
+                wy_range = st.slider("Watch Year", wl, wh, (wl, wh))
+                df = df[(df['Watch_Year'] >= wy_range[0]) & (df['Watch_Year'] <= wy_range[1])]
+        rw = st.radio("View", ["All", "Rewatched", "First watch"])
+        if rw == "Rewatched":     df = df[df[NTH] >= 2]
+        elif rw == "First watch": df = df[df[NTH] <= 1]
+    st.caption(f"{len(df)} of {original_count} films")
 
 
 # ── STATS ─────────────────────────────────────────────────────
@@ -341,29 +335,7 @@ n_langs     = df['Language'].nunique()
 # ── HERO ──────────────────────────────────────────────────────
 h_left, h_right = st.columns([3, 1], gap="large")
 
-# JS to click the hidden sidebar toggle
-st.markdown("""
-<script>
-function openSidebar() {
-    const btn = window.parent.document.querySelector('[data-testid="collapsedControl"]');
-    if (btn) btn.click();
-}
-</script>
-<style>
-.filter-btn {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: #0071e3; color: white !important;
-    border: none; border-radius: 980px;
-    padding: 8px 18px; font-family: 'Inter', sans-serif;
-    font-size: 0.78rem; font-weight: 500; letter-spacing: .01em;
-    cursor: pointer; box-shadow: 0 2px 8px rgba(0,113,227,.3);
-    text-decoration: none;
-    margin-bottom: 32px; margin-top: 4px;
-}
-.filter-btn:hover { background: #0077ed; box-shadow: 0 4px 12px rgba(0,113,227,.4); }
-</style>
-<button class="filter-btn" onclick="openSidebar()">⟐ Filters</button>
-""", unsafe_allow_html=True)
+
 
 with h_left:
     st.markdown(f"""
