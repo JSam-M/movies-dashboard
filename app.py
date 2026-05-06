@@ -706,5 +706,5 @@ with tab4:
 st.markdown('<hr class="div-line" style="margin-top:40px;">', unsafe_allow_html=True)
 st.markdown(
     f'<p class="footer-txt">{original_count} films &nbsp;·&nbsp; '
-    f'v5.1 &nbsp;·&nbsp; {datetime.now().strftime("%B %Y")}</p>',
+    f'v4.0 &nbsp;·&nbsp; {datetime.now().strftime("%B %Y")}</p>',
     unsafe_allow_html=True)
