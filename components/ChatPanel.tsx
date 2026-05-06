@@ -5,7 +5,7 @@ import type { Movie } from '@/lib/movies'
 
 interface Message { role: 'user'|'assistant'; content: string }
 
-interface Props { movies: Movie[]; onClose: () => void }
+interface Props { movies: Movie[]; onClose: () => void; initialMessage?: string }
 
 const QUICK_PROMPTS = [
   "I loved Parasite — what should I watch?",
@@ -26,7 +26,7 @@ function formatMessage(text: string) {
   })
 }
 
-export default function ChatPanel({ movies, onClose }: Props) {
+export default function ChatPanel({ movies, onClose, initialMessage }: Props) {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
@@ -45,6 +45,13 @@ export default function ChatPanel({ movies, onClose }: Props) {
   useEffect(() => {
     inputRef.current?.focus()
   }, [])
+
+  // Auto-send if opened with a pre-filled query from the hero search
+  useEffect(() => {
+    if (initialMessage && messages.length === 1) {
+      send(initialMessage)
+    }
+  }, [initialMessage]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const send = async (text?: string) => {
     const content = text || input.trim()
