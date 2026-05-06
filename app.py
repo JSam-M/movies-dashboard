@@ -603,13 +603,12 @@ with tab4:
 
     tot_m=len(tdf); tot_h=tdf['Runtime_mins'].sum()/60
     days=tot_h/24; avg_rt=tdf['Runtime_mins'].mean() if tot_m else 0
-    peak_year = str(int(tdf.groupby('Watch_Year')['Name'].count().idxmax())) if not tdf.empty else "—"
 
     st.markdown('<hr class="div-line" style="margin:16px 0 28px;">', unsafe_allow_html=True)
     s1,s2,s3,s4 = st.columns(4, gap="medium")
     for col,val,unit,lbl,dot in [
         (s1,str(tot_m),      "",  "Total Watches",  "#0071e3"),
-        (s2,peak_year,       "",  "Peak Year",       "#ff9500"),
+        (s2,f"{tot_h:.0f}",  "h", "Hours Spent",    "#ff9500"),
         (s3,f"{days:.1f}",   "d", "Days in Cinema", "#34c759"),
         (s4,f"{avg_rt:.0f}", "m", "Avg Runtime",    "#ff3b30"),
     ]:
