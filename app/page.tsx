@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import type { Movie } from '@/lib/movies'
 import ChatPanel from '@/components/ChatPanel'
 import Link from 'next/link'
@@ -10,12 +10,15 @@ export default function DiscoverPage() {
   const [filtered,  setFiltered]  = useState<Movie[]>([])
   const [loading,   setLoading]   = useState(true)
   const [chatOpen,  setChatOpen]  = useState(false)
+  const [aiQuery,   setAiQuery]   = useState('')
+  const [initialMsg,setInitialMsg]= useState('')
   const [search,    setSearch]    = useState('')
   const [genre,     setGenre]     = useState('All')
   const [language,  setLanguage]  = useState('All')
   const [showRewatched, setShowRewatched] = useState(false)
   const [sortBy,    setSortBy]    = useState<'rating'|'rating_asc'|'rewatched'|'recent'|'oldest'>('rating')
   const [stats,     setStats]     = useState<Record<string,unknown>>({})
+  const aiInputRef  = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     fetch('/api/movies')
@@ -27,7 +30,7 @@ export default function DiscoverPage() {
 
   useEffect(() => {
     let f = [...allMovies]
-    if (search)        f = f.filter(m => m.name.toLowerCase().includes(search.toLowerCase()) || m.director.toLowerCase().includes(search.toLowerCase()))
+    if (search)             f = f.filter(m => m.name.toLowerCase().includes(search.toLowerCase()) || m.director.toLowerCase().includes(search.toLowerCase()))
     if (genre !== 'All')    f = f.filter(m => m.genre.includes(genre))
     if (language !== 'All') f = f.filter(m => m.language === language)
     if (showRewatched)      f = f.filter(m => m.timesWatched >= 2)
@@ -38,6 +41,13 @@ export default function DiscoverPage() {
     if (sortBy === 'oldest')      f = [...f].sort((a,b) => a.date.localeCompare(b.date))
     setFiltered(f)
   }, [search, genre, language, showRewatched, sortBy, allMovies])
+
+  const handleAiSearch = () => {
+    if (!aiQuery.trim()) return
+    setInitialMsg(aiQuery.trim())
+    setAiQuery('')
+    setChatOpen(true)
+  }
 
   const genres    = ['All', ...Array.from(new Set(allMovies.flatMap(m => m.genre.split(',').map(g => g.trim()).filter(Boolean)))).sort()]
   const languages = ['All', ...Array.from(new Set(allMovies.map(m => m.language))).sort()]
@@ -85,17 +95,29 @@ export default function DiscoverPage() {
             {stats.total as number} films watched. Not sure what to watch? The AI knows this collection inside out.
           </p>
 
-          {/* Search bar */}
-          <div className="relative max-w-lg mx-auto mb-4">
-            <svg className="absolute left-4 top-1/2 -translate-y-1/2" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#86868b" strokeWidth="2">
-              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          {/* AI Search bar */}
+          <div className="relative max-w-lg mx-auto mt-8">
+            <svg className="absolute left-4 top-1/2 -translate-y-1/2" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0071e3" strokeWidth="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
             </svg>
-            <input value={search} onChange={e => setSearch(e.target.value)}
-              placeholder={`Search ${stats.total as number}+ films or directors…`}
-              className="w-full pl-11 pr-4 py-3.5 rounded-2xl font-body text-[0.9rem] outline-none"
-              style={{background:'white',border:'1px solid rgba(0,0,0,0.08)',color:'var(--text)',boxShadow:'0 4px 20px rgba(0,0,0,0.08)'}} />
+            <input
+              ref={aiInputRef}
+              value={aiQuery}
+              onChange={e => setAiQuery(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleAiSearch()}
+              placeholder="What should I watch tonight?"
+              className="w-full pl-11 pr-14 py-3.5 rounded-2xl font-body text-[0.9rem] outline-none"
+              style={{background:'white',border:'1px solid rgba(0,113,227,0.2)',color:'var(--text)',boxShadow:'0 4px 24px rgba(0,113,227,0.12)'}}
+            />
+            <button onClick={handleAiSearch}
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-xl flex items-center justify-center transition-all"
+              style={{background: aiQuery.trim() ? 'var(--blue)' : 'rgba(0,0,0,0.06)'}}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={aiQuery.trim() ? 'white' : '#86868b'} strokeWidth="2.5">
+                <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
+            </button>
           </div>
-          <p className="font-body text-[0.72rem] text-[var(--muted)]">Or ask the AI for a personalised recommendation ↓</p>
+          <p className="font-body text-[0.7rem] text-[var(--muted)] mt-3">AI recommends only from films actually watched</p>
         </div>
 
         {/* TOP PICKS */}
@@ -222,7 +244,7 @@ export default function DiscoverPage() {
         </svg>
       </button>
 
-      {chatOpen && <ChatPanel movies={allMovies} onClose={() => setChatOpen(false)} />}
+      {chatOpen && <ChatPanel movies={allMovies} initialMessage={initialMsg} onClose={() => { setChatOpen(false); setInitialMsg('') }} />}
     </div>
   )
 }
