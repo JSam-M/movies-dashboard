@@ -58,9 +58,9 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
   }
 
   const parseRuntime = (v: string) => { const n = parseInt(v); return isNaN(n) ? 0 : n }
-  entries = entries.map(e => ({ ...e, runtimeMins: parseRuntime(e.runtime) }))
+  const entriesWithMins = entries.map(e => ({ ...e, runtimeMins: parseRuntime(e.runtime) }))
 
-  const totalMins  = entries.reduce((s, e) => s + (e as typeof e & {runtimeMins:number}).runtimeMins, 0)
+  const totalMins  = entriesWithMins.reduce((s, e) => s + e.runtimeMins, 0)
   const totalHours = Math.round(totalMins / 60)
   const totalDays  = (totalMins / 1440).toFixed(1)
   const avgRating  = movies.filter(m => m.tmdbRating > 0).length > 0
@@ -93,13 +93,13 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
 
   // ── Viewing timeline by year-month ──
   const monthData: Record<string,{movies:number,hours:number}> = {}
-  entries.forEach((e: typeof e & {runtimeMins?:number}) => {
+  entriesWithMins.forEach((e) => {
     const [d,mo,y] = e.date.split('/')
     if (d&&mo&&y) {
       const k = `20${y}-${mo.padStart(2,'0')}`
       monthData[k] = monthData[k]||{movies:0,hours:0}
       monthData[k].movies++
-      monthData[k].hours += ((e as typeof e & {runtimeMins:number}).runtimeMins||0)/60
+      monthData[k].hours += (e.runtimeMins||0)/60
     }
   })
   const timelineData = Object.entries(monthData).sort((a,b)=>a[0].localeCompare(b[0]))
