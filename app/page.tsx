@@ -14,7 +14,7 @@ export default function DiscoverPage() {
   const [genre,     setGenre]     = useState('All')
   const [language,  setLanguage]  = useState('All')
   const [showRewatched, setShowRewatched] = useState(false)
-  const [sortBy,    setSortBy]    = useState<'rating'|'rewatched'|'recent'>('rating')
+  const [sortBy,    setSortBy]    = useState<'rating'|'rating_asc'|'rewatched'|'recent'|'oldest'>('rating')
   const [stats,     setStats]     = useState<Record<string,unknown>>({})
 
   useEffect(() => {
@@ -31,9 +31,11 @@ export default function DiscoverPage() {
     if (genre !== 'All')    f = f.filter(m => m.genre.includes(genre))
     if (language !== 'All') f = f.filter(m => m.language === language)
     if (showRewatched)      f = f.filter(m => m.timesWatched >= 2)
-    if (sortBy === 'rating')    f = [...f].sort((a,b) => b.tmdbRating - a.tmdbRating)
-    if (sortBy === 'rewatched') f = [...f].sort((a,b) => b.timesWatched - a.timesWatched)
-    if (sortBy === 'recent')    f = [...f].sort((a,b) => b.date.localeCompare(a.date))
+    if (sortBy === 'rating')      f = [...f].sort((a,b) => b.tmdbRating - a.tmdbRating)
+    if (sortBy === 'rating_asc')  f = [...f].sort((a,b) => a.tmdbRating - b.tmdbRating)
+    if (sortBy === 'rewatched')   f = [...f].sort((a,b) => b.timesWatched - a.timesWatched)
+    if (sortBy === 'recent')      f = [...f].sort((a,b) => b.date.localeCompare(a.date))
+    if (sortBy === 'oldest')      f = [...f].sort((a,b) => a.date.localeCompare(b.date))
     setFiltered(f)
   }, [search, genre, language, showRewatched, sortBy, allMovies])
 
@@ -82,6 +84,18 @@ export default function DiscoverPage() {
           <p className="font-body text-[1rem] text-[var(--sub)] max-w-md mx-auto leading-relaxed mb-10">
             {stats.total as number} films watched. Not sure what to watch? The AI knows this collection inside out.
           </p>
+
+          {/* Search bar */}
+          <div className="relative max-w-lg mx-auto mb-4">
+            <svg className="absolute left-4 top-1/2 -translate-y-1/2" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#86868b" strokeWidth="2">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input value={search} onChange={e => setSearch(e.target.value)}
+              placeholder={`Search ${stats.total as number}+ films or directors…`}
+              className="w-full pl-11 pr-4 py-3.5 rounded-2xl font-body text-[0.9rem] outline-none"
+              style={{background:'white',border:'1px solid rgba(0,0,0,0.08)',color:'var(--text)',boxShadow:'0 4px 20px rgba(0,0,0,0.08)'}} />
+          </div>
+          <p className="font-body text-[0.72rem] text-[var(--muted)]">Or ask the AI for a personalised recommendation ↓</p>
         </div>
 
         {/* TOP PICKS */}
@@ -144,12 +158,14 @@ export default function DiscoverPage() {
               style={{background:'white',border:'1px solid rgba(0,0,0,0.08)',color:'var(--text)'}}>
               {languages.map(l => <option key={l}>{l}</option>)}
             </select>
-            <select value={sortBy} onChange={e => setSortBy(e.target.value as 'rating'|'rewatched'|'recent')}
+            <select value={sortBy} onChange={e => setSortBy(e.target.value as 'rating'|'rating_asc'|'rewatched'|'recent'|'oldest')}
               className="px-3 py-2.5 rounded-xl font-body text-sm outline-none"
               style={{background:'white',border:'1px solid rgba(0,0,0,0.08)',color:'var(--text)'}}>
-              <option value="rating">Sort: Rating</option>
-              <option value="rewatched">Sort: Rewatched</option>
-              <option value="recent">Sort: Recent</option>
+              <option value="rating">Rating ↓</option>
+              <option value="rating_asc">Rating ↑</option>
+              <option value="rewatched">Rewatched ↓</option>
+              <option value="recent">Newest first</option>
+              <option value="oldest">Oldest first</option>
             </select>
             <button onClick={() => setShowRewatched(!showRewatched)}
               className="px-4 py-2.5 rounded-xl font-body text-sm font-medium transition-all"
