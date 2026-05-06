@@ -604,20 +604,44 @@ with tab4:
     tot_m=len(tdf); tot_h=tdf['Runtime_mins'].sum()/60
     days=tot_h/24; avg_rt=tdf['Runtime_mins'].mean() if tot_m else 0
 
+    # Favourite Genre (from filtered unique films)
+    gc = {}
+    for gs in df['Genre'].dropna():
+        for g in str(gs).split(','): g=g.strip(); gc[g]=gc.get(g,0)+1
+    fav_genre = max(gc, key=gc.get).strip() if gc else "—"
+
+    # Binge Streak — longest consecutive days with at least one watch
+    binge = 0
+    if not tdf.empty:
+        watch_dates = set(tdf['Date_Parsed'].dt.date.dropna())
+        if watch_dates:
+            sorted_dates = sorted(watch_dates)
+            streak = best = 1
+            for i in range(1, len(sorted_dates)):
+                if (sorted_dates[i] - sorted_dates[i-1]).days == 1:
+                    streak += 1; best = max(best, streak)
+                else:
+                    streak = 1
+            binge = best
+
     st.markdown('<hr class="div-line" style="margin:16px 0 28px;">', unsafe_allow_html=True)
-    s1,s2,s3,s4 = st.columns(4, gap="medium")
+    s1,s2,s3,s4,s5 = st.columns(5, gap="medium")
     for col,val,unit,lbl,dot in [
-        (s1,str(tot_m),      "",  "Total Watches",  "#0071e3"),
-        (s2,f"{tot_h:.0f}",  "h", "Hours Spent",    "#ff9500"),
-        (s3,f"{days:.1f}",   "d", "Days in Cinema", "#34c759"),
-        (s4,f"{avg_rt:.0f}", "m", "Avg Runtime",    "#ff3b30"),
+        (s1, str(tot_m),       "",   "Total Watches",   "#0071e3"),
+        (s2, fav_genre,        "",   "Favourite Genre", "#ff9500"),
+        (s3, str(binge),       "d",  "Binge Streak",    "#34c759"),
+        (s4, f"{days:.1f}",    "d",  "Days in Cinema",  "#5856d6"),
+        (s5, f"{avg_rt:.0f}", "m",  "Avg Runtime",     "#ff3b30"),
     ]:
         with col:
+            is_text = lbl in ("Favourite Genre",)
+            font_size   = "1.2rem" if is_text else "2.4rem"
+            font_family = "'Inter', sans-serif" if is_text else "'Cormorant Garamond', serif"
             st.markdown(f"""
             <div class="glass kpi-glass">
                 <div style="position:absolute;top:16px;right:16px;width:8px;height:8px;
                     border-radius:50%;background:{dot};opacity:.7;"></div>
-                <div class="kpi-value" style="font-size:2.4rem;">{val}<sup style="font-size:.85rem;">{unit}</sup></div>
+                <div class="kpi-value" style="font-size:{font_size};font-family:{font_family};line-height:1.25;">{val}<sup style="font-size:.75rem;">{unit}</sup></div>
                 <div class="kpi-label">{lbl}</div>
             </div>
             """, unsafe_allow_html=True)
