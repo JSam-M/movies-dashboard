@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import type { Movie } from '@/lib/movies'
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
 interface Props { movies: Movie[]; allEntries: Movie[]; watchYear: [number,number] | null }
 
@@ -144,9 +144,8 @@ export default function TrendsTab({ movies, allEntries, watchYear }: Props) {
                 <XAxis dataKey="period" tick={{fontFamily:'DM Sans',fontSize:10,fill:'#86868b'}} axisLine={false} tickLine={false} angle={view==='all'?-45:0} textAnchor={view==='all'?'end':'middle'} interval={view==='all'?5:0} />
                 <YAxis tick={{fontFamily:'DM Sans',fontSize:10,fill:'#86868b'}} axisLine={false} tickLine={false} />
                 <Tooltip {...tooltip} formatter={(v:number)=>[v,'Films']} />
-                <Bar dataKey="movies" radius={[4,4,0,0]} label={view!=='all'?{position:'top',fontSize:10,fill:'#86868b',fontFamily:'DM Sans'}:false}>
-                  {data.map((_,i)=><Cell key={i} fill={`hsl(${210+i*3},${80-i}%,${50+i}%)`} />)}
-                </Bar>
+                <Bar dataKey="movies" radius={[4,4,0,0]} fill="#0071e3"
+                  label={view!=='all'?{position:'top',fontSize:10,fill:'#86868b',fontFamily:'DM Sans'}:false} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -160,9 +159,8 @@ export default function TrendsTab({ movies, allEntries, watchYear }: Props) {
                 <XAxis dataKey="period" tick={{fontFamily:'DM Sans',fontSize:10,fill:'#86868b'}} axisLine={false} tickLine={false} angle={view==='all'?-45:0} textAnchor={view==='all'?'end':'middle'} interval={view==='all'?5:0} />
                 <YAxis tick={{fontFamily:'DM Sans',fontSize:10,fill:'#86868b'}} axisLine={false} tickLine={false} />
                 <Tooltip {...tooltip} formatter={(v:number)=>[`${v}h`,'Hours']} />
-                <Bar dataKey="hours" radius={[4,4,0,0]} label={view!=='all'?{position:'top',fontSize:10,fill:'#86868b',fontFamily:'DM Sans',formatter:(v:number)=>`${v}h`}:false}>
-                  {data.map((_,i)=><Cell key={i} fill={`hsl(${35+i*3},${85-i}%,${52+i}%)`} />)}
-                </Bar>
+                <Bar dataKey="hours" radius={[4,4,0,0]} fill="#ff9500"
+                  label={view!=='all'?{position:'top',fontSize:10,fill:'#86868b',fontFamily:'DM Sans',formatter:(v:number)=>`${v}h`}:false} />
               </BarChart>
             </ResponsiveContainer>
           </div>

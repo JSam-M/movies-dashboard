@@ -39,6 +39,7 @@ export default function CatalogueTab({ movies }: { movies: Movie[] }) {
                   {c.label} {sortBy===c.key ? (asc?'↑':'↓') : ''}
                 </th>
               ))}
+              <th className="px-5 py-3.5 text-left font-body text-[0.6rem] font-semibold tracking-[0.1em] uppercase text-[var(--sub)]">Watches</th>
               <th className="px-5 py-3.5 text-left font-body text-[0.6rem] font-semibold tracking-[0.1em] uppercase text-[var(--sub)]">Genre</th>
               <th className="px-5 py-3.5 text-left font-body text-[0.6rem] font-semibold tracking-[0.1em] uppercase text-[var(--sub)]">Director</th>
               <th className="px-5 py-3.5 text-left font-body text-[0.6rem] font-semibold tracking-[0.1em] uppercase text-[var(--sub)]">Runtime</th>
@@ -54,6 +55,9 @@ export default function CatalogueTab({ movies }: { movies: Movie[] }) {
                 </td>
                 <td className="px-5 py-3 font-body text-[0.82rem] text-[var(--sub)]">{m.releaseYear}</td>
                 <td className="px-5 py-3 font-body text-[0.82rem] text-[var(--sub)]">{m.tmdbRating.toFixed(1)}</td>
+                <td className="px-5 py-3 font-body text-[0.82rem] text-[var(--sub)]">
+                  {m.timesWatched >= 2 ? `${m.timesWatched}×` : '1×'}
+                </td>
                 <td className="px-5 py-3 font-body text-[0.82rem] text-[var(--sub)]">{m.genre}</td>
                 <td className="px-5 py-3 font-body text-[0.82rem] text-[var(--sub)]">{m.director.split(',')[0]}</td>
                 <td className="px-5 py-3 font-body text-[0.82rem] text-[var(--sub)]">{m.runtime}</td>
