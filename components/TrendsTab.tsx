@@ -54,9 +54,12 @@ export default function TrendsTab({ movies, allEntries, watchYear }: Props) {
   const totDays    = +(totHours/24).toFixed(1)
   const avgRuntime = entries.length ? Math.round(entries.reduce((s,e)=>s+e.runtimeMins,0)/entries.length) : 0
 
-  // Binge streak
+  // Binge streak — parse DD/MM/YY correctly
   let binge = 0, bingeStr = ''
-  const dates = [...new Set(entries.map(e => e.date.split('/').reverse().join('-')))].sort()
+  const dates = [...new Set(entries.map(e => {
+    const [d, m, y] = e.date.split('/')
+    return `20${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`
+  }))].sort()
   if (dates.length > 0) {
     let streak = 1, best = 1, bestStart = dates[0], curStart = dates[0]
     for (let i = 1; i < dates.length; i++) {
