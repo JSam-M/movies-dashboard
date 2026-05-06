@@ -176,7 +176,7 @@ html, body, .stApp,
 /* ── KPI cards ── */
 .kpi-glass {
     padding: 24px 22px; position: relative; overflow: hidden;
-    min-height: 115px; display: flex; flex-direction: column; justify-content: flex-end;
+    height: 120px; display: flex; flex-direction: column; justify-content: flex-end;
 }
 .kpi-glass::after {
     content: '';
@@ -618,24 +618,34 @@ with tab4:
 
     # Binge Streak — longest consecutive days with at least one watch
     binge = 0
+    binge_period = ""
     if not tdf.empty:
-        watch_dates = set(tdf['Date_Parsed'].dt.date.dropna())
+        watch_dates = sorted(set(tdf['Date_Parsed'].dt.date.dropna()))
         if watch_dates:
-            sorted_dates = sorted(watch_dates)
             streak = best = 1
-            for i in range(1, len(sorted_dates)):
-                if (sorted_dates[i] - sorted_dates[i-1]).days == 1:
-                    streak += 1; best = max(best, streak)
+            cur_start = best_start = watch_dates[0]
+            for i in range(1, len(watch_dates)):
+                if (watch_dates[i] - watch_dates[i-1]).days == 1:
+                    streak += 1
+                    if streak > best:
+                        best = streak
+                        best_start = cur_start
                 else:
                     streak = 1
+                    cur_start = watch_dates[i]
             binge = best
+            best_end = best_start + __import__('datetime').timedelta(days=best - 1)
+            if best_start.month == best_end.month:
+                binge_period = best_start.strftime("%-d") + "–" + best_end.strftime("%-d %b %Y")
+            else:
+                binge_period = best_start.strftime("%-d %b") + "–" + best_end.strftime("%-d %b %Y")
 
     st.markdown('<hr class="div-line" style="margin:16px 0 28px;">', unsafe_allow_html=True)
     s1,s2,s3,s4,s5 = st.columns(5, gap="medium")
     for col,val,unit,lbl,dot in [
         (s1, str(tot_m),       "",   "Total Watches",   "#0071e3"),
         (s2, fav_genre,        "",   "Favourite Genre", "#ff9500"),
-        (s3, str(binge),       "d",  "Binge Streak",    "#34c759"),
+        (s3, str(binge),       "d",  f"Binge Streak<br><span style='font-size:.5rem;letter-spacing:.1em;font-weight:400;opacity:.7;'>{binge_period}</span>",    "#34c759"),
         (s4, f"{days:.1f}",    "d",  "Days in Cinema",  "#5856d6"),
         (s5, f"{avg_rt:.0f}", "m",  "Avg Runtime",     "#ff3b30"),
     ]:
