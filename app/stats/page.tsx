@@ -17,9 +17,9 @@ export default function StatsPage() {
 
   // Filters
   const [search,        setSearch]        = useState('')
-  const [language,      setLanguage]      = useState('All')
-  const [genre,         setGenre]         = useState('All')
-  const [director,      setDirector]      = useState('All')
+  const [selLanguages,  setSelLanguages]  = useState<string[]>([])
+  const [selGenres,     setSelGenres]     = useState<string[]>([])
+  const [selDirectors,  setSelDirectors]  = useState<string[]>([])
   const [minRating,     setMinRating]     = useState(0)
   const [watchYears,    setWatchYears]    = useState<number[]>([])
   const [rewatchFilter, setRewatchFilter] = useState('All')
