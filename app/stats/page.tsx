@@ -1,84 +1,73 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import type { Movie } from '@/lib/movies'
 import ChatPanel from '@/components/ChatPanel'
-import MultiSelect from '@/components/MultiSelect'
 import Link from 'next/link'
+import StatsContent from '@/components/StatsContent'
+import MultiSelect from '@/components/MultiSelect'
 
-type SortKey = 'rating' | 'rewatched' | 'date'
-type SortDir = 'desc' | 'asc'
+export default function StatsPage() {
+  const [allMovies,  setAllMovies]  = useState<Movie[]>([])
+  const [allEntries, setAllEntries] = useState<Movie[]>([])
+  const [filtered,   setFiltered]   = useState<Movie[]>([])
+  const [loading,    setLoading]    = useState(true)
+  const [chatOpen,   setChatOpen]   = useState(false)
+  const [sidebarOpen,setSidebarOpen]= useState(false)
 
-export default function DiscoverPage() {
-  const [allMovies,   setAllMovies]   = useState<Movie[]>([])
-  const [filtered,    setFiltered]    = useState<Movie[]>([])
-  const [loading,     setLoading]     = useState(true)
-  const [chatOpen,    setChatOpen]    = useState(false)
-  const [aiQuery,     setAiQuery]     = useState('')
-  const [initialMsg,  setInitialMsg]  = useState('')
-  const [search,      setSearch]      = useState('')
-  const [genres,      setGenres]      = useState<string[]>([])
-  const [languages,   setLanguages]   = useState<string[]>([])
-  const [showRewatched, setShowRewatched] = useState(false)
-  const [sortKey,     setSortKey]     = useState<SortKey>('rating')
-  const [sortDir,     setSortDir]     = useState<SortDir>('desc')
-  const [stats,       setStats]       = useState<Record<string,unknown>>({})
-  const aiInputRef = useRef<HTMLInputElement>(null)
+  // Filters
+  const [search,        setSearch]        = useState('')
+  const [language,      setLanguage]      = useState('All')
+  const [genre,         setGenre]         = useState('All')
+  const [director,      setDirector]      = useState('All')
+  const [minRating,     setMinRating]     = useState(0)
+  const [watchYears,    setWatchYears]    = useState<number[]>([])
+  const [rewatchFilter, setRewatchFilter] = useState('All')
 
   useEffect(() => {
     fetch('/api/movies')
       .then(r => r.json())
-      .then(({ movies, stats: s }) => {
-        setAllMovies(movies); setStats(s); setLoading(false)
+      .then(({ movies, allEntries: ae }) => {
+        setAllMovies(movies); setAllEntries(ae)
+        setFiltered(movies); setLoading(false)
       })
   }, [])
 
-  useEffect(() => {
+  const applyFilters = useCallback(() => {
     let f = [...allMovies]
-    if (search)           f = f.filter(m => m.name.toLowerCase().includes(search.toLowerCase()) || m.director.toLowerCase().includes(search.toLowerCase()))
-    if (genres.length)    f = f.filter(m => genres.some(g => m.genre.includes(g)))
-    if (languages.length) f = f.filter(m => languages.includes(m.language))
-    if (showRewatched)    f = f.filter(m => m.timesWatched >= 2)
-    f = [...f].sort((a, b) => {
-      let diff = 0
-      if (sortKey === 'rating')   diff = a.tmdbRating - b.tmdbRating
-      if (sortKey === 'rewatched') diff = a.timesWatched - b.timesWatched
-      if (sortKey === 'date')     diff = a.date.localeCompare(b.date)
-      return sortDir === 'desc' ? -diff : diff
-    })
+    if (search)             f = f.filter(m => m.name.toLowerCase().includes(search.toLowerCase()))
+    if (selLanguages.length)  f = f.filter(m => selLanguages.includes(m.language))
+    if (selGenres.length)     f = f.filter(m => selGenres.some(g => m.genre.includes(g)))
+    if (selDirectors.length)  f = f.filter(m => selDirectors.some(d => m.director.includes(d)))
+    if (minRating > 0)      f = f.filter(m => m.tmdbRating >= minRating)
+    if (watchYears.length > 0) {
+      const names = new Set(allEntries.filter(e => {
+        const y = parseInt('20' + e.date.split('/')[2])
+        return watchYears.includes(y)
+      }).map(e => e.name))
+      f = f.filter(m => names.has(m.name))
+    }
+    if (rewatchFilter === 'Rewatched')   f = f.filter(m => m.timesWatched >= 2)
+    if (rewatchFilter === 'First watch') f = f.filter(m => m.timesWatched <= 1)
     setFiltered(f)
-  }, [search, genres, languages, showRewatched, sortKey, sortDir, allMovies])
+  }, [allMovies, allEntries, search, selLanguages, selGenres, selDirectors, minRating, watchYears, rewatchFilter])
 
-  const handleAiSearch = () => {
-    if (!aiQuery.trim()) return
-    setInitialMsg(aiQuery.trim())
-    setAiQuery('')
-    setChatOpen(true)
+  useEffect(() => { applyFilters() }, [applyFilters])
+
+  const languages  = ['All', ...Array.from(new Set(allMovies.map(m => m.language))).sort()]
+  const genres     = ['All', ...Array.from(new Set(allMovies.flatMap(m => m.genre.split(',').map(g => g.trim()).filter(Boolean)))).sort()]
+  const directors  = ['All', ...Array.from(new Set(allMovies.flatMap(m => m.director.split(',').map(d => d.trim()).filter(d => d && d !== 'N/A')))).sort()]
+  const allYears   = Array.from(new Set(allEntries.map(e => parseInt('20' + e.date.split('/')[2])).filter(y => !isNaN(y)))).sort()
+
+  const activeFilters = [search, selLanguages.length>0, selGenres.length>0, selDirectors.length>0, minRating>0, watchYears.length>0, rewatchFilter!=='All'].filter(Boolean).length
+
+  const resetFilters = () => {
+    setSearch(''); setSelLanguages([]); setSelGenres([])
+    setSelDirectors([]); setMinRating(0); setWatchYears([]); setRewatchFilter('All')
   }
 
-  const handleSort = (key: SortKey) => {
-    if (sortKey === key) setSortDir(d => d === 'desc' ? 'asc' : 'desc')
-    else { setSortKey(key); setSortDir('desc') }
-  }
-
-  const allGenreOptions    = Array.from(new Set(allMovies.flatMap(m => m.genre.split(',').map(g => g.trim()).filter(Boolean)))).sort()
-  const allLanguageOptions = Array.from(new Set(allMovies.map(m => m.language))).sort()
-
-  const topRated      = [...allMovies].sort((a,b) => b.tmdbRating - a.tmdbRating).slice(0,4)
-  const mostRewatched = [...allMovies].filter(m => m.timesWatched >= 2).sort((a,b) => b.timesWatched - a.timesWatched).slice(0,2)
-  const topPicks      = Array.from(new Map([...topRated, ...mostRewatched].map(m => [m.name, m])).values()).slice(0,6)
-
-  const sortArrow = (key: SortKey) => sortKey === key ? (sortDir === 'desc' ? ' ↓' : ' ↑') : ''
-
-  const btnStyle = (active: boolean): React.CSSProperties => ({
-    padding: '8px 14px', borderRadius: '100px',
-    border: `1px solid ${active ? '#0071e3' : 'rgba(0,0,0,0.08)'}`,
-    background: active ? '#0071e3' : 'white',
-    color: active ? 'white' : 'var(--sub)',
-    fontSize: '0.78rem', fontFamily: 'inherit', cursor: 'pointer',
-    fontWeight: active ? 500 : 400,
-    transition: 'all 0.15s',
-  })
+  const toggleYear = (y: number) =>
+    setWatchYears(prev => prev.includes(y) ? prev.filter(x => x !== y) : [...prev, y])
 
   if (loading) return (
     <div className="min-h-screen mesh-bg flex items-center justify-center">
@@ -88,214 +77,185 @@ export default function DiscoverPage() {
     </div>
   )
 
+  const inputStyle = {
+    background:'rgba(0,0,0,0.04)', border:'1px solid rgba(0,0,0,0.08)',
+    borderRadius:'10px', padding:'8px 10px', fontFamily:'inherit',
+    fontSize:'0.78rem', color:'var(--text)', width:'100%', outline:'none'
+  }
+  const labelStyle = {
+    display:'block', fontFamily:'inherit', fontSize:'0.58rem', fontWeight:600,
+    letterSpacing:'0.12em', textTransform:'uppercase' as const,
+    color:'var(--sub)', marginBottom:'6px'
+  }
+
   return (
-    <div className="min-h-screen mesh-bg">
+    <div className="min-h-screen mesh-bg flex flex-col">
       {/* NAV */}
-      <nav className="sticky top-0 z-40 border-b border-black/7" style={{background:'rgba(245,245,247,0.85)',backdropFilter:'blur(20px)'}}>
-        <div className="max-w-[1200px] mx-auto px-8 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div style={{
-              width:'22px',height:'22px',borderRadius:'5px',background:'#0071e3',
-              display:'inline-flex',alignItems:'center',justifyContent:'center',
-              fontFamily:'Georgia,serif',fontSize:'12px',fontWeight:300,color:'white',
-              letterSpacing:'-0.5px',flexShrink:0,
-            }}>fc</div>
-            <span className="font-display text-lg font-light text-[var(--text)]">Film Collection</span>
+      <nav className="sticky top-0 z-40 border-b border-black/7 flex-shrink-0"
+        style={{background:'rgba(245,245,247,0.85)',backdropFilter:'blur(20px)'}}>
+        <div className="px-6 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Link href="/" className="flex items-center gap-2 hover:opacity-70 transition-opacity">
+              <div style={{width:'22px',height:'22px',borderRadius:'5px',background:'#0071e3',display:'inline-flex',alignItems:'center',justifyContent:'center',fontFamily:'Georgia,serif',fontSize:'12px',fontWeight:300,color:'white',letterSpacing:'-0.5px',flexShrink:0}}>fc</div>
+              <span className="font-display text-lg font-light text-[var(--text)]">Film Collection</span>
+            </Link>
+            <span className="text-black/20">/</span>
+            <span className="font-body text-[0.75rem] font-semibold text-[var(--sub)]">Stats</span>
           </div>
-          <Link href="/stats" className="font-body text-[0.75rem] font-medium text-[var(--sub)] hover:text-[var(--text)] transition-colors flex items-center gap-1.5">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
-            </svg>
-            My Stats
-          </Link>
+          <div className="flex items-center gap-3">
+            <button onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg font-body text-[0.72rem] font-medium transition-all"
+              style={{
+                background: sidebarOpen ? 'rgba(0,113,227,0.08)' : 'rgba(0,0,0,0.04)',
+                color: sidebarOpen ? 'var(--blue)' : 'var(--sub)',
+                border: `1px solid ${sidebarOpen ? 'rgba(0,113,227,0.2)' : 'rgba(0,0,0,0.08)'}`,
+              }}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+              </svg>
+              Filters
+              {activeFilters > 0 && (
+                <span className="w-4 h-4 rounded-full text-[0.58rem] font-bold bg-blue-500 text-white flex items-center justify-center">{activeFilters}</span>
+              )}
+            </button>
+          </div>
         </div>
       </nav>
 
-      <div className="max-w-[1200px] mx-auto px-8 py-20">
+      {/* BODY */}
+      <div className="flex flex-1 overflow-hidden">
 
-        {/* HERO */}
-        <div className="text-center mb-20">
-          <p className="font-body text-[0.65rem] font-semibold tracking-[0.2em] uppercase text-[var(--sub)] mb-5">Personal Film Archive · Since 2019</p>
-          <h1 className="font-display text-[clamp(3.5rem,7vw,6.5rem)] font-light leading-[0.9] tracking-tight text-[var(--text)] mb-8">
-            A life in{' '}
-            <em style={{fontStyle:'italic',background:'linear-gradient(135deg,#0071e3,#34aadc)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>cinema</em>
-          </h1>
-          <p className="font-body text-[1rem] text-[var(--sub)] max-w-md mx-auto leading-relaxed mb-8">
-            {stats.total as number} films watched. Not sure what to watch? The AI knows this collection inside out.
-          </p>
-
-          {/* AI search — solid blue pill */}
-          <div style={{position:'relative',maxWidth:'520px',margin:'0 auto'}}>
-            <div style={{
-              display:'flex',alignItems:'center',
-              background:'#0071e3',borderRadius:'100px',
-              padding:'6px 6px 6px 18px',
-              boxShadow:'0 8px 32px rgba(0,113,227,0.35)',
+        {/* SIDEBAR — fixed, full height, independent scroll */}
+        {sidebarOpen && (
+          <aside className="fixed left-0 z-30 border-r border-black/7 overflow-y-auto"
+            style={{
+              top: '56px',          // below nav
+              bottom: 0,
+              width: '260px',
+              background: 'rgba(255,255,255,0.92)',
+              backdropFilter: 'blur(24px)',
             }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="2" style={{flexShrink:0,marginRight:'10px'}}>
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-              </svg>
-              <input
-                ref={aiInputRef}
-                value={aiQuery}
-                onChange={e => setAiQuery(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleAiSearch()}
-                placeholder="What should I watch tonight?"
-                style={{
-                  flex:1,background:'transparent',border:'none',outline:'none',
-                  color:'white',fontSize:'0.95rem',fontFamily:'inherit',
-                }}
-              />
-              <button onClick={handleAiSearch} style={{
-                width:'38px',height:'38px',borderRadius:'100px',flexShrink:0,
-                background:'rgba(255,255,255,0.2)',border:'none',cursor:'pointer',
-                display:'flex',alignItems:'center',justifyContent:'center',
-                transition:'background 0.15s',
-              }}
-              onMouseEnter={e => (e.currentTarget.style.background='rgba(255,255,255,0.3)')}
-              onMouseLeave={e => (e.currentTarget.style.background='rgba(255,255,255,0.2)')}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
-                  <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          {/* Quick prompts */}
-          <div style={{display:'flex',flexWrap:'wrap',gap:'8px',justifyContent:'center',marginTop:'14px'}}>
-            {['Something feel-good','Best Tamil films','Under 2 hours','Hidden gems','Watch with family'].map(q => (
-              <button key={q} onClick={() => { setInitialMsg(q); setChatOpen(true) }} style={{
-                padding:'6px 14px',borderRadius:'100px',
-                border:'1px solid rgba(0,0,0,0.1)',background:'white',
-                fontSize:'0.75rem',fontFamily:'inherit',color:'var(--sub)',cursor:'pointer',
-              }}>{q}</button>
-            ))}
-          </div>
-          <p className="font-body text-[0.7rem] text-[var(--muted)] mt-3">AI recommends only from films actually watched</p>
-        </div>
-
-        {/* TOP PICKS */}
-        <div className="mb-16">
-          <div className="flex items-end justify-between mb-6">
-            <div>
-              <p className="font-body text-[0.6rem] font-semibold tracking-[0.16em] uppercase text-[var(--sub)] mb-2">Curated</p>
-              <p className="font-display text-[2rem] font-light text-[var(--text)]">Top Picks</p>
-            </div>
-            <p className="font-body text-[0.72rem] text-[var(--muted)]">Highest rated + most rewatched</p>
-          </div>
-          <div className="grid grid-cols-3 gap-4">
-            {topPicks.map(m => (
-              <div key={m.name} className="glass rounded-2xl p-5 hover:shadow-lg transition-all">
-                <div className="flex items-start justify-between mb-3">
-                  <span className="font-body text-[0.62rem] font-semibold tracking-[0.08em] uppercase px-2 py-1 rounded-full"
-                    style={{background:'rgba(0,113,227,0.07)',color:'var(--blue)'}}>
-                    {m.genre.split(',')[0].trim()}
-                  </span>
-                  <div className="text-right">
-                    <span className="font-display text-[1.3rem] font-light" style={{color:'var(--blue)'}}>{m.tmdbRating.toFixed(1)}</span>
-                    {m.timesWatched >= 2 && <span className="block font-body text-[0.6rem] text-amber-500 font-semibold">{m.timesWatched}× watched</span>}
-                  </div>
-                </div>
-                <p className="font-display text-[1.1rem] font-light text-[var(--text)] leading-tight mb-1">{m.name}</p>
-                <p className="font-body text-[0.7rem] text-[var(--sub)] mb-3">{m.releaseYear} · {m.language} · {m.runtime}</p>
-                <p className="font-body text-[0.76rem] text-[var(--sub)] leading-relaxed line-clamp-3">{m.overview}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* BROWSE */}
-        <div>
-          <div className="flex items-end justify-between mb-6">
-            <div>
-              <p className="font-body text-[0.6rem] font-semibold tracking-[0.16em] uppercase text-[var(--sub)] mb-2">Browse</p>
-              <p className="font-display text-[2rem] font-light text-[var(--text)]">Full Collection</p>
-            </div>
-            <p className="font-body text-[0.75rem] text-[var(--muted)]">{filtered.length} films</p>
-          </div>
-
-          {/* Filters */}
-          <div className="mb-6 space-y-4">
-            {/* Row 1: text search + sort + favourites */}
-            <div className="flex gap-3 flex-wrap items-center">
-              <div className="relative flex-1 min-w-[200px]">
-                <svg className="absolute left-3 top-1/2 -translate-y-1/2" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#86868b" strokeWidth="2">
-                  <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                </svg>
-                <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search films or directors…"
-                  className="w-full pl-9 pr-4 py-2.5 rounded-xl font-body text-sm outline-none"
-                  style={{background:'white',border:'1px solid rgba(0,0,0,0.08)',color:'var(--text)'}} />
-              </div>
-              <div className="flex gap-2">
-                {(['rating','rewatched','date'] as SortKey[]).map(k => (
-                  <button key={k} onClick={() => handleSort(k)} style={btnStyle(sortKey === k)}>
-                    {k === 'rating' ? 'Rating' : k === 'rewatched' ? 'Rewatched' : 'Date'}
-                    {sortArrow(k)}
+            <div className="p-5">
+              <div className="flex items-center justify-between mb-5">
+                <p style={{...labelStyle, marginBottom:0}}>Refine</p>
+                <div className="flex items-center gap-3">
+                  {activeFilters > 0 && (
+                    <button onClick={resetFilters} className="font-body text-[0.65rem] text-[var(--blue)] hover:opacity-70">Clear all</button>
+                  )}
+                  <button onClick={() => setSidebarOpen(false)} className="text-[var(--muted)] hover:text-[var(--text)]">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
                   </button>
-                ))}
+                </div>
               </div>
-              <button onClick={() => setShowRewatched(!showRewatched)} style={btnStyle(showRewatched)}>
-                ★ Favourites
-              </button>
-            </div>
 
-            {/* Row 2: genre + language multiselect */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="glass rounded-xl p-4">
-                <MultiSelect
-                  label="Genre"
-                  options={allGenreOptions}
-                  selected={genres}
-                  onChange={setGenres}
-                  placeholder="Search genres…"
-                />
-              </div>
-              <div className="glass rounded-xl p-4">
+              <div className="space-y-5">
+                {/* Search */}
+                <div>
+                  <label style={labelStyle}>Search</label>
+                  <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Film title…" style={inputStyle} />
+                </div>
+
+                {/* Language */}
                 <MultiSelect
                   label="Language"
-                  options={allLanguageOptions}
-                  selected={languages}
-                  onChange={setLanguages}
+                  options={languages.filter(l => l !== 'All')}
+                  selected={selLanguages}
+                  onChange={setSelLanguages}
                   placeholder="Search languages…"
                 />
+
+                {/* Genre */}
+                <MultiSelect
+                  label="Genre"
+                  options={genres.filter(g => g !== 'All')}
+                  selected={selGenres}
+                  onChange={setSelGenres}
+                  placeholder="Search genres…"
+                />
+
+                {/* Director */}
+                <MultiSelect
+                  label="Director"
+                  options={directors.filter(d => d !== 'All').slice(0,300)}
+                  selected={selDirectors}
+                  onChange={setSelDirectors}
+                  placeholder="Search directors…"
+                />
+
+                {/* Min Rating */}
+                <div>
+                  <label style={labelStyle}>Min Rating — {minRating.toFixed(1)}</label>
+                  <input type="range" min="0" max="10" step="0.5" value={minRating}
+                    onChange={e => setMinRating(parseFloat(e.target.value))}
+                    className="w-full accent-blue-500" />
+                  <div className="flex justify-between font-body text-[0.58rem] text-[var(--muted)] mt-1">
+                    <span>0</span><span>10</span>
+                  </div>
+                </div>
+
+                {/* Watch Year — checkboxes */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label style={{...labelStyle, marginBottom:0}}>Watch Year</label>
+                    {watchYears.length > 0 && (
+                      <button onClick={() => setWatchYears([])} className="font-body text-[0.6rem] text-[var(--blue)]">Clear</button>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-3 gap-1.5">
+                    {allYears.map(y => (
+                      <button key={y} onClick={() => toggleYear(y)}
+                        className="py-1.5 rounded-lg font-body text-[0.7rem] font-medium transition-all"
+                        style={{
+                          background: watchYears.includes(y) ? 'var(--blue)' : 'rgba(0,0,0,0.04)',
+                          color: watchYears.includes(y) ? 'white' : 'var(--sub)',
+                          border: `1px solid ${watchYears.includes(y) ? 'var(--blue)' : 'rgba(0,0,0,0.08)'}`,
+                        }}>
+                        {y}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Rewatch */}
+                <div>
+                  <label style={labelStyle}>View</label>
+                  <div className="flex flex-col gap-1.5">
+                    {['All','Rewatched','First watch'].map(opt => (
+                      <button key={opt} onClick={() => setRewatchFilter(opt)}
+                        className="py-1.5 rounded-lg font-body text-[0.72rem] font-medium text-left px-3 transition-all"
+                        style={{
+                          background: rewatchFilter===opt ? 'var(--blue)' : 'rgba(0,0,0,0.04)',
+                          color: rewatchFilter===opt ? 'white' : 'var(--sub)',
+                          border: `1px solid ${rewatchFilter===opt ? 'var(--blue)' : 'rgba(0,0,0,0.08)'}`,
+                        }}>
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-black/7">
+                  <p className="font-body text-[0.7rem] text-[var(--muted)]">
+                    <span style={{color:'var(--text)',fontWeight:600}}>{filtered.length}</span> of {allMovies.length} films
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
+          </aside>
+        )}
 
-          {/* Film list */}
-          <div className="grid grid-cols-1 gap-2">
-            {filtered.slice(0,60).map(m => (
-              <div key={m.name} className="glass rounded-xl px-5 py-3.5 flex items-center gap-5 hover:bg-white/90 transition-all">
-                <div className="font-display text-[1.5rem] font-light w-12 text-center flex-shrink-0" style={{color:'var(--blue)'}}>
-                  {m.tmdbRating > 0 ? m.tmdbRating.toFixed(1) : '—'}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-body text-[0.88rem] font-medium text-[var(--text)] truncate">
-                    {m.name}{m.timesWatched >= 2 && <span className="text-amber-400 ml-1">★</span>}
-                  </p>
-                  <p className="font-body text-[0.7rem] text-[var(--sub)]">{m.releaseYear} · {m.director.split(',')[0].trim()} · {m.runtime}</p>
-                </div>
-                <div className="hidden md:flex gap-2 flex-shrink-0 items-center">
-                  {m.timesWatched >= 2 && (
-                    <span className="font-body text-[0.62rem] px-2 py-1 rounded-full font-semibold" style={{background:'rgba(251,191,36,0.12)',color:'#d97706'}}>{m.timesWatched}×</span>
-                  )}
-                  <span className="font-body text-[0.62rem] px-2 py-1 rounded-full" style={{background:'rgba(0,0,0,0.04)',color:'var(--sub)'}}>{m.language}</span>
-                  <span className="font-body text-[0.62rem] px-2 py-1 rounded-full" style={{background:'rgba(0,0,0,0.04)',color:'var(--sub)'}}>{m.genre.split(',')[0].trim()}</span>
-                </div>
-              </div>
-            ))}
-            {filtered.length > 60 && (
-              <p className="text-center font-body text-[0.75rem] text-[var(--muted)] py-4">Showing 60 of {filtered.length} — refine filters to narrow down</p>
-            )}
+        {/* MAIN — scrollable, shifts right when sidebar open */}
+        <main className="flex-1 overflow-y-auto transition-all duration-300"
+          style={{marginLeft: sidebarOpen ? '260px' : '0'}}>
+          <div className="max-w-[1200px] mx-auto px-8 py-8">
+            <StatsContent movies={filtered} allEntries={allEntries} watchYears={watchYears} />
           </div>
-        </div>
-
-        <div className="mt-16 pt-6 border-t border-black/7 text-center">
-          <p className="font-body text-[0.65rem] tracking-[0.1em] uppercase text-[rgba(0,0,0,0.2)]">
-            {stats.total as number} films · v2.0 · {new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'})}
-          </p>
-        </div>
+        </main>
       </div>
+
+      {chatOpen && <ChatPanel movies={allMovies} onClose={() => setChatOpen(false)} />}
 
       {/* FLOATING CHAT */}
       <button onClick={() => setChatOpen(true)}
@@ -305,8 +265,6 @@ export default function DiscoverPage() {
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
         </svg>
       </button>
-
-      {chatOpen && <ChatPanel movies={allMovies} initialMessage={initialMsg} onClose={() => { setChatOpen(false); setInitialMsg('') }} />}
     </div>
   )
 }
