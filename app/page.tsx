@@ -1,210 +1,228 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import type { Movie } from '@/lib/movies'
-import KPIBar from '@/components/KPIBar'
-import FilterBar from '@/components/FilterBar'
-import CatalogueTab from '@/components/CatalogueTab'
-import RankingsTab from '@/components/RankingsTab'
-import CompositionTab from '@/components/CompositionTab'
-import TrendsTab from '@/components/TrendsTab'
 import ChatPanel from '@/components/ChatPanel'
+import Link from 'next/link'
 
-export default function Home() {
-  const [allMovies,   setAllMovies]   = useState<Movie[]>([])
-  const [allEntries,  setAllEntries]  = useState<Movie[]>([])
-  const [filtered,    setFiltered]    = useState<Movie[]>([])
-  const [stats,       setStats]       = useState<Record<string, unknown>>({})
-  const [activeTab,   setActiveTab]   = useState('catalogue')
-  const [chatOpen,    setChatOpen]    = useState(false)
-  const [loading,     setLoading]     = useState(true)
-
-  // Filters
+export default function DiscoverPage() {
+  const [allMovies, setAllMovies] = useState<Movie[]>([])
+  const [filtered,  setFiltered]  = useState<Movie[]>([])
+  const [loading,   setLoading]   = useState(true)
+  const [chatOpen,  setChatOpen]  = useState(false)
   const [search,    setSearch]    = useState('')
-  const [language,  setLanguage]  = useState('All')
   const [genre,     setGenre]     = useState('All')
-  const [director,  setDirector]  = useState('All')
-  const [minRating, setMinRating] = useState(0)
-  const [watchYear, setWatchYear] = useState<[number,number] | null>(null)
-  const [rewatchFilter, setRewatchFilter] = useState('All')
+  const [language,  setLanguage]  = useState('All')
+  const [showRewatched, setShowRewatched] = useState(false)
+  const [sortBy,    setSortBy]    = useState<'rating'|'rating_asc'|'rewatched'|'recent'|'oldest'>('rating')
+  const [stats,     setStats]     = useState<Record<string,unknown>>({})
 
   useEffect(() => {
     fetch('/api/movies')
       .then(r => r.json())
-      .then(({ movies, allEntries: ae, stats: s }) => {
-        setAllMovies(movies)
-        setAllEntries(ae)
-        setStats(s)
-        setFiltered(movies)
-        setLoading(false)
+      .then(({ movies, stats: s }) => {
+        setAllMovies(movies); setStats(s); setLoading(false)
       })
   }, [])
 
-  const applyFilters = useCallback(() => {
+  useEffect(() => {
     let f = [...allMovies]
-    if (search)      f = f.filter(m => m.name.toLowerCase().includes(search.toLowerCase()))
-    if (language !== 'All') f = f.filter(m => m.language === language)
+    if (search)        f = f.filter(m => m.name.toLowerCase().includes(search.toLowerCase()) || m.director.toLowerCase().includes(search.toLowerCase()))
     if (genre !== 'All')    f = f.filter(m => m.genre.includes(genre))
-    if (director !== 'All') f = f.filter(m => m.director.includes(director))
-    if (minRating > 0)      f = f.filter(m => m.tmdbRating >= minRating)
-    if (watchYear) {
-      const names = new Set(
-        allEntries
-          .filter(e => {
-            const y = parseInt('20' + e.date.split('/')[2])
-            return y >= watchYear[0] && y <= watchYear[1]
-          })
-          .map(e => e.name)
-      )
-      f = f.filter(m => names.has(m.name))
-    }
-    if (rewatchFilter === 'Rewatched')   f = f.filter(m => m.timesWatched >= 2)
-    if (rewatchFilter === 'First watch') f = f.filter(m => m.timesWatched <= 1)
+    if (language !== 'All') f = f.filter(m => m.language === language)
+    if (showRewatched)      f = f.filter(m => m.timesWatched >= 2)
+    if (sortBy === 'rating')      f = [...f].sort((a,b) => b.tmdbRating - a.tmdbRating)
+    if (sortBy === 'rating_asc')  f = [...f].sort((a,b) => a.tmdbRating - b.tmdbRating)
+    if (sortBy === 'rewatched')   f = [...f].sort((a,b) => b.timesWatched - a.timesWatched)
+    if (sortBy === 'recent')      f = [...f].sort((a,b) => b.date.localeCompare(a.date))
+    if (sortBy === 'oldest')      f = [...f].sort((a,b) => a.date.localeCompare(b.date))
     setFiltered(f)
-  }, [allMovies, allEntries, search, language, genre, director, minRating, watchYear, rewatchFilter])
+  }, [search, genre, language, showRewatched, sortBy, allMovies])
 
-  useEffect(() => { applyFilters() }, [applyFilters])
+  const genres    = ['All', ...Array.from(new Set(allMovies.flatMap(m => m.genre.split(',').map(g => g.trim()).filter(Boolean)))).sort()]
+  const languages = ['All', ...Array.from(new Set(allMovies.map(m => m.language))).sort()]
 
-  const tabs = ['catalogue','rankings','composition','trends']
-
-  // Derived options
-  const languages  = ['All', ...Array.from(new Set(allMovies.map(m => m.language))).sort()]
-  const genres     = ['All', ...Array.from(new Set(allMovies.flatMap(m => m.genre.split(',').map(g => g.trim()).filter(Boolean)))).sort()]
-  const directors  = ['All', ...Array.from(new Set(allMovies.flatMap(m => m.director.split(',').map(d => d.trim()).filter(Boolean)))).sort()]
-  const watchYears = Array.from(new Set(allEntries.map(e => parseInt('20' + e.date.split('/')[2])).filter(y => !isNaN(y)))).sort()
-  const minWY = watchYears[0] || 2019
-  const maxWY = watchYears[watchYears.length - 1] || 2026
+  // Top picks: mix of highest rated + most rewatched, deduplicated
+  const topRated    = [...allMovies].sort((a,b) => b.tmdbRating - a.tmdbRating).slice(0,4)
+  const mostRewatched = [...allMovies].filter(m => m.timesWatched >= 2).sort((a,b) => b.timesWatched - a.timesWatched).slice(0,2)
+  const topPicks    = Array.from(new Map([...topRated, ...mostRewatched].map(m => [m.name, m])).values()).slice(0,6)
 
   if (loading) return (
     <div className="min-h-screen mesh-bg flex items-center justify-center">
-      <div className="text-center">
-        <div className="font-display text-4xl font-light text-gray-400 mb-4">Loading</div>
-        <div className="flex gap-2 justify-center">
-          {[0,1,2].map(i => (
-            <div key={i} className="w-2 h-2 rounded-full bg-blue-400"
-              style={{ animation: `pulse-dot 1.2s ease ${i*0.2}s infinite` }} />
-          ))}
-        </div>
+      <div className="flex gap-2">
+        {[0,1,2].map(i => <div key={i} className="w-2 h-2 rounded-full bg-blue-300" style={{animation:`pulse-dot 1.2s ease ${i*0.2}s infinite`}} />)}
       </div>
     </div>
   )
 
   return (
-    <div className="min-h-screen mesh-bg relative">
-      <div className="relative z-10 max-w-[1380px] mx-auto px-12 py-12">
+    <div className="min-h-screen mesh-bg">
+      {/* NAV */}
+      <nav className="sticky top-0 z-40 border-b border-black/7" style={{background:'rgba(245,245,247,0.85)',backdropFilter:'blur(20px)'}}>
+        <div className="max-w-[1200px] mx-auto px-8 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-lg">🎬</span>
+            <span className="font-display text-lg font-light text-[var(--text)]">Film Collection</span>
+          </div>
+          <Link href="/stats" className="font-body text-[0.75rem] font-medium text-[var(--sub)] hover:text-[var(--text)] transition-colors flex items-center gap-1.5">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+            </svg>
+            My Stats
+          </Link>
+        </div>
+      </nav>
 
-        {/* ── HEADER ── */}
-        <div className="flex items-start justify-between mb-10 pb-8 border-b border-black/7">
-          <div>
-            <p className="font-body text-[0.6rem] font-semibold tracking-[0.16em] uppercase text-[var(--sub)] mb-4">
-              Personal Archive · Since 2019
-            </p>
-            <h1 className="font-display text-[clamp(2.8rem,5vw,5rem)] font-light leading-[0.95] tracking-tight text-[var(--text)]">
-              A life in{' '}
-              <em style={{
-                fontStyle: 'italic',
-                background: 'linear-gradient(135deg,#0071e3,#34aadc)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              }}>cinema</em>
-            </h1>
-            <p className="font-body text-[0.88rem] text-[var(--sub)] mt-4 max-w-sm leading-relaxed">
-              {stats.total as number} films across {stats.languages as number} languages —{' '}
-              {stats.totalHours as number} hours of storytelling logged since the first watch.
-            </p>
+      <div className="max-w-[1200px] mx-auto px-8 py-20">
+        {/* HERO */}
+        <div className="text-center mb-20">
+          <p className="font-body text-[0.65rem] font-semibold tracking-[0.2em] uppercase text-[var(--sub)] mb-5">Personal Film Archive · Since 2019</p>
+          <h1 className="font-display text-[clamp(3.5rem,7vw,6.5rem)] font-light leading-[0.9] tracking-tight text-[var(--text)] mb-8">
+            A life in{' '}
+            <em style={{fontStyle:'italic',background:'linear-gradient(135deg,#0071e3,#34aadc)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>cinema</em>
+          </h1>
+          <p className="font-body text-[1rem] text-[var(--sub)] max-w-md mx-auto leading-relaxed mb-10">
+            {stats.total as number} films watched. Not sure what to watch? The AI knows this collection inside out.
+          </p>
+
+          {/* Search bar */}
+          <div className="relative max-w-lg mx-auto mb-4">
+            <svg className="absolute left-4 top-1/2 -translate-y-1/2" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#86868b" strokeWidth="2">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input value={search} onChange={e => setSearch(e.target.value)}
+              placeholder={`Search ${stats.total as number}+ films or directors…`}
+              className="w-full pl-11 pr-4 py-3.5 rounded-2xl font-body text-[0.9rem] outline-none"
+              style={{background:'white',border:'1px solid rgba(0,0,0,0.08)',color:'var(--text)',boxShadow:'0 4px 20px rgba(0,0,0,0.08)'}} />
+          </div>
+          <p className="font-body text-[0.72rem] text-[var(--muted)]">Or ask the AI for a personalised recommendation ↓</p>
+        </div>
+
+        {/* TOP PICKS */}
+        <div className="mb-16">
+          <div className="flex items-end justify-between mb-6">
+            <div>
+              <p className="font-body text-[0.6rem] font-semibold tracking-[0.16em] uppercase text-[var(--sub)] mb-2">Curated</p>
+              <p className="font-display text-[2rem] font-light text-[var(--text)]">Top Picks</p>
+            </div>
+            <p className="font-body text-[0.72rem] text-[var(--muted)]">Highest rated + most rewatched</p>
+          </div>
+          <div className="grid grid-cols-3 gap-4">
+            {topPicks.map(m => (
+              <div key={m.name} className="glass rounded-2xl p-5 hover:shadow-lg transition-all group">
+                <div className="flex items-start justify-between mb-3">
+                  <span className="font-body text-[0.62rem] font-semibold tracking-[0.08em] uppercase px-2 py-1 rounded-full"
+                    style={{background:'rgba(0,113,227,0.07)',color:'var(--blue)'}}>
+                    {m.genre.split(',')[0].trim()}
+                  </span>
+                  <div className="text-right">
+                    <span className="font-display text-[1.3rem] font-light" style={{color:'var(--blue)'}}>{m.tmdbRating.toFixed(1)}</span>
+                    {m.timesWatched >= 2 && <span className="block font-body text-[0.6rem] text-amber-500 font-semibold">{m.timesWatched}× watched</span>}
+                  </div>
+                </div>
+                <p className="font-display text-[1.1rem] font-light text-[var(--text)] leading-tight mb-1">{m.name}</p>
+                <p className="font-body text-[0.7rem] text-[var(--sub)] mb-3">{m.releaseYear} · {m.language} · {m.runtime}</p>
+                <p className="font-body text-[0.76rem] text-[var(--sub)] leading-relaxed line-clamp-3">{m.overview}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* BROWSE */}
+        <div>
+          <div className="flex items-end justify-between mb-6">
+            <div>
+              <p className="font-body text-[0.6rem] font-semibold tracking-[0.16em] uppercase text-[var(--sub)] mb-2">Browse</p>
+              <p className="font-display text-[2rem] font-light text-[var(--text)]">Full Collection</p>
+            </div>
+            <p className="font-body text-[0.75rem] text-[var(--muted)]">{filtered.length} films</p>
           </div>
 
-          {/* Highest rated callout */}
-          {filtered.length > 0 && (() => {
-            const top = [...filtered].sort((a,b) => b.tmdbRating - a.tmdbRating)[0]
-            return (
-              <div className="glass rounded-[22px] p-7 ml-8 min-w-[220px] hidden lg:block"
-                style={{ boxShadow: '0 8px 32px rgba(0,125,250,.1),0 2px 8px rgba(0,0,0,.06)' }}>
-                <p className="font-body text-[0.6rem] font-semibold tracking-[0.14em] uppercase text-[var(--sub)] mb-3">
-                  Highest Rated
-                </p>
-                <p className="font-display text-[1.35rem] font-light text-[var(--text)] leading-tight mb-1">
-                  {top.name}
-                </p>
-                <p className="font-body text-[0.7rem] text-[var(--sub)] mb-4">
-                  {top.releaseYear} · {top.genre.split(',')[0]}
-                </p>
-                <p className="font-display text-[2.8rem] font-light leading-none" style={{ color: 'var(--blue)' }}>
-                  {top.tmdbRating.toFixed(1)}
-                  <span className="font-body text-base text-[var(--muted)]"> / 10</span>
-                </p>
-              </div>
-            )
-          })()}
-        </div>
-
-        {/* ── FILTERS ── */}
-        <FilterBar
-          search={search} setSearch={setSearch}
-          language={language} setLanguage={setLanguage} languages={languages}
-          genre={genre} setGenre={setGenre} genres={genres}
-          director={director} setDirector={setDirector} directors={directors}
-          minRating={minRating} setMinRating={setMinRating}
-          minWY={minWY} maxWY={maxWY}
-          watchYear={watchYear} setWatchYear={setWatchYear}
-          rewatchFilter={rewatchFilter} setRewatchFilter={setRewatchFilter}
-          total={allMovies.length} filtered={filtered.length}
-        />
-
-        {/* ── KPI BAR ── */}
-        <KPIBar movies={filtered} allEntries={allEntries} watchYear={watchYear} />
-
-        {/* ── TABS ── */}
-        <div className="mt-8 mb-0 border-b border-black/7 flex gap-0">
-          {tabs.map(tab => (
-            <button key={tab} onClick={() => setActiveTab(tab)}
-              className="font-body text-[0.65rem] font-semibold tracking-[0.1em] uppercase px-7 py-4 border-b-[1.5px] transition-colors"
+          {/* Filters row */}
+          <div className="flex gap-3 mb-4 flex-wrap items-center">
+            <div className="relative flex-1 min-w-[180px]">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#86868b" strokeWidth="2">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search films or directors…"
+                className="w-full pl-9 pr-4 py-2.5 rounded-xl font-body text-sm outline-none"
+                style={{background:'white',border:'1px solid rgba(0,0,0,0.08)',color:'var(--text)'}} />
+            </div>
+            <select value={genre} onChange={e => setGenre(e.target.value)}
+              className="px-3 py-2.5 rounded-xl font-body text-sm outline-none"
+              style={{background:'white',border:'1px solid rgba(0,0,0,0.08)',color:'var(--text)'}}>
+              {genres.slice(0,25).map(g => <option key={g}>{g}</option>)}
+            </select>
+            <select value={language} onChange={e => setLanguage(e.target.value)}
+              className="px-3 py-2.5 rounded-xl font-body text-sm outline-none"
+              style={{background:'white',border:'1px solid rgba(0,0,0,0.08)',color:'var(--text)'}}>
+              {languages.map(l => <option key={l}>{l}</option>)}
+            </select>
+            <select value={sortBy} onChange={e => setSortBy(e.target.value as 'rating'|'rating_asc'|'rewatched'|'recent'|'oldest')}
+              className="px-3 py-2.5 rounded-xl font-body text-sm outline-none"
+              style={{background:'white',border:'1px solid rgba(0,0,0,0.08)',color:'var(--text)'}}>
+              <option value="rating">Rating ↓</option>
+              <option value="rating_asc">Rating ↑</option>
+              <option value="rewatched">Rewatched ↓</option>
+              <option value="recent">Newest first</option>
+              <option value="oldest">Oldest first</option>
+            </select>
+            <button onClick={() => setShowRewatched(!showRewatched)}
+              className="px-4 py-2.5 rounded-xl font-body text-sm font-medium transition-all"
               style={{
-                color: activeTab === tab ? 'var(--text)' : 'rgba(0,0,0,0.3)',
-                borderBottomColor: activeTab === tab ? 'var(--text)' : 'transparent',
-                marginBottom: '-1px',
+                background: showRewatched ? 'var(--blue)' : 'white',
+                color: showRewatched ? 'white' : 'var(--sub)',
+                border: `1px solid ${showRewatched ? 'var(--blue)' : 'rgba(0,0,0,0.08)'}`,
               }}>
-              {tab}
+              ★ Favourites
             </button>
-          ))}
+          </div>
+
+          {/* Film list */}
+          <div className="grid grid-cols-1 gap-2">
+            {filtered.slice(0,60).map(m => (
+              <div key={m.name} className="glass rounded-xl px-5 py-3.5 flex items-center gap-5 hover:bg-white/90 transition-all">
+                <div className="font-display text-[1.5rem] font-light w-12 text-center flex-shrink-0" style={{color:'var(--blue)'}}>
+                  {m.tmdbRating > 0 ? m.tmdbRating.toFixed(1) : '—'}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-body text-[0.88rem] font-medium text-[var(--text)] truncate">
+                    {m.name} {m.timesWatched >= 2 && <span className="text-amber-400 ml-1" title={`Watched ${m.timesWatched}×`}>★</span>}
+                  </p>
+                  <p className="font-body text-[0.7rem] text-[var(--sub)]">{m.releaseYear} · {m.director.split(',')[0].trim()} · {m.runtime}</p>
+                </div>
+                <div className="hidden md:flex gap-2 flex-shrink-0 items-center">
+                  {m.timesWatched >= 2 && (
+                    <span className="font-body text-[0.62rem] px-2 py-1 rounded-full font-semibold" style={{background:'rgba(251,191,36,0.12)',color:'#d97706'}}>{m.timesWatched}×</span>
+                  )}
+                  <span className="font-body text-[0.62rem] px-2 py-1 rounded-full" style={{background:'rgba(0,0,0,0.04)',color:'var(--sub)'}}>{m.language}</span>
+                  <span className="font-body text-[0.62rem] px-2 py-1 rounded-full" style={{background:'rgba(0,0,0,0.04)',color:'var(--sub)'}}>{m.genre.split(',')[0].trim()}</span>
+                </div>
+              </div>
+            ))}
+            {filtered.length > 60 && (
+              <p className="text-center font-body text-[0.75rem] text-[var(--muted)] py-4">Showing 60 of {filtered.length} — refine filters to narrow down</p>
+            )}
+          </div>
         </div>
 
-        <div className="mt-8">
-          {activeTab === 'catalogue'   && <CatalogueTab   movies={filtered} />}
-          {activeTab === 'rankings'    && <RankingsTab    movies={filtered} />}
-          {activeTab === 'composition' && <CompositionTab movies={filtered} />}
-          {activeTab === 'trends'      && <TrendsTab      movies={filtered} allEntries={allEntries} watchYear={watchYear} />}
-        </div>
-
-        {/* ── FOOTER ── */}
         <div className="mt-16 pt-6 border-t border-black/7 text-center">
           <p className="font-body text-[0.65rem] tracking-[0.1em] uppercase text-[rgba(0,0,0,0.2)]">
-            {stats.total as number} films · v1.0 · {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+            {stats.total as number} films · v2.0 · {new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'})}
           </p>
         </div>
       </div>
 
-      {/* ── AI CHAT BUTTON ── */}
-      <button
-        onClick={() => setChatOpen(true)}
-        className="fixed bottom-8 right-8 z-50 flex items-center gap-2 px-5 py-3.5 rounded-full font-body text-sm font-semibold text-white transition-all"
-        style={{
-          background: 'linear-gradient(135deg,#0071e3,#34aadc)',
-          boxShadow: '0 4px 20px rgba(0,113,227,0.4)',
-        }}>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      {/* FLOATING CHAT */}
+      <button onClick={() => setChatOpen(true)}
+        className="fixed bottom-8 right-8 z-50 w-14 h-14 rounded-full flex items-center justify-center text-white shadow-2xl transition-all hover:scale-105"
+        style={{background:'linear-gradient(135deg,#0071e3,#34aadc)',boxShadow:'0 8px 32px rgba(0,113,227,0.4)'}}>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
         </svg>
-        Ask for a Recommendation
       </button>
 
-      {/* ── AI CHAT PANEL ── */}
-      {chatOpen && (
-        <ChatPanel
-          movies={allMovies}
-          onClose={() => setChatOpen(false)}
-        />
-      )}
+      {chatOpen && <ChatPanel movies={allMovies} onClose={() => setChatOpen(false)} />}
     </div>
   )
 }
