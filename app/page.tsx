@@ -34,10 +34,11 @@ function MovieModal({ movie, onClose }: { movie: Movie; onClose: () => void }) {
   }, [onClose])
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6"
-      style={{background:'rgba(0,0,0,0.4)',backdropFilter:'blur(8px)'}}
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-8"
+      style={{background:'rgba(0,0,0,0.25)',backdropFilter:'blur(12px)'}}
       onClick={onClose}>
-      <div className="glass-card rounded-3xl p-8 max-w-lg w-full relative animate-fade-up"
+      <div className="relative w-full animate-fade-up"
+        style={{maxWidth:'480px',background:'rgba(255,255,255,0.96)',borderRadius:'24px',padding:'32px',boxShadow:'0 32px 80px rgba(0,0,0,0.18),0 8px 24px rgba(0,0,0,0.08)',border:'1px solid rgba(255,255,255,0.9)'}}
         onClick={e => e.stopPropagation()}>
         <button onClick={onClose}
           className="absolute top-5 right-5 text-[var(--muted)] hover:text-[var(--text)] transition-colors">
@@ -195,7 +196,10 @@ export default function DiscoverPage() {
               <input ref={aiInputRef} value={aiQuery} onChange={e=>setAiQuery(e.target.value)}
                 onKeyDown={e=>e.key==='Enter'&&handleAiSearch()}
                 placeholder="What should I watch tonight?"
-                style={{flex:1,background:'transparent',border:'none',outline:'none',color:'white',fontSize:'0.95rem',fontFamily:'inherit'}}/>
+                style={{flex:1,background:'transparent',border:'none',outline:'none',color:'white',fontSize:'0.95rem',fontFamily:'inherit'}}
+                onFocus={e => e.target.style.opacity='1'}
+              />
+              <style>{`input::placeholder { color: rgba(255,255,255,0.75); }`}</style>
               <button onClick={handleAiSearch} style={{width:'38px',height:'38px',borderRadius:'100px',flexShrink:0,background:'rgba(255,255,255,0.2)',border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}
                 onMouseEnter={e=>(e.currentTarget.style.background='rgba(255,255,255,0.3)')}
                 onMouseLeave={e=>(e.currentTarget.style.background='rgba(255,255,255,0.2)')}>
@@ -208,7 +212,7 @@ export default function DiscoverPage() {
 
           {/* Quick prompts */}
           <div style={{display:'flex',flexWrap:'wrap',gap:'8px',justifyContent:'center',marginTop:'14px'}}>
-            {['Something feel-good','Best Tamil films','Under 2 hours','Hidden gems','Watch with family'].map(q=>(
+            {['Something feel-good','I loved Parasite — suggest similar','Best Tamil films','Under 2 hours','Hidden gems','Watch with family'].map(q=>(
               <button key={q} onClick={()=>{setInitialMsg(q);setChatOpen(true)}} style={{padding:'6px 14px',borderRadius:'100px',border:'1px solid rgba(0,0,0,0.1)',background:'white',fontSize:'0.75rem',fontFamily:'inherit',color:'var(--sub)',cursor:'pointer'}}>{q}</button>
             ))}
           </div>

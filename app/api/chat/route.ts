@@ -10,24 +10,23 @@ export async function POST(req: NextRequest) {
 
     const allMovies = getUniqueMovies()
 
-    // Compact catalogue — name, year, language, top 2 genres, director, rating only
-    // Removes overviews entirely — cuts tokens by ~70%
-    const catalogue = allMovies.map(m => {
-      const genres = m.genre.split(',').slice(0,2).map((g: string) => g.trim()).join('/')
-      const director = m.director.split(',')[0].trim()
-      const rw = m.timesWatched >= 2 ? '★' : ''
-      return `${m.name}|${m.releaseYear}|${m.language}|${genres}|${director}|${m.tmdbRating}${rw}`
-    }).join('\n')
+    // Compact catalogue — sorted by rating desc, top 500 only
+    // Last name only for director, single genre, no overviews
+    const catalogue = allMovies
+      .sort((a, b) => b.tmdbRating - a.tmdbRating)
+      .slice(0, 500)
+      .map(m => {
+        const genre   = m.genre.split(',')[0].trim()
+        const dirParts = m.director.split(',')[0].trim().split(' ')
+        const director = dirParts[dirParts.length - 1]
+        const rw = m.timesWatched >= 2 ? '★' : ''
+        return `${m.name}|${m.releaseYear}|${m.language}|${genre}|${director}|${m.tmdbRating}${rw}`
+      }).join('\n')
 
-    const systemPrompt = `You are a film recommendation assistant for a personal movie collection.
-${allMovies.length} films watched. Recommend ONLY from this list.
-
-Rules:
-- Give 3-5 recommendations per reply
-- Format: **Film Name** (Year, Language) — one sentence reason
-- If user mentions a film not in the list, use your knowledge of that film's genre/tone/themes to find the closest matches FROM THE LIST
-- Be warm and specific. After recs, ask one follow-up to refine
-- ★ = personally rewatched multiple times (strong endorsement)
+    const systemPrompt = `Film recommender. ${allMovies.length} films. Recommend ONLY from catalogue.
+Format: **Name** (Year, Language) — one sentence why. Give 3-5 recs. ★=personally rewatched.
+If user mentions a film not in catalogue, use your knowledge of its genre/tone to find matches FROM THE LIST.
+Ask one follow-up after recs.
 
 CATALOGUE (Name|Year|Language|Genre|Director|Rating★):
 ${catalogue}`
