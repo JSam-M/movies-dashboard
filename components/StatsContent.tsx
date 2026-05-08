@@ -1,6 +1,7 @@
 'use client'
 
 import type { Movie } from '@/lib/movies'
+import React from 'react'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, LineChart, Line, CartesianGrid
@@ -44,6 +45,70 @@ function KPICard({ value, unit, label, sub, dot }: { value: string; unit?: strin
       <div className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mt-2">{label}</div>
       {sub && <div className="font-body text-[0.6rem] text-[var(--muted)] mt-0.5">{sub}</div>}
     </div>
+  )
+}
+
+
+function CatalogueSection({ movies }: { movies: Movie[] }) {
+  const [sortCol, setSortCol] = React.useState<'name'|'releaseYear'|'tmdbRating'|'timesWatched'|'genre'|'director'|'runtime'|'language'>('tmdbRating')
+  const [sortDir, setSortDir] = React.useState<'asc'|'desc'>('desc')
+
+  const handleSort = (col: typeof sortCol) => {
+    if (sortCol === col) setSortDir(d => d === 'desc' ? 'asc' : 'desc')
+    else { setSortCol(col); setSortDir(col === 'name' || col === 'genre' || col === 'director' || col === 'language' ? 'asc' : 'desc') }
+  }
+
+  const sorted = [...movies].sort((a, b) => {
+    const va = a[sortCol], vb = b[sortCol]
+    const cmp = typeof va === 'string' ? String(va).localeCompare(String(vb)) : (Number(va) - Number(vb))
+    return sortDir === 'asc' ? cmp : -cmp
+  })
+
+  const arrow = (col: typeof sortCol) => sortCol === col ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''
+  const thStyle = (col: typeof sortCol): React.CSSProperties => ({
+    padding:'10px 14px', textAlign:'left', fontSize:'0.58rem', fontWeight:600,
+    letterSpacing:'0.1em', textTransform:'uppercase',
+    color: sortCol === col ? '#0071e3' : '#86868b',
+    cursor:'pointer', userSelect:'none', whiteSpace:'nowrap',
+    borderBottom:'1px solid rgba(0,0,0,0.06)', fontFamily:'inherit',
+  })
+
+  return (
+    <Section eyebrow="Browse" title="Complete Catalogue">
+      <div className="glass rounded-2xl overflow-hidden">
+        <table style={{width:'100%',borderCollapse:'collapse',fontSize:'0.8rem'}}>
+          <thead>
+            <tr>
+              <th style={thStyle('name')} onClick={() => handleSort('name')}>Film{arrow('name')}</th>
+              <th style={thStyle('releaseYear')} onClick={() => handleSort('releaseYear')}>Year{arrow('releaseYear')}</th>
+              <th style={thStyle('tmdbRating')} onClick={() => handleSort('tmdbRating')}>Rating{arrow('tmdbRating')}</th>
+              <th style={thStyle('timesWatched')} onClick={() => handleSort('timesWatched')}>Watches{arrow('timesWatched')}</th>
+              <th style={thStyle('genre')} onClick={() => handleSort('genre')}>Genre{arrow('genre')}</th>
+              <th style={thStyle('director')} onClick={() => handleSort('director')}>Director{arrow('director')}</th>
+              <th style={thStyle('runtime')} onClick={() => handleSort('runtime')}>Runtime{arrow('runtime')}</th>
+              <th style={thStyle('language')} onClick={() => handleSort('language')}>Language{arrow('language')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sorted.map((m, i) => (
+              <tr key={m.name} style={{borderBottom: i < sorted.length-1 ? '1px solid rgba(0,0,0,0.04)' : 'none'}}
+                className="hover:bg-black/[0.02] transition-colors">
+                <td style={{padding:'9px 14px',fontWeight:500,color:'var(--text)',fontFamily:'inherit'}}>
+                  {m.name}{m.timesWatched>=2 && <span style={{color:'#fbbf24',marginLeft:'4px'}}>★</span>}
+                </td>
+                <td style={{padding:'9px 14px',color:'var(--sub)',fontFamily:'inherit'}}>{m.releaseYear}</td>
+                <td style={{padding:'9px 14px',color:'var(--sub)',fontFamily:'inherit'}}>{m.tmdbRating.toFixed(1)}</td>
+                <td style={{padding:'9px 14px',color:'var(--sub)',fontFamily:'inherit'}}>{m.timesWatched}×</td>
+                <td style={{padding:'9px 14px',color:'var(--sub)',fontFamily:'inherit'}}>{m.genre.split(',').slice(0,2).join(', ')}</td>
+                <td style={{padding:'9px 14px',color:'var(--sub)',fontFamily:'inherit'}}>{m.director.split(',')[0].trim()}</td>
+                <td style={{padding:'9px 14px',color:'var(--sub)',fontFamily:'inherit'}}>{m.runtime}</td>
+                <td style={{padding:'9px 14px',color:'var(--sub)',fontFamily:'inherit'}}>{m.language}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Section>
   )
 }
 
@@ -299,36 +364,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
       )}
 
       {/* ── CATALOGUE ── */}
-      <Section eyebrow="Browse" title="Complete Catalogue">
-        <div className="glass rounded-2xl overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr style={{borderBottom:'1px solid rgba(0,0,0,0.06)'}}>
-                {['Film','Year','Rating','Watches','Genre','Director','Runtime','Language'].map(h => (
-                  <th key={h} className="px-4 py-3 text-left font-body text-[0.58rem] font-semibold tracking-[0.1em] uppercase text-[var(--sub)]">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {[...movies].sort((a,b)=>b.tmdbRating-a.tmdbRating).map((m,i) => (
-                <tr key={m.name} style={{borderBottom: i<movies.length-1 ? '1px solid rgba(0,0,0,0.04)' : 'none'}}
-                  className="hover:bg-black/[0.02] transition-colors">
-                  <td className="px-4 py-2.5 font-body text-[0.82rem] font-medium text-[var(--text)]">
-                    {m.name} {m.timesWatched>=2 && <span className="text-amber-400 ml-1">★</span>}
-                  </td>
-                  <td className="px-4 py-2.5 font-body text-[0.78rem] text-[var(--sub)]">{m.releaseYear}</td>
-                  <td className="px-4 py-2.5 font-body text-[0.78rem] text-[var(--sub)]">{m.tmdbRating.toFixed(1)}</td>
-                  <td className="px-4 py-2.5 font-body text-[0.78rem] text-[var(--sub)]">{m.timesWatched}×</td>
-                  <td className="px-4 py-2.5 font-body text-[0.78rem] text-[var(--sub)]">{m.genre.split(',').slice(0,2).join(', ')}</td>
-                  <td className="px-4 py-2.5 font-body text-[0.78rem] text-[var(--sub)]">{m.director.split(',')[0].trim()}</td>
-                  <td className="px-4 py-2.5 font-body text-[0.78rem] text-[var(--sub)]">{m.runtime}</td>
-                  <td className="px-4 py-2.5 font-body text-[0.78rem] text-[var(--sub)]">{m.language}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Section>
+      <CatalogueSection movies={movies} />
 
       <div className="pt-6 border-t border-black/7 text-center pb-8">
         <p className="font-body text-[0.65rem] tracking-[0.1em] uppercase text-[rgba(0,0,0,0.2)]">
