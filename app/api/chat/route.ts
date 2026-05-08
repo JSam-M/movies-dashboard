@@ -6,37 +6,35 @@ const client = new Anthropic()
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages, likedMovies, watchedMovies } = await req.json()
+    const { messages } = await req.json()
 
     const allMovies = getUniqueMovies()
 
-    // Build a compact movie catalogue for the AI context
-    const catalogue = allMovies.map(m =>
-      `${m.name} (${m.releaseYear}, ${m.language}) | ${m.genre} | Dir: ${m.director} | TMDb: ${m.tmdbRating} | ${m.timesWatched >= 2 ? 'REWATCHED' : ''} | Synopsis: ${m.overview?.slice(0, 120)}`
-    ).join('\n')
+    // Compact catalogue — name, year, language, top 2 genres, director, rating only
+    // Removes overviews entirely — cuts tokens by ~70%
+    const catalogue = allMovies.map(m => {
+      const genres = m.genre.split(',').slice(0,2).map((g: string) => g.trim()).join('/')
+      const director = m.director.split(',')[0].trim()
+      const rw = m.timesWatched >= 2 ? '★' : ''
+      return `${m.name}|${m.releaseYear}|${m.language}|${genres}|${director}|${m.tmdbRating}${rw}`
+    }).join('\n')
 
-    const systemPrompt = `You are a film recommendation assistant for a personal movie collection dashboard.
+    const systemPrompt = `You are a film recommendation assistant for a personal movie collection.
+${allMovies.length} films watched. Recommend ONLY from this list.
 
-The user has watched ${allMovies.length} films. Your job is to recommend films FROM THIS LIST ONLY based on their taste.
+Rules:
+- Give 3-5 recommendations per reply
+- Format: **Film Name** (Year, Language) — one sentence reason
+- If user mentions a film not in the list, use your knowledge of that film's genre/tone/themes to find the closest matches FROM THE LIST
+- Be warm and specific. After recs, ask one follow-up to refine
+- ★ = personally rewatched multiple times (strong endorsement)
 
-IMPORTANT RULES:
-- ONLY recommend films that exist in the catalogue below
-- Give 3-5 recommendations per response
-- For each recommendation, give a ONE sentence reason why they'd like it based on their stated preferences
-- Be conversational, warm, and specific — reference exact things from the films
-- If the user mentions a film not in the catalogue, acknowledge it but pivot to what IS in the list
-- Format each recommendation as: **Film Name** (Year) — reason
-- After recommendations, ask a follow-up to refine further (e.g. "Want something shorter?" or "More Tamil cinema?")
-
-${likedMovies?.length > 0 ? `User has indicated they like: ${likedMovies.join(', ')}` : ''}
-${watchedMovies?.length > 0 ? `User has watched recently: ${watchedMovies.join(', ')}` : ''}
-
-FULL FILM CATALOGUE (recommend ONLY from this list):
+CATALOGUE (Name|Year|Language|Genre|Director|Rating★):
 ${catalogue}`
 
     const response = await client.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 1024,
+      max_tokens: 600,
       system: systemPrompt,
       messages: messages,
     })
@@ -44,8 +42,12 @@ ${catalogue}`
     const text = response.content[0].type === 'text' ? response.content[0].text : ''
     return NextResponse.json({ message: text })
 
-  } catch (err) {
+  } catch (err: unknown) {
     console.error('Chat error:', err)
-    return NextResponse.json({ error: 'Failed to get recommendation' }, { status: 500 })
+    const msg = err instanceof Error ? err.message : ''
+    if (msg.includes('overloaded') || msg.includes('529')) {
+      return NextResponse.json({ error: 'overloaded' }, { status: 503 })
+    }
+    return NextResponse.json({ error: 'failed' }, { status: 500 })
   }
 }

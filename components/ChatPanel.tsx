@@ -72,9 +72,13 @@ export default function ChatPanel({ movies, onClose, initialMessage }: Props) {
         }),
       })
       const data = await res.json()
-      setMessages(prev => [...prev, { role: 'assistant', content: data.message || 'Sorry, something went wrong.' }])
+      if (data.error === 'overloaded') {
+        setMessages(prev => [...prev, { role: 'assistant', content: 'The AI is busy right now — try again in a moment.' }])
+      } else {
+        setMessages(prev => [...prev, { role: 'assistant', content: data.message || 'Sorry, something went wrong.' }])
+      }
     } catch {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Connection error. Please try again.' }])
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Connection error — please try again.' }])
     } finally {
       setLoading(false)
     }

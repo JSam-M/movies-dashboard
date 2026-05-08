@@ -24,9 +24,9 @@ const tt = {
   cursor: { fill:'rgba(0,0,0,0.03)' }
 }
 
-function Section({ eyebrow, title, children }: { eyebrow: string; title: string; children: React.ReactNode }) {
+function Section({ eyebrow, title, children, id }: { eyebrow: string; title: string; children: React.ReactNode; id?: string }) {
   return (
-    <div className="mb-14">
+    <div className="mb-14" id={id}>
       <p className="font-body text-[0.6rem] font-semibold tracking-[0.16em] uppercase text-[var(--sub)] mb-1">{eyebrow}</p>
       <p className="font-display text-[1.8rem] font-light text-[var(--text)] mb-6">{title}</p>
       {children}
@@ -34,7 +34,7 @@ function Section({ eyebrow, title, children }: { eyebrow: string; title: string;
   )
 }
 
-function KPICard({ value, unit, label, sub, dot }: { value: string; unit?: string; label: string; sub?: string; dot: string }) {
+function KPICard({ value, unit, label, sub, dot, sectionId }: { value: string; unit?: string; label: string; sub?: string; dot: string; sectionId?: string }) {
   const isText = value.length > 5
   return (
     <div className="glass rounded-2xl p-6 relative overflow-hidden" style={{minHeight:'110px',display:'flex',flexDirection:'column',justifyContent:'flex-end'}}>
@@ -213,23 +213,23 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
       </div>
 
       {/* ── KPIs ── */}
-      <Section eyebrow="Overview" title="At a Glance">
+      <Section eyebrow="Overview" title="At a Glance" id="section-overview">
         <div className="grid grid-cols-4 gap-4 mb-4">
-          <KPICard value={String(movies.length)}   label="Unique Films"       dot="#0071e3" />
-          <KPICard value={String(entries.length)}  label="Total Watches"      dot="#5856d6" sub="incl. rewatches" />
-          <KPICard value={avgRating}               label="Avg TMDb Rating"    dot="#ff9500" sub="out of 10" />
-          <KPICard value={pctHighRated+"%"}        label="Rated ≥7.5"         dot="#34c759" sub={`${highRated} films`} />
+          <KPICard value={String(movies.length)}   label="Unique Films" sectionId="section-catalogue"       dot="#0071e3" />
+          <KPICard value={String(entries.length)}  label="Total Watches" sectionId="section-trends"      dot="#5856d6" sub="incl. rewatches" />
+          <KPICard value={avgRating}               label="Avg TMDb Rating" sectionId="section-quality"    dot="#ff9500" sub="out of 10" />
+          <KPICard value={pctHighRated+"%"}        label="Rated ≥7.5" sectionId="section-quality"         dot="#34c759" sub={`${highRated} films`} />
         </div>
         <div className="grid grid-cols-4 gap-4">
-          <KPICard value={String(totalDays)} unit="d" label="Days in Cinema"  dot="#ff3b30" sub={`${totalHours}h total`} />
-          <KPICard value={String(rewatched.length)} label="Rewatched"         dot="#af52de" sub="personal picks" />
-          <KPICard value={topDirStr}               label="Top Director"       dot="#00c7be" />
-          <KPICard value={peakYear}                label="Peak Year"          dot="#ffcc00" />
+          <KPICard value={String(totalDays)} unit="d" label="Days in Cinema" sectionId="section-trends"  dot="#ff3b30" sub={`${totalHours}h total`} />
+          <KPICard value={String(rewatched.length)} label="Rewatched" sectionId="section-rewatched"         dot="#af52de" sub="personal picks" />
+          <KPICard value={topDirStr}               label="Top Director" sectionId="section-directors"       dot="#00c7be" />
+          <KPICard value={peakYear}                label="Peak Year" sectionId="section-trends"          dot="#ffcc00" />
         </div>
       </Section>
 
       {/* ── TIMELINE ── */}
-      <Section eyebrow="Trends" title="Viewing Over Time">
+      <Section eyebrow="Trends" title="Viewing Over Time" id="section-trends">
         <div className="glass rounded-2xl p-6 mb-4">
           <p className="font-body text-[0.65rem] font-semibold tracking-[0.1em] uppercase text-[var(--sub)] mb-4">Films per Month</p>
           <ResponsiveContainer width="100%" height={220}>
@@ -257,7 +257,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
       </Section>
 
       {/* ── LANGUAGE & GENRE ── */}
-      <Section eyebrow="Composition" title="Language & Genre">
+      <Section eyebrow="Composition" title="Language & Genre" id="section-composition">
         <div className="grid grid-cols-2 gap-6">
           <div className="glass rounded-2xl p-6">
             <p className="font-body text-[0.65rem] font-semibold tracking-[0.1em] uppercase text-[var(--sub)] mb-4">By Language</p>
@@ -297,7 +297,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
       </Section>
 
       {/* ── RATING DISTRIBUTION ── */}
-      <Section eyebrow="Quality" title="Rating Distribution">
+      <Section eyebrow="Quality" title="Rating Distribution" id="section-quality">
         <div className="grid grid-cols-2 gap-6">
           <div className="glass rounded-2xl p-6">
             <p className="font-body text-[0.65rem] font-semibold tracking-[0.1em] uppercase text-[var(--sub)] mb-4">Films by TMDb Score</p>
@@ -332,7 +332,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
       </Section>
 
       {/* ── DIRECTORS ── */}
-      <Section eyebrow="Filmmakers" title="Top Directors">
+      <Section eyebrow="Filmmakers" title="Top Directors" id="section-directors">
         <div className="glass rounded-2xl p-6">
           <ResponsiveContainer width="100%" height={340}>
             <BarChart data={[...dirData].reverse()} layout="vertical" margin={{left:0,right:36,top:0,bottom:0}}>
@@ -348,7 +348,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
 
       {/* ── REWATCHED ── */}
       {topRewatched.length > 0 && (
-        <Section eyebrow="Personal Picks" title="Most Rewatched">
+        <Section eyebrow="Personal Picks" title="Most Rewatched" id="section-rewatched">
           <div className="glass rounded-2xl p-6">
             <ResponsiveContainer width="100%" height={280}>
               <BarChart data={[...topRewatched].reverse()} layout="vertical" margin={{left:0,right:40,top:0,bottom:0}}>
@@ -364,7 +364,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
       )}
 
       {/* ── CATALOGUE ── */}
-      <CatalogueSection movies={movies} />
+      <div id="section-catalogue"><CatalogueSection movies={movies} /></div>
 
       <div className="pt-6 border-t border-black/7 text-center pb-8">
         <p className="font-body text-[0.65rem] tracking-[0.1em] uppercase text-[rgba(0,0,0,0.2)]">

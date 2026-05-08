@@ -25,7 +25,7 @@ export default function MultiSelect({ options, selected, onChange, placeholder =
 
   const filtered = options.filter(o =>
     o !== 'All' && o.toLowerCase().includes(query.toLowerCase())
-  ).slice(0, 12)
+  ).slice(0, 20)
 
   const toggle = (opt: string) => {
     if (selected.includes(opt)) onChange(selected.filter(s => s !== opt))
@@ -82,14 +82,14 @@ export default function MultiSelect({ options, selected, onChange, placeholder =
       />
 
       {/* Dropdown */}
-      {open && filtered.length > 0 && (
+      {open && (filtered.length > 0 || query.length === 0) && options.filter(o => o !== 'All').slice(0,20).length > 0 && (
         <div style={{
           position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0,
           background: 'white', border: '1px solid rgba(0,0,0,0.1)',
           borderRadius: '12px', boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
           zIndex: 100, overflow: 'hidden', maxHeight: '220px', overflowY: 'auto',
         }}>
-          {filtered.map(opt => {
+          {(query.length > 0 ? filtered : options.filter(o => o !== 'All').slice(0,20)).map(opt => {
             const isSelected = selected.includes(opt)
             return (
               <div key={opt} onClick={() => { toggle(opt); setQuery('') }}
