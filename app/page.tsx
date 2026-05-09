@@ -273,7 +273,7 @@ export default function DiscoverPage() {
                   <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
                 </svg>
                 <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search films or directors…"
-                  className="w-full pl-9 pr-4 py-2.5 rounded-xl font-body text-sm outline-none"
+                  className="w-full pl-9 pr-4 py-2.5 rounded-xl font-body text-sm outline-none multiselect-input"
                   style={{background:'white',border:'1px solid rgba(0,0,0,0.08)',color:'var(--text)'}}/>
               </div>
               <div className="flex gap-1.5 sm:gap-2 flex-wrap">
