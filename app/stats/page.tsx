@@ -6,22 +6,22 @@ import ChatPanel from '@/components/ChatPanel'
 import Link from 'next/link'
 import StatsContent from '@/components/StatsContent'
 import MultiSelect from '@/components/MultiSelect'
-
+import ScrollJump from '@/components/ScrollJump'
 import AboutModal from '@/components/AboutModal'
 
 export default function StatsPage() {
-  const [allMovies,  setAllMovies]  = useState<Movie[]>([])
-  const [allEntries, setAllEntries] = useState<Movie[]>([])
-  const [filtered,   setFiltered]   = useState<Movie[]>([])
-  const [loading,    setLoading]    = useState(true)
-  const [chatOpen,   setChatOpen]   = useState(false)
-  const [sidebarOpen,setSidebarOpen]= useState(false)
-  const [aboutOpen,  setAboutOpen]  = useState(false)
+  const [allMovies,   setAllMovies]   = useState<Movie[]>([])
+  const [allEntries,  setAllEntries]  = useState<Movie[]>([])
+  const [filtered,    setFiltered]    = useState<Movie[]>([])
+  const [loading,     setLoading]     = useState(true)
+  const [chatOpen,    setChatOpen]    = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [aboutOpen,   setAboutOpen]   = useState(false)
 
-  // Filters
-  const [selectedFilm,  setSelectedFilm]  = useState<string>('')
-  const [filmQuery,     setFilmQuery]     = useState('')
-  const [filmDropOpen,  setFilmDropOpen]  = useState(false)
+  // Film multi-select
+  const [filmQuery,    setFilmQuery]    = useState('')
+  const [selectedFilms,setSelectedFilms]= useState<string[]>([])
+  const [filmDropOpen, setFilmDropOpen] = useState(false)
   const filmRef = useRef<HTMLDivElement>(null)
 
   const [selLanguages,  setSelLanguages]  = useState<string[]>([])
@@ -40,35 +40,6 @@ export default function StatsPage() {
       })
   }, [])
 
-  // Close film dropdown on outside click
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (filmRef.current && !filmRef.current.contains(e.target as Node)) setFilmDropOpen(false)
-    }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [])
-
-  const applyFilters = useCallback(() => {
-    let f = [...allMovies]
-    if (selectedFilm)         f = f.filter(m => m.name === selectedFilm)
-    if (selLanguages.length)  f = f.filter(m => selLanguages.includes(m.language))
-    if (selGenres.length)     f = f.filter(m => selGenres.some(g => m.genre.includes(g)))
-    if (selDirectors.length)  f = f.filter(m => selDirectors.some(d => m.director.includes(d)))
-    if (minRating > 0)        f = f.filter(m => m.tmdbRating >= minRating)
-    if (watchYears.length > 0) {
-      const names = new Set(allEntries.filter(e => {
-        const y = parseInt('20' + e.date.split('/')[2])
-        return watchYears.includes(y)
-      }).map(e => e.name))
-      f = f.filter(m => names.has(m.name))
-    }
-    if (rewatchFilter === 'Rewatched')   f = f.filter(m => m.timesWatched >= 2)
-    if (rewatchFilter === 'First watch') f = f.filter(m => m.timesWatched <= 1)
-    setFiltered(f)
-  }, [allMovies, allEntries, selectedFilm, selLanguages, selGenres, selDirectors, minRating, watchYears, rewatchFilter])
-
-  useEffect(() => { applyFilters() }, [applyFilters])
   useEffect(() => {
     if (typeof window === 'undefined' || loading) return
     const hash = window.location.hash
@@ -79,20 +50,52 @@ export default function StatsPage() {
     }, 800)
     return () => clearTimeout(timer)
   }, [loading])
-  const languages = ['All', ...Array.from(new Set(allMovies.map(m => m.language))).sort()]
-  const genres    = ['All', ...Array.from(new Set(allMovies.flatMap(m => m.genre.split(',').map(g => g.trim()).filter(Boolean)))).sort()]
-  const directors = ['All', ...Array.from(new Set(allMovies.flatMap(m => m.director.split(',').map(d => d.trim()).filter(d => d && d !== 'N/A')))).sort()]
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (filmRef.current && !filmRef.current.contains(e.target as Node)) setFilmDropOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const applyFilters = useCallback(() => {
+    let f = [...allMovies]
+    if (selectedFilms.length)  f = f.filter(m => selectedFilms.includes(m.name))
+    if (selLanguages.length)   f = f.filter(m => selLanguages.includes(m.language))
+    if (selGenres.length)      f = f.filter(m => selGenres.some(g => m.genre.includes(g)))
+    if (selDirectors.length)   f = f.filter(m => selDirectors.some(d => m.director.includes(d)))
+    if (minRating > 0)         f = f.filter(m => m.tmdbRating >= minRating)
+    if (watchYears.length > 0) {
+      const names = new Set(allEntries.filter(e => {
+        const y = parseInt('20' + e.date.split('/')[2])
+        return watchYears.includes(y)
+      }).map(e => e.name))
+      f = f.filter(m => names.has(m.name))
+    }
+    if (rewatchFilter === 'Rewatched')   f = f.filter(m => m.timesWatched >= 2)
+    if (rewatchFilter === 'First watch') f = f.filter(m => m.timesWatched <= 1)
+    setFiltered(f)
+  }, [allMovies, allEntries, selectedFilms, selLanguages, selGenres, selDirectors, minRating, watchYears, rewatchFilter])
+
+  useEffect(() => { applyFilters() }, [applyFilters])
+
+  const languages = Array.from(new Set(allMovies.map(m => m.language))).sort()
+  const genres    = Array.from(new Set(allMovies.flatMap(m => m.genre.split(',').map(g => g.trim()).filter(Boolean)))).sort()
+  const directors = Array.from(new Set(allMovies.flatMap(m => m.director.split(',').map(d => d.trim()).filter(d => d && d !== 'N/A')))).sort()
   const allYears  = Array.from(new Set(allEntries.map(e => parseInt('20' + e.date.split('/')[2])).filter(y => !isNaN(y)))).sort()
 
-  // Film autocomplete
   const filmSuggestions = filmQuery.trim().length >= 1
-    ? allMovies.filter(m => m.name.toLowerCase().includes(filmQuery.toLowerCase())).slice(0, 10)
+    ? allMovies.filter(m =>
+        m.name.toLowerCase().includes(filmQuery.toLowerCase()) &&
+        !selectedFilms.includes(m.name)
+      ).slice(0, 10)
     : []
 
-  const activeFilters = [selectedFilm, selLanguages.length>0, selGenres.length>0, selDirectors.length>0, minRating>0, watchYears.length>0, rewatchFilter!=='All'].filter(Boolean).length
+  const activeFilters = [selectedFilms.length>0, selLanguages.length>0, selGenres.length>0, selDirectors.length>0, minRating>0, watchYears.length>0, rewatchFilter!=='All'].filter(Boolean).length
 
   const resetFilters = () => {
-    setSelectedFilm(''); setFilmQuery('')
+    setSelectedFilms([]); setFilmQuery('')
     setSelLanguages([]); setSelGenres([])
     setSelDirectors([]); setMinRating(0); setWatchYears([]); setRewatchFilter('All')
   }
@@ -164,7 +167,6 @@ export default function StatsPage() {
         {/* SIDEBAR */}
         {sidebarOpen && (
           <>
-            {/* Mobile backdrop */}
             <div className="fixed inset-0 bg-black/20 z-20 sm:hidden" onClick={() => setSidebarOpen(false)} />
             <aside className="fixed left-0 z-30 border-r border-black/7 overflow-y-auto"
               style={{
@@ -189,45 +191,50 @@ export default function StatsPage() {
                 </div>
 
                 <div className="space-y-5">
-                  {/* Film autocomplete */}
+                  {/* Film multi-select */}
                   <div ref={filmRef}>
                     <label style={labelStyle}>Film</label>
+                    {/* Selected film chips */}
+                    {selectedFilms.length > 0 && (
+                      <div style={{display:'flex',flexWrap:'wrap',gap:'4px',marginBottom:'6px'}}>
+                        {selectedFilms.map(f => (
+                          <span key={f} style={{
+                            display:'inline-flex',alignItems:'center',gap:'4px',
+                            padding:'3px 8px',borderRadius:'100px',
+                            background:'rgba(0,113,227,0.1)',color:'#0071e3',
+                            fontSize:'0.72rem',fontFamily:'inherit',
+                          }}>
+                            {f}
+                            <button onClick={() => setSelectedFilms(prev => prev.filter(x => x !== f))}
+                              style={{background:'none',border:'none',cursor:'pointer',color:'#0071e3',fontSize:'13px',lineHeight:1,padding:0,opacity:0.7}}>
+                              ×
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
                     <div style={{position:'relative'}}>
                       <input
-                        value={selectedFilm || filmQuery}
-                        onChange={e => {
-                          setFilmQuery(e.target.value)
-                          setSelectedFilm('')
-                          setFilmDropOpen(true)
-                        }}
+                        value={filmQuery}
+                        onChange={e => { setFilmQuery(e.target.value); setFilmDropOpen(true) }}
                         onFocus={() => setFilmDropOpen(true)}
-                        placeholder="Search film title…"
+                        placeholder={selectedFilms.length > 0 ? 'Add more films…' : 'Search film title…'}
                         style={inputStyle}
                       />
-                      {selectedFilm && (
-                        <button
-                          onClick={() => { setSelectedFilm(''); setFilmQuery('') }}
-                          style={{
-                            position:'absolute', right:'8px', top:'50%', transform:'translateY(-50%)',
-                            background:'none', border:'none', cursor:'pointer',
-                            color:'var(--muted)', fontSize:'16px', lineHeight:1,
-                          }}
-                        >×</button>
-                      )}
                     </div>
-                    {filmDropOpen && filmSuggestions.length > 0 && !selectedFilm && (
+                    {filmDropOpen && filmSuggestions.length > 0 && (
                       <div style={{
                         position:'absolute', left:'20px', right:'20px',
                         background:'white', border:'1px solid rgba(0,0,0,0.1)',
                         borderRadius:'12px', boxShadow:'0 8px 24px rgba(0,0,0,0.1)',
-                        zIndex:100, overflow:'hidden', maxHeight:'220px', overflowY:'auto',
+                        zIndex:200, overflow:'hidden', maxHeight:'220px', overflowY:'auto',
                       }}>
                         {filmSuggestions.map(m => (
                           <div
                             key={m.name}
                             onClick={() => {
-                              setSelectedFilm(m.name)
-                              setFilmQuery(m.name)
+                              setSelectedFilms(prev => [...prev, m.name])
+                              setFilmQuery('')
                               setFilmDropOpen(false)
                             }}
                             style={{
@@ -247,13 +254,13 @@ export default function StatsPage() {
                   </div>
 
                   {/* Language */}
-                  <MultiSelect label="Language" options={languages.filter(l => l !== 'All')} selected={selLanguages} onChange={setSelLanguages} placeholder="Search languages…" />
+                  <MultiSelect label="Language" options={languages} selected={selLanguages} onChange={setSelLanguages} placeholder="Search languages…" />
 
                   {/* Genre */}
-                  <MultiSelect label="Genre" options={genres.filter(g => g !== 'All')} selected={selGenres} onChange={setSelGenres} placeholder="Search genres…" />
+                  <MultiSelect label="Genre" options={genres} selected={selGenres} onChange={setSelGenres} placeholder="Search genres…" />
 
                   {/* Director */}
-                  <MultiSelect label="Director" options={directors.filter(d => d !== 'All').slice(0,300)} selected={selDirectors} onChange={setSelDirectors} placeholder="Search directors…" />
+                  <MultiSelect label="Director" options={directors.slice(0,300)} selected={selDirectors} onChange={setSelDirectors} placeholder="Search directors…" />
 
                   {/* Min Rating */}
                   <div>
@@ -329,7 +336,7 @@ export default function StatsPage() {
 
       {chatOpen && <ChatPanel movies={allMovies} onClose={() => setChatOpen(false)} />}
       {aboutOpen && <AboutModal onClose={() => setAboutOpen(false)} />}
-      
+      <ScrollJump />
 
       {/* FLOATING CHAT */}
       <button onClick={() => setChatOpen(true)}
