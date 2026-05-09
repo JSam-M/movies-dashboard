@@ -64,6 +64,7 @@ function KPICard({ value, unit, label, sub, dot, sectionId }: {
 function CatalogueSection({ movies }: { movies: Movie[] }) {
   const [sortCol, setSortCol] = React.useState<'name'|'releaseYear'|'tmdbRating'|'timesWatched'|'genre'|'director'|'runtime'|'language'>('tmdbRating')
   const [sortDir, setSortDir] = React.useState<'asc'|'desc'>('desc')
+  const [selectedMovie, setSelectedMovie] = React.useState<Movie|null>(null)
 
   const handleSort = (col: typeof sortCol) => {
     if (sortCol === col) setSortDir(d => d === 'desc' ? 'asc' : 'desc')
@@ -77,6 +78,7 @@ function CatalogueSection({ movies }: { movies: Movie[] }) {
   })
 
   const arrow = (col: typeof sortCol) => sortCol === col ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''
+
   const thStyle = (col: typeof sortCol): React.CSSProperties => ({
     padding:'10px 14px', textAlign:'left', fontSize:'0.58rem', fontWeight:600,
     letterSpacing:'0.1em', textTransform:'uppercase',
@@ -87,7 +89,51 @@ function CatalogueSection({ movies }: { movies: Movie[] }) {
 
   return (
     <Section eyebrow="Browse" title="Complete Catalogue">
-      <div className="glass rounded-2xl overflow-x-auto">
+      {/* Modal */}
+      {selectedMovie && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-8"
+          style={{background:'rgba(0,0,0,0.25)',backdropFilter:'blur(12px)'}}
+          onClick={() => setSelectedMovie(null)}>
+          <div className="relative w-full animate-fade-up"
+            style={{maxWidth:'480px',background:'rgba(255,255,255,0.96)',borderRadius:'24px',padding:'28px',boxShadow:'0 32px 80px rgba(0,0,0,0.18)',border:'1px solid rgba(255,255,255,0.9)'}}
+            onClick={e => e.stopPropagation()}>
+            <button onClick={() => setSelectedMovie(null)} className="absolute top-5 right-5 text-[var(--muted)] hover:text-[var(--text)] transition-colors">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+            <div className="flex items-start justify-between mb-4 pr-8">
+              <div>
+                <p className="font-body text-[0.62rem] font-semibold tracking-[0.1em] uppercase px-2 py-1 rounded-full mb-3 inline-block"
+                  style={{background:'rgba(0,113,227,0.07)',color:'var(--blue)'}}>
+                  {selectedMovie.genre.split(',')[0].trim()}
+                </p>
+                <h2 className="font-display text-[1.6rem] font-light text-[var(--text)] leading-tight">{selectedMovie.name}</h2>
+                <p className="font-body text-[0.75rem] text-[var(--sub)] mt-1">
+                  {selectedMovie.releaseYear} · {selectedMovie.language} · {selectedMovie.runtime}
+                  {selectedMovie.timesWatched >= 2 && <span className="text-amber-500 ml-2">★ Watched {selectedMovie.timesWatched}×</span>}
+                </p>
+              </div>
+              <div className="text-right flex-shrink-0 ml-4">
+                <div className="font-display text-[2.2rem] font-light" style={{color:'var(--blue)'}}>{selectedMovie.tmdbRating.toFixed(1)}</div>
+                <div className="font-body text-[0.6rem] text-[var(--muted)]">TMDb</div>
+              </div>
+            </div>
+            <p className="font-body text-[0.85rem] text-[var(--sub)] leading-relaxed mb-5">{selectedMovie.overview || 'No overview available.'}</p>
+            <div className="flex flex-wrap gap-2 pt-4 border-t border-black/7">
+              <span className="font-body text-[0.72rem] text-[var(--sub)]">Director:</span>
+              <span className="font-body text-[0.72rem] text-[var(--text)]">{selectedMovie.director.split(',')[0].trim()}</span>
+              {selectedMovie.genre.split(',').slice(0,3).map(g => (
+                <span key={g} className="font-body text-[0.65rem] px-2 py-0.5 rounded-full"
+                  style={{background:'rgba(0,0,0,0.05)',color:'var(--sub)'}}>{g.trim()}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Desktop table */}
+      <div className="glass rounded-2xl overflow-x-auto hidden sm:block">
         <table style={{width:'100%',borderCollapse:'collapse',fontSize:'0.8rem'}}>
           <thead>
             <tr>
@@ -104,7 +150,8 @@ function CatalogueSection({ movies }: { movies: Movie[] }) {
           <tbody>
             {sorted.map((m, i) => (
               <tr key={m.name} style={{borderBottom: i < sorted.length-1 ? '1px solid rgba(0,0,0,0.04)' : 'none'}}
-                className="hover:bg-black/[0.02] transition-colors">
+                className="hover:bg-black/[0.02] transition-colors cursor-pointer"
+                onClick={() => setSelectedMovie(m)}>
                 <td style={{padding:'9px 14px',fontWeight:500,color:'var(--text)',fontFamily:'inherit'}}>
                   {m.name}{m.timesWatched>=2 && <span style={{color:'#fbbf24',marginLeft:'4px'}}>★</span>}
                 </td>
@@ -119,6 +166,28 @@ function CatalogueSection({ movies }: { movies: Movie[] }) {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile card list */}
+      <div className="grid grid-cols-1 gap-2 sm:hidden">
+        {sorted.map(m => (
+          <button key={m.name} onClick={() => setSelectedMovie(m)}
+            className="glass rounded-xl px-4 py-3.5 flex items-center gap-3 hover:bg-white/90 transition-all text-left w-full">
+            <div className="font-display text-[1.4rem] font-light w-10 text-center flex-shrink-0" style={{color:'var(--blue)'}}>
+              {m.tmdbRating>0?m.tmdbRating.toFixed(1):'—'}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-body text-[0.88rem] font-medium text-[var(--text)] truncate">
+                {m.name}{m.timesWatched>=2&&<span className="text-amber-400 ml-1">★</span>}
+              </p>
+              <p className="font-body text-[0.7rem] text-[var(--sub)]">{m.releaseYear} · {m.director.split(',')[0].trim()} · {m.runtime}</p>
+            </div>
+            {m.timesWatched>=2&&(
+              <span className="font-body text-[0.62rem] px-2 py-1 rounded-full font-semibold flex-shrink-0"
+                style={{background:'rgba(251,191,36,0.12)',color:'#d97706'}}>{m.timesWatched}×</span>
+            )}
+          </button>
+        ))}
       </div>
     </Section>
   )
