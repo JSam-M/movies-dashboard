@@ -74,6 +74,7 @@ export default function MultiSelect({ options, selected, onChange, placeholder =
 
       {/* Search input */}
       <input
+        className="multiselect-input"
         style={inputStyle}
         placeholder={selected.length > 0 ? 'Add more…' : placeholder}
         value={query}
