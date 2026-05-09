@@ -109,8 +109,3 @@ textarea::placeholder {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-@media (max-width: 768px) {
-  input, textarea, select {
-    font-size: 16px !important;
-  }
-}
