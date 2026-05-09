@@ -51,7 +51,7 @@ function MovieModal({ movie, onClose }: { movie: Movie; onClose: () => void }) {
               style={{background:'rgba(0,113,227,0.07)',color:'var(--blue)'}}>
               {movie.genre.split(',')[0].trim()}
             </p>
-            <h2 className="font-display text-[1.6rem] font-light text-[var(--text)] leading-tight">{movie.name}</h2>
+            <h2 className="font-display text-[1.5rem] font-light text-[var(--text)] leading-tight">{movie.name}</h2>
             <p className="font-body text-[0.75rem] text-[var(--sub)] mt-1">
               {movie.releaseYear} · {movie.language} · {movie.runtime}
               {movie.timesWatched >= 2 && <span className="text-amber-500 ml-2">★ Watched {movie.timesWatched}×</span>}
@@ -233,7 +233,7 @@ export default function DiscoverPage() {
               <p className="font-body text-[0.6rem] font-semibold tracking-[0.16em] uppercase text-[var(--sub)] mb-2">Today&apos;s Picks</p>
               <p className="font-display text-[1.5rem] sm:text-[2rem] font-light text-[var(--text)]">Featured Films</p>
             </div>
-            <p className="font-body text-[0.72rem] text-[var(--muted)] hidden sm:block">Refreshes daily · Click for details</p>
+            <p className="font-body text-[0.7rem] text-[var(--muted)] hidden sm:block">Refreshes daily · Click for details</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {dailyPicks.map(m=>(
