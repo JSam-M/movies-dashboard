@@ -29,7 +29,7 @@ export default function CatalogueTab({ movies }: { movies: Movie[] }) {
       </div>
 
       <div className="glass rounded-2xl overflow-hidden">
-        <table className="w-full text-sm">
+        <table className="w-full text-[0.85rem]">
           <thead>
             <tr style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
               {cols.map(c => (

@@ -194,7 +194,7 @@ export default function DiscoverPage() {
 
           {/* AI search pill */}
           <div style={{position:'relative',maxWidth:'520px',margin:'0 auto'}}>
-            <div style={{display:'flex',alignItems:'center',background:'#0071e3',borderRadius:'100px',padding:'6px 6px 6px 18px',boxShadow:'0 8px 32px rgba(0,113,227,0.35)'}}>
+            <div style={{display:'flex',alignItems:'center',background:'#0071e3',borderRadius:'9999px',padding:'6px 6px 6px 18px',boxShadow:'0 8px 32px rgba(0,113,227,0.35)'}}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="2" style={{flexShrink:0,marginRight:'10px'}}>
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
               </svg>
@@ -204,7 +204,7 @@ export default function DiscoverPage() {
                 className="hero-search"
                 style={{flex:1,background:'transparent',border:'none',outline:'none',color:'white',fontSize:'1rem',fontFamily:'inherit',colorScheme:'light'}}
               />
-              <button onClick={handleAiSearch} style={{width:'38px',height:'38px',borderRadius:'100px',flexShrink:0,background:'rgba(255,255,255,0.2)',border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}
+              <button onClick={handleAiSearch} style={{width:'38px',height:'38px',borderRadius:'9999px',flexShrink:0,background:'rgba(255,255,255,0.2)',border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}
                 onMouseEnter={e=>(e.currentTarget.style.background='rgba(255,255,255,0.3)')}
                 onMouseLeave={e=>(e.currentTarget.style.background='rgba(255,255,255,0.2)')}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
@@ -218,7 +218,7 @@ export default function DiscoverPage() {
           <div style={{display:'flex',flexWrap:'wrap',gap:'8px',justifyContent:'center',marginTop:'14px'}}>
             {['Something feel-good','I loved Parasite — suggest similar','Best Tamil films','Under 2 hours','Hidden gems','Watch with family'].map(q=>(
               <button key={q} onClick={()=>{setInitialMsg(q);setChatOpen(true)}}
-                style={{padding:'6px 14px',borderRadius:'100px',border:'1px solid rgba(0,0,0,0.06)',background:'rgba(255,255,255,0.6)',backdropFilter:'blur(12px)',fontSize:'0.75rem',fontFamily:'inherit',color:'var(--sub)',cursor:'pointer'}}>
+                style={{padding:'6px 14px',borderRadius:'9999px',border:'1px solid rgba(0,0,0,0.06)',background:'rgba(255,255,255,0.6)',backdropFilter:'blur(12px)',fontSize:'0.75rem',fontFamily:'inherit',color:'var(--sub)',cursor:'pointer'}}>
                 {q}
               </button>
             ))}
@@ -248,7 +248,7 @@ export default function DiscoverPage() {
                     {m.timesWatched>=2&&<span className="block font-body text-[0.6rem] font-semibold" style={{color:'var(--gold)'}}>{m.timesWatched}× watched</span>}
                   </div>
                 </div>
-                <p className="font-display text-[1.1rem] font-light text-[var(--text)] leading-tight mb-1">{m.name}</p>
+                <p className="font-display text-[1rem] font-light text-[var(--text)] leading-tight mb-1">{m.name}</p>
                 <p className="font-body text-[0.7rem] text-[var(--sub)] mb-2">{m.releaseYear} · {m.language} · {m.runtime}</p>
                 <p className="font-body text-[0.75rem] text-[var(--sub)] leading-relaxed line-clamp-2">{m.overview}</p>
               </button>

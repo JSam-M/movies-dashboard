@@ -38,14 +38,14 @@ export default function MultiSelect({ options, selected, onChange, placeholder =
     width: '100%', padding: '7px 10px',
     borderRadius: '12px', border: '1px solid rgba(0,0,0,0.12)',
     background: 'white', fontFamily: 'inherit',
-    fontSize: '0.78rem', color: 'var(--text)', outline: 'none',
+    fontSize: '0.75rem', color: 'var(--text)', outline: 'none',
   }
 
   return (
     <div ref={ref} style={{ position: 'relative' }}>
       {label && (
         <div style={{
-          fontSize: '0.58rem', fontWeight: 600, letterSpacing: '0.12em',
+          fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.12em',
           textTransform: 'uppercase', color: 'var(--sub)', marginBottom: '6px',
           fontFamily: 'inherit',
         }}>{label}</div>
@@ -59,7 +59,7 @@ export default function MultiSelect({ options, selected, onChange, placeholder =
               display: 'inline-flex', alignItems: 'center', gap: '4px',
               padding: '3px 8px', borderRadius: '9999px',
               background: 'rgba(0,113,227,0.1)', color: '#0071e3',
-              fontSize: '0.72rem', fontFamily: 'inherit',
+              fontSize: '0.7rem', fontFamily: 'inherit',
             }}>
               {s}
               <button onClick={() => remove(s)} style={{
@@ -95,7 +95,7 @@ export default function MultiSelect({ options, selected, onChange, placeholder =
             return (
               <div key={opt} onClick={() => { toggle(opt); setQuery('') }}
                 style={{
-                  padding: '9px 12px', fontSize: '0.8rem', cursor: 'pointer',
+                  padding: '9px 12px', fontSize: '0.85rem', cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                   background: isSelected ? 'rgba(0,113,227,0.04)' : 'white',
                   color: isSelected ? '#0071e3' : 'var(--text)',

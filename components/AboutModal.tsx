@@ -39,7 +39,7 @@ function FeedbackTrigger() {
   return (
     <div className="w-full mt-4">
       {status === 'done' ? (
-        <p className="font-body text-[0.72rem] text-[var(--sub)]">Thank you ✓</p>
+        <p className="font-body text-[0.7rem] text-[var(--sub)]">Thank you ✓</p>
       ) : (
         <div className="flex gap-2">
           <input
@@ -47,7 +47,7 @@ function FeedbackTrigger() {
             onChange={e => setText(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && submit()}
             placeholder="Your thoughts…"
-            className="flex-1 rounded-lg font-body text-[0.78rem] outline-none"
+            className="flex-1 rounded-xl font-body text-[0.75rem] outline-none"
             style={{ background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.08)', padding: '7px 10px' }}
           />
           <button
@@ -63,7 +63,7 @@ function FeedbackTrigger() {
           </button>
         </div>
       )}
-      {status === 'error' && <p className="font-body text-[0.65rem] text-red-400 mt-1">Something went wrong. Try again.</p>}
+      {status === 'error' && <p className="font-body text-[0.6rem] text-red-400 mt-1">Something went wrong. Try again.</p>}
     </div>
   )
 }

@@ -108,7 +108,7 @@ function CatalogueSection({ movies }: { movies: Movie[] }) {
                   style={{background:'rgba(0,113,227,0.07)',color:'var(--blue)'}}>
                   {selectedMovie.genre.split(',')[0].trim()}
                 </p>
-                <h2 className="font-display text-[1.6rem] font-light text-[var(--text)] leading-tight">{selectedMovie.name}</h2>
+                <h2 className="font-display text-[1.5rem] font-light text-[var(--text)] leading-tight">{selectedMovie.name}</h2>
                 <p className="font-body text-[0.75rem] text-[var(--sub)] mt-1">
                   {selectedMovie.releaseYear} · {selectedMovie.language} · {selectedMovie.runtime}
                   {selectedMovie.timesWatched >= 2 && <span style={{color:'var(--gold)'}} className="ml-2">★ Watched {selectedMovie.timesWatched}×</span>}
@@ -134,7 +134,7 @@ function CatalogueSection({ movies }: { movies: Movie[] }) {
 
       {/* Desktop table */}
       <div className="glass rounded-2xl overflow-x-auto hidden sm:block">
-        <table style={{width:'100%',borderCollapse:'collapse',fontSize:'0.8rem'}}>
+        <table style={{width:'100%',borderCollapse:'collapse',fontSize:'0.85rem'}}>
           <thead>
             <tr>
               <th style={thStyle('name')} onClick={() => handleSort('name')}>Film{arrow('name')}</th>
@@ -173,17 +173,17 @@ function CatalogueSection({ movies }: { movies: Movie[] }) {
         {sorted.map(m => (
           <button key={m.name} onClick={() => setSelectedMovie(m)}
             className="glass rounded-xl px-4 py-3.5 flex items-center gap-3 hover:bg-white/90 transition-all text-left w-full">
-            <div className="font-display text-[1.4rem] font-light w-10 text-center flex-shrink-0" style={{color:'var(--blue)'}}>
+            <div className="font-display text-[1.5rem] font-light w-10 text-center flex-shrink-0" style={{color:'var(--blue)'}}>
               {m.tmdbRating>0?m.tmdbRating.toFixed(1):'—'}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-body text-[0.88rem] font-medium text-[var(--text)] truncate">
+              <p className="font-body text-[0.85rem] font-medium text-[var(--text)] truncate">
                 {m.name}{m.timesWatched>=2&&<span style={{color:'var(--gold)'}} className="ml-1">★</span>}
               </p>
               <p className="font-body text-[0.7rem] text-[var(--sub)]">{m.releaseYear} · {m.director.split(',')[0].trim()} · {m.runtime}</p>
             </div>
             {m.timesWatched>=2&&(
-              <span className="font-body text-[0.62rem] px-2 py-1 rounded-full font-semibold flex-shrink-0"
+              <span className="font-body text-[0.6rem] px-2 py-1 rounded-full font-semibold flex-shrink-0"
                 style={{background:'var(--gold-bg)',color:'var(--gold)'}}>{m.timesWatched}×</span>
             )}
           </button>

@@ -52,7 +52,7 @@ export default function RankingsTab({ movies }: { movies: Movie[] }) {
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-[360px] flex items-center justify-center text-[var(--sub)] font-body text-sm">
+            <div className="h-[360px] flex items-center justify-center text-[var(--sub)] font-body text-[0.85rem]">
               No rewatched films in current selection
             </div>
           )}
