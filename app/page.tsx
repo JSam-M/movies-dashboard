@@ -319,7 +319,7 @@ export default function DiscoverPage() {
               <div className="glass rounded-xl px-5 py-5 text-center">
                 <p className="font-body text-[0.82rem] text-[var(--text)] mb-1">Showing 60 of {filtered.length} films</p>
                 <p className="font-body text-[0.75rem] text-[var(--sub)] mb-3">Refine filters above, or browse the complete list on the Stats page.</p>
-                <Link href="/stats" className="font-body text-[0.78rem] font-semibold text-[var(--blue)] hover:opacity-70 transition-opacity">
+                <Link href="/stats#section-catalogue" className="font-body text-[0.78rem] font-semibold text-[var(--blue)] hover:opacity-70 transition-opacity">
                   View full collection on Stats →
                 </Link>
               </div>
