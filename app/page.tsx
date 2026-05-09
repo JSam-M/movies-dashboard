@@ -248,7 +248,7 @@ export default function DiscoverPage() {
                 <p className="font-display text-[1.1rem] font-light text-[var(--text)] leading-tight mb-1">{m.name}</p>
                 <p className="font-body text-[0.7rem] text-[var(--sub)] mb-2">{m.releaseYear} · {m.language} · {m.runtime}</p>
                 <p className="font-body text-[0.76rem] text-[var(--sub)] leading-relaxed line-clamp-2">{m.overview}</p>
-                <p className="font-body text-[0.65rem] text-[var(--blue)] mt-3">Tap to read more →</p>
+          
               </button>
             ))}
           </div>
