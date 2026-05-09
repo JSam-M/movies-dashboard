@@ -95,7 +95,7 @@ export default function TrendsTab({ movies, allEntries, watchYear }: Props) {
   return (
     <div>
       <p className="font-body text-[0.6rem] font-semibold tracking-[0.14em] uppercase text-[var(--sub)] mb-1">Analytics</p>
-      <p className="font-display text-[1.6rem] font-light text-[var(--text)] mb-1">Viewing Over Time</p>
+      <p className="font-display text-[1.5rem] font-light text-[var(--text)] mb-1">Viewing Over Time</p>
       <p className="font-body text-[0.75rem] text-[var(--sub)] mb-6">Films watched and hours invested across your collection history.</p>
 
       {/* View toggle */}
@@ -118,16 +118,16 @@ export default function TrendsTab({ movies, allEntries, watchYear }: Props) {
         {trendKPIs.map(k => {
           const lines = k.label.split('\n')
           return (
-            <div key={k.label} className="glass rounded-[18px] p-5 relative overflow-hidden"
+            <div key={k.label} className="glass rounded-2xl p-5 relative overflow-hidden"
               style={{ height:'110px', display:'flex', flexDirection:'column', justifyContent:'flex-end' }}>
               <div className="absolute top-4 right-4 w-2 h-2 rounded-full" style={{background:k.dot,opacity:0.7}} />
               <div className={`font-display font-light leading-none tracking-tight text-[var(--text)] ${k.small ? 'text-[1.2rem]' : 'text-[2.2rem]'}`}
                 style={k.small ? {fontFamily:'DM Sans,sans-serif'} : {}}>
                 {k.val}<sup className="font-body text-[0.75rem] text-[var(--muted)] align-super">{k.unit}</sup>
               </div>
-              <div className="font-body text-[0.58rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mt-1.5 leading-tight">
+              <div className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mt-1.5 leading-tight">
                 {lines[0]}
-                {lines[1] && <span className="block text-[0.52rem] normal-case tracking-normal font-normal opacity-70 mt-0.5">{lines[1]}</span>}
+                {lines[1] && <span className="block text-[0.6rem] normal-case tracking-normal font-normal opacity-70 mt-0.5">{lines[1]}</span>}
               </div>
             </div>
           )

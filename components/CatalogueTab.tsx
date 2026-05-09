@@ -24,7 +24,7 @@ export default function CatalogueTab({ movies }: { movies: Movie[] }) {
     <div>
       <div className="mb-5">
         <p className="font-body text-[0.6rem] font-semibold tracking-[0.14em] uppercase text-[var(--sub)] mb-1">Browse</p>
-        <p className="font-display text-[1.6rem] font-light text-[var(--text)]">Complete Collection</p>
+        <p className="font-display text-[1.5rem] font-light text-[var(--text)]">Complete Collection</p>
         <p className="font-body text-[0.75rem] text-[var(--sub)] mt-1">★ marks a personal rewatch</p>
       </div>
 
@@ -53,15 +53,15 @@ export default function CatalogueTab({ movies }: { movies: Movie[] }) {
                 <td className="px-5 py-3 font-body text-[0.85rem] text-[var(--text)] font-medium">
                   {m.name} {m.timesWatched >= 2 ? <span className="text-amber-500 ml-1">★</span> : ''}
                 </td>
-                <td className="px-5 py-3 font-body text-[0.82rem] text-[var(--sub)]">{m.releaseYear}</td>
-                <td className="px-5 py-3 font-body text-[0.82rem] text-[var(--sub)]">{m.tmdbRating.toFixed(1)}</td>
-                <td className="px-5 py-3 font-body text-[0.82rem] text-[var(--sub)]">
+                <td className="px-5 py-3 font-body text-[0.85rem] text-[var(--sub)]">{m.releaseYear}</td>
+                <td className="px-5 py-3 font-body text-[0.85rem] text-[var(--sub)]">{m.tmdbRating.toFixed(1)}</td>
+                <td className="px-5 py-3 font-body text-[0.85rem] text-[var(--sub)]">
                   {m.timesWatched >= 2 ? `${m.timesWatched}×` : '1×'}
                 </td>
-                <td className="px-5 py-3 font-body text-[0.82rem] text-[var(--sub)]">{m.genre}</td>
-                <td className="px-5 py-3 font-body text-[0.82rem] text-[var(--sub)]">{m.director.split(',')[0]}</td>
-                <td className="px-5 py-3 font-body text-[0.82rem] text-[var(--sub)]">{m.runtime}</td>
-                <td className="px-5 py-3 font-body text-[0.82rem] text-[var(--sub)]">{m.language}</td>
+                <td className="px-5 py-3 font-body text-[0.85rem] text-[var(--sub)]">{m.genre}</td>
+                <td className="px-5 py-3 font-body text-[0.85rem] text-[var(--sub)]">{m.director.split(',')[0]}</td>
+                <td className="px-5 py-3 font-body text-[0.85rem] text-[var(--sub)]">{m.runtime}</td>
+                <td className="px-5 py-3 font-body text-[0.85rem] text-[var(--sub)]">{m.language}</td>
               </tr>
             ))}
           </tbody>

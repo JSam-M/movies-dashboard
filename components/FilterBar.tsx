@@ -51,12 +51,12 @@ export default function FilterBar(p: Props) {
         </button>
 
         {activeCount > 0 && (
-          <button onClick={reset} className="font-body text-[0.72rem] text-[var(--sub)] hover:text-[var(--text)] transition-colors">
+          <button onClick={reset} className="font-body text-[0.7rem] text-[var(--sub)] hover:text-[var(--text)] transition-colors">
             Clear all
           </button>
         )}
 
-        <span className="ml-auto font-body text-[0.72rem] text-[var(--muted)]">
+        <span className="ml-auto font-body text-[0.7rem] text-[var(--muted)]">
           {p.filtered} of {p.total} films
         </span>
       </div>

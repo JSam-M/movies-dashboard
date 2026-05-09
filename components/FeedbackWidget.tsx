@@ -63,13 +63,12 @@ export default function FeedbackWidget() {
           onClick={() => { setOpen(false); setStatus('idle') }}
         >
           <div
-            className="w-full animate-fade-up"
+            className="w-full animate-fade-up rounded-3xl"
             style={{
               maxWidth: '400px',
               background: 'rgba(255,255,255,0.97)',
-              borderRadius: '20px',
               padding: '28px',
-              boxShadow: '0 24px 64px rgba(0,0,0,0.14)',
+              boxShadow: '0 32px 80px rgba(0,0,0,0.18), 0 8px 24px rgba(0,0,0,0.08)',
               border: '1px solid rgba(255,255,255,0.9)',
             }}
             onClick={e => e.stopPropagation()}
@@ -83,15 +82,15 @@ export default function FeedbackWidget() {
             ) : (
               <>
                 <div className="mb-5">
-                  <p className="font-display text-[1.3rem] font-light text-[var(--text)]">Share feedback</p>
-                  <p className="font-body text-[0.72rem] text-[var(--sub)] mt-1">Anything — the design, a film missing, a bug, whatever.</p>
+                  <p className="font-display text-[1.5rem] font-light text-[var(--text)]">Share feedback</p>
+                  <p className="font-body text-[0.7rem] text-[var(--sub)] mt-1">Anything — the design, a film missing, a bug, whatever.</p>
                 </div>
                 <textarea
                   value={text}
                   onChange={e => setText(e.target.value)}
                   placeholder="Your thoughts…"
                   rows={4}
-                  className="w-full rounded-xl font-body text-[0.83rem] text-[var(--text)] outline-none resize-none"
+                  className="w-full rounded-xl font-body text-[0.85rem] text-[var(--text)] outline-none resize-none"
                   style={{
                     background: 'rgba(0,0,0,0.04)',
                     border: '1px solid rgba(0,0,0,0.08)',
@@ -105,7 +104,7 @@ export default function FeedbackWidget() {
                 <div className="flex gap-3 mt-4">
                   <button
                     onClick={() => { setOpen(false); setStatus('idle') }}
-                    className="flex-1 py-2.5 rounded-xl font-body text-[0.78rem] font-medium transition-all"
+                    className="flex-1 py-2.5 rounded-xl font-body text-[0.75rem] font-medium transition-all"
                     style={{ background: 'rgba(0,0,0,0.05)', color: 'var(--sub)' }}
                   >
                     Cancel
@@ -113,7 +112,7 @@ export default function FeedbackWidget() {
                   <button
                     onClick={submit}
                     disabled={!text.trim() || status === 'sending'}
-                    className="flex-1 py-2.5 rounded-xl font-body text-[0.78rem] font-medium text-white transition-all"
+                    className="flex-1 py-2.5 rounded-xl font-body text-[0.75rem] font-medium text-white transition-all"
                     style={{
                       background: text.trim() && status !== 'sending' ? '#0071e3' : 'rgba(0,0,0,0.12)',
                       color: text.trim() && status !== 'sending' ? 'white' : 'var(--muted)',
