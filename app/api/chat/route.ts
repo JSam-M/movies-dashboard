@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { getUniqueMovies } from '@/lib/movies'
-import { needsApiCall, heuristicRecommend } from '@/lib/heuristic'
+import { needsApiCall } from '@/lib/heuristic'
 
 const client = new Anthropic()
 
@@ -9,38 +9,34 @@ export async function POST(req: NextRequest) {
   try {
     const { messages } = await req.json()
 
-    const allMovies = getUniqueMovies()
+    // Only the latest user message is used for heuristic check
+    const lastUserMsg = [...messages].reverse().find((m: {role:string}) => m.role === 'user')
+    const query = lastUserMsg?.content || ''
 
-    // Only the last user message matters for routing
-    const lastUserMsg = [...messages].reverse().find((m: {role:string;content:string}) => m.role === 'user')
-    const lastQuery   = lastUserMsg?.content || ''
-
-    // ── Heuristic path (free, instant) ──
-    if (!needsApiCall(lastQuery)) {
-      const result = heuristicRecommend(lastQuery, allMovies)
-      return NextResponse.json({ message: result })
+    // If query doesn't need API, signal the client to use heuristic
+    if (!needsApiCall(query)) {
+      return NextResponse.json({ useHeuristic: true })
     }
 
-    // ── API fallback (complex / similarity queries) ──
-    // Send only name|genre|rating to keep token count minimal
+    const allMovies = getUniqueMovies()
+
+    // Minimal catalogue — name|genre|rating only, no overviews, top 400 by rating
     const catalogue = allMovies
       .sort((a, b) => b.tmdbRating - a.tmdbRating)
-      .slice(0, 500)
+      .slice(0, 400)
       .map(m => {
         const genre = m.genre.split(',')[0].trim()
-        const rw    = m.timesWatched >= 2 ? '★' : ''
+        const rw = m.timesWatched >= 2 ? '\u2605' : ''
         return `${m.name}|${m.releaseYear}|${m.language}|${genre}|${m.tmdbRating}${rw}`
       }).join('\n')
 
-    const systemPrompt = `Film recommender. Recommend ONLY from the catalogue below.
-Format each rec as: **Name** (Year, Language) — one sentence why. Give 3-5 recs. ★=personally rewatched.
-If user references a film not in the catalogue, use its genre/tone to find matches FROM THE LIST.
-End with one short follow-up question.
+    const systemPrompt = `Film recommender. Recommend ONLY from catalogue below.
+Format: **Name** (Year, Language) — one sentence why. Give 3-5 recs. \u2605=personally rewatched.
+Be concise. No preamble.
 
-CATALOGUE (Name|Year|Language|Genre|Rating★):
-${catalogue}`
+CATALOGUE (Name|Year|Language|Genre|Rating):\n${catalogue}`
 
-    // Only send last 4 messages to keep context small
+    // Send only last 4 messages to keep token count low
     const trimmedMessages = messages.slice(-4)
 
     const response = await client.messages.create({
