@@ -91,7 +91,7 @@ html, body {
 /* Placeholder visibility fix */
 input::placeholder,
 textarea::placeholder {
-  color: var(--muted) !important;
+  color: var(--muted);
   opacity: 1;
 }
 
