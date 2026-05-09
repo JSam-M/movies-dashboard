@@ -32,7 +32,7 @@ function scrollTo(id: string) {
 function Section({ eyebrow, title, children, id }: { eyebrow: string; title: string; children: React.ReactNode; id?: string }) {
   return (
     <div className="mb-14" id={id}>
-      <p className="font-body text-[0.6rem] font-semibold tracking-[0.16em] uppercase text-[var(--sub)] mb-1">{eyebrow}</p>
+      <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-1">{eyebrow}</p>
       <p className="font-display text-[1.5rem] font-light text-[var(--text)] mb-6">{title}</p>
       {children}
     </div>
@@ -104,7 +104,7 @@ function CatalogueSection({ movies }: { movies: Movie[] }) {
             </button>
             <div className="flex items-start justify-between mb-4 pr-8">
               <div>
-                <p className="font-body text-[0.6rem] font-semibold tracking-[0.1em] uppercase px-2 py-1 rounded-full mb-3 inline-block"
+                <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase px-2 py-1 rounded-full mb-3 inline-block"
                   style={{background:'rgba(0,113,227,0.07)',color:'var(--blue)'}}>
                   {selectedMovie.genre.split(',')[0].trim()}
                 </p>
@@ -274,7 +274,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
   return (
     <div>
       <div className="mb-10 pb-8 border-b border-black/7">
-        <p className="font-body text-[0.6rem] font-semibold tracking-[0.16em] uppercase text-[var(--sub)] mb-2">Personal Archive</p>
+        <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-2">Personal Archive</p>
         <h1 className="font-display text-[2.8rem] font-light text-[var(--text)] leading-tight">My Film Stats</h1>
       </div>
 
@@ -295,7 +295,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
 
       <Section eyebrow="Trends" title="Viewing Over Time" id="section-trends">
         <div className="glass rounded-2xl p-4 sm:p-6 mb-4">
-          <p className="font-body text-[0.6rem] font-semibold tracking-[0.1em] uppercase text-[var(--sub)] mb-4">Films per Month</p>
+          <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-4">Films per Month</p>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={timelineData} margin={{left:0,right:8,top:4,bottom:40}}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.05)" />
@@ -307,7 +307,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
           </ResponsiveContainer>
         </div>
         <div className="glass rounded-2xl p-4 sm:p-6">
-          <p className="font-body text-[0.6rem] font-semibold tracking-[0.1em] uppercase text-[var(--sub)] mb-4">Films per Year</p>
+          <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-4">Films per Year</p>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={annualData} margin={{left:0,right:8,top:4,bottom:0}}>
               <XAxis dataKey="year" tick={{fontFamily:'inherit',fontSize:11,fill:'#86868b'}} axisLine={false} tickLine={false} />
@@ -323,7 +323,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
       <Section eyebrow="Composition" title="Language & Genre" id="section-composition">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="glass rounded-2xl p-4 sm:p-6">
-            <p className="font-body text-[0.6rem] font-semibold tracking-[0.1em] uppercase text-[var(--sub)] mb-4">By Language</p>
+            <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-4">By Language</p>
             <div className="flex items-center gap-4">
               <PieChart width={160} height={160}>
                 <Pie data={langData} cx={80} cy={80} innerRadius={50} outerRadius={75} dataKey="value" paddingAngle={2}>
@@ -345,7 +345,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
             </div>
           </div>
           <div className="glass rounded-2xl p-4 sm:p-6">
-            <p className="font-body text-[0.6rem] font-semibold tracking-[0.1em] uppercase text-[var(--sub)] mb-4">Top Genres</p>
+            <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-4">Top Genres</p>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={[...genreData].reverse()} layout="vertical" margin={{left:0,right:36,top:0,bottom:0}}>
                 <XAxis type="number" tick={{fontFamily:'inherit',fontSize:9,fill:'#86868b'}} axisLine={false} tickLine={false} />
@@ -362,7 +362,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
       <Section eyebrow="Quality" title="Rating Distribution" id="section-quality">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="glass rounded-2xl p-4 sm:p-6">
-            <p className="font-body text-[0.6rem] font-semibold tracking-[0.1em] uppercase text-[var(--sub)] mb-4">Films by TMDb Score</p>
+            <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-4">Films by TMDb Score</p>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={ratingData} margin={{left:0,right:8,top:4,bottom:0}}>
                 <XAxis dataKey="name" tick={{fontFamily:'inherit',fontSize:11,fill:'#86868b'}} axisLine={false} tickLine={false} />
@@ -374,7 +374,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
             </ResponsiveContainer>
           </div>
           <div className="glass rounded-2xl p-4 sm:p-6">
-            <p className="font-body text-[0.6rem] font-semibold tracking-[0.1em] uppercase text-[var(--sub)] mb-4">Highest Rated</p>
+            <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-4">Highest Rated</p>
             <div className="space-y-2.5">
               {[...movies].sort((a,b)=>b.tmdbRating-a.tmdbRating).slice(0,6).map((m,i)=>(
                 <div key={m.name} className="flex items-center gap-3">
@@ -424,7 +424,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
       <div id="section-catalogue"><CatalogueSection movies={movies} /></div>
 
       <div className="pt-6 border-t border-black/7 text-center pb-8">
-        <p className="font-body text-[0.6rem] tracking-[0.1em] uppercase text-[rgba(0,0,0,0.2)]">
+        <p className="font-body text-[0.6rem] tracking-[0.12em] uppercase text-[rgba(0,0,0,0.2)]">
           {movies.length} films · {new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'})}
         </p>
       </div>

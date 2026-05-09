@@ -23,7 +23,7 @@ export default function CatalogueTab({ movies }: { movies: Movie[] }) {
   return (
     <div>
       <div className="mb-5">
-        <p className="font-body text-[0.6rem] font-semibold tracking-[0.14em] uppercase text-[var(--sub)] mb-1">Browse</p>
+        <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-1">Browse</p>
         <p className="font-display text-[1.5rem] font-light text-[var(--text)]">Complete Collection</p>
         <p className="font-body text-[0.75rem] text-[var(--sub)] mt-1">★ marks a personal rewatch</p>
       </div>
@@ -35,15 +35,15 @@ export default function CatalogueTab({ movies }: { movies: Movie[] }) {
               {cols.map(c => (
                 <th key={c.key}
                   onClick={() => { if(sortBy===c.key) setAsc(!asc); else { setSortBy(c.key); setAsc(false) } }}
-                  className="px-5 py-3.5 text-left font-body text-[0.6rem] font-semibold tracking-[0.1em] uppercase text-[var(--sub)] cursor-pointer select-none hover:text-[var(--text)] transition-colors">
+                  className="px-5 py-3.5 text-left font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] cursor-pointer select-none hover:text-[var(--text)] transition-colors">
                   {c.label} {sortBy===c.key ? (asc?'↑':'↓') : ''}
                 </th>
               ))}
-              <th className="px-5 py-3.5 text-left font-body text-[0.6rem] font-semibold tracking-[0.1em] uppercase text-[var(--sub)]">Watches</th>
-              <th className="px-5 py-3.5 text-left font-body text-[0.6rem] font-semibold tracking-[0.1em] uppercase text-[var(--sub)]">Genre</th>
-              <th className="px-5 py-3.5 text-left font-body text-[0.6rem] font-semibold tracking-[0.1em] uppercase text-[var(--sub)]">Director</th>
-              <th className="px-5 py-3.5 text-left font-body text-[0.6rem] font-semibold tracking-[0.1em] uppercase text-[var(--sub)]">Runtime</th>
-              <th className="px-5 py-3.5 text-left font-body text-[0.6rem] font-semibold tracking-[0.1em] uppercase text-[var(--sub)]">Language</th>
+              <th className="px-5 py-3.5 text-left font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)]">Watches</th>
+              <th className="px-5 py-3.5 text-left font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)]">Genre</th>
+              <th className="px-5 py-3.5 text-left font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)]">Director</th>
+              <th className="px-5 py-3.5 text-left font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)]">Runtime</th>
+              <th className="px-5 py-3.5 text-left font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)]">Language</th>
             </tr>
           </thead>
           <tbody>

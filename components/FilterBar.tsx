@@ -43,7 +43,7 @@ export default function FilterBar(p: Props) {
           </svg>
           Filters
           {activeCount > 0 && (
-            <span className="ml-1 px-1.5 py-0.5 rounded-full text-[0.6rem] font-bold"
+            <span className="ml-1 px-1.5 py-0.5 rounded-full text-[0.6rem] font-semibold"
               style={{ background: open ? 'rgba(255,255,255,0.25)' : 'var(--blue)', color: open ? 'white' : 'white' }}>
               {activeCount}
             </span>

@@ -42,7 +42,7 @@ export default function KPIBar({ movies, allEntries, watchYear }: Props) {
           <div className="font-display text-[2.6rem] font-light leading-none tracking-tight text-[var(--text)]">
             {k.val}<sup className="font-body text-[0.85rem] text-[var(--muted)] align-super">{k.unit}</sup>
           </div>
-          <div className="font-body text-[0.6rem] font-semibold tracking-[0.14em] uppercase text-[var(--sub)] mt-2">
+          <div className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mt-2">
             {k.label}
           </div>
         </div>

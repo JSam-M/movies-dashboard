@@ -146,7 +146,7 @@ export default function ChatPanel({ movies, onClose, initialMessage }: Props) {
           )}
           {messages.length === 1 && (
             <div className="pt-2 space-y-2">
-              <p className="font-body text-[0.6rem] font-semibold tracking-[0.1em] uppercase text-[var(--muted)] px-1">Quick start</p>
+              <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--muted)] px-1">Quick start</p>
               <div className="flex flex-wrap gap-2">
                 {QUICK_PROMPTS.map(q => (
                   <button key={q} onClick={() => send(q)}

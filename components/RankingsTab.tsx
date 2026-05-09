@@ -20,7 +20,7 @@ export default function RankingsTab({ movies }: { movies: Movie[] }) {
   return (
     <div className="grid grid-cols-2 gap-8">
       <div>
-        <p className="font-body text-[0.6rem] font-semibold tracking-[0.14em] uppercase text-[var(--sub)] mb-1">By Rating</p>
+        <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-1">By Rating</p>
         <p className="font-display text-[1.5rem] font-light text-[var(--text)] mb-5">Highest Rated</p>
         <div className="glass rounded-2xl p-5">
           <ResponsiveContainer width="100%" height={360}>
@@ -37,7 +37,7 @@ export default function RankingsTab({ movies }: { movies: Movie[] }) {
       </div>
 
       <div>
-        <p className="font-body text-[0.6rem] font-semibold tracking-[0.14em] uppercase text-[var(--sub)] mb-1">Personal Picks</p>
+        <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-1">Personal Picks</p>
         <p className="font-display text-[1.5rem] font-light text-[var(--text)] mb-5">Most Rewatched</p>
         <div className="glass rounded-2xl p-5">
           {top10rw.length > 0 ? (

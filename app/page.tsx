@@ -47,7 +47,7 @@ function MovieModal({ movie, onClose }: { movie: Movie; onClose: () => void }) {
         </button>
         <div className="flex items-start justify-between mb-4 pr-8">
           <div>
-            <p className="font-body text-[0.6rem] font-semibold tracking-[0.1em] uppercase px-2 py-1 rounded-full mb-3 inline-block"
+            <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase px-2 py-1 rounded-full mb-3 inline-block"
               style={{background:'rgba(0,113,227,0.07)',color:'var(--blue)'}}>
               {movie.genre.split(',')[0].trim()}
             </p>
@@ -204,7 +204,7 @@ export default function DiscoverPage() {
                 className="hero-search"
                 style={{flex:1,background:'transparent',border:'none',outline:'none',color:'white',fontSize:'1rem',fontFamily:'inherit',colorScheme:'light'}}
               />
-              <button onClick={handleAiSearch} style={{width:'38px',height:'38px',borderRadius:'9999px',flexShrink:0,background:'rgba(255,255,255,0.2)',border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}
+              <button onClick={handleAiSearch} style={{width:'38px',height:'38px',borderRadius:'9999px',flexShrink:0,background:'rgba(255,255,255,0.2)',border:'none',display:'flex',alignItems:'center',justifyContent:'center'}}
                 onMouseEnter={e=>(e.currentTarget.style.background='rgba(255,255,255,0.3)')}
                 onMouseLeave={e=>(e.currentTarget.style.background='rgba(255,255,255,0.2)')}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
@@ -230,14 +230,14 @@ export default function DiscoverPage() {
         <div className="mb-12 sm:mb-16">
           <div className="flex items-end justify-between mb-6">
             <div>
-              <p className="font-body text-[0.6rem] font-semibold tracking-[0.16em] uppercase text-[var(--sub)] mb-2">Today&apos;s Picks</p>
+              <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-2">Today&apos;s Picks</p>
               <p className="font-display text-[1.5rem] sm:text-[2rem] font-light text-[var(--text)]">Featured Films</p>
             </div>
             <p className="font-body text-[0.7rem] text-[var(--muted)] hidden sm:block">Refreshes daily · Click for details</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {dailyPicks.map(m=>(
-              <button key={m.name} onClick={()=>setSelectedMovie(m)} className="glass rounded-2xl p-5 text-left hover:shadow-lg transition-all hover:scale-[1.01]" style={{cursor:'pointer'}}>
+              <button key={m.name} onClick={()=>setSelectedMovie(m)} className="glass rounded-2xl p-5 text-left transition-all hover:scale-[1.01] hover:bg-white/90">
                 <div className="flex items-start justify-between mb-3">
                   <span className="font-body text-[0.6rem] font-semibold tracking-[0.08em] uppercase px-2 py-1 rounded-full"
                     style={{background:'rgba(0,113,227,0.07)',color:'var(--blue)'}}>
@@ -260,7 +260,7 @@ export default function DiscoverPage() {
         <div>
           <div className="flex items-end justify-between mb-6">
             <div>
-              <p className="font-body text-[0.6rem] font-semibold tracking-[0.16em] uppercase text-[var(--sub)] mb-2">Browse</p>
+              <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-2">Browse</p>
               <p className="font-display text-[1.5rem] sm:text-[2rem] font-light text-[var(--text)]">Collection</p>
             </div>
             <p className="font-body text-[0.75rem] text-[var(--muted)]">{filtered.length} films</p>
@@ -330,7 +330,7 @@ export default function DiscoverPage() {
         </div>
 
         <div className="mt-12 sm:mt-16 pt-6 border-t border-black/7 text-center">
-          <p className="font-body text-[0.6rem] tracking-[0.1em] uppercase text-[rgba(0,0,0,0.2)]">
+          <p className="font-body text-[0.6rem] tracking-[0.12em] uppercase text-[rgba(0,0,0,0.2)]">
             {stats.total as number} films · {new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'})}
           </p>
         </div>

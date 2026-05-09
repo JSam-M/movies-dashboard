@@ -94,7 +94,7 @@ export default function TrendsTab({ movies, allEntries, watchYear }: Props) {
 
   return (
     <div>
-      <p className="font-body text-[0.6rem] font-semibold tracking-[0.14em] uppercase text-[var(--sub)] mb-1">Analytics</p>
+      <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-1">Analytics</p>
       <p className="font-display text-[1.5rem] font-light text-[var(--text)] mb-1">Viewing Over Time</p>
       <p className="font-body text-[0.75rem] text-[var(--sub)] mb-6">Films watched and hours invested across your collection history.</p>
 
@@ -137,7 +137,7 @@ export default function TrendsTab({ movies, allEntries, watchYear }: Props) {
       {/* Charts */}
       <div className="grid grid-cols-2 gap-8">
         <div>
-          <p className="font-body text-[0.6rem] font-semibold tracking-[0.1em] uppercase text-[var(--sub)] mb-4">Volume</p>
+          <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-4">Volume</p>
           <div className="glass rounded-2xl p-5">
             <ResponsiveContainer width="100%" height={340}>
               <BarChart data={data} margin={{left:0,right:8,top:8,bottom:40}}>
@@ -152,7 +152,7 @@ export default function TrendsTab({ movies, allEntries, watchYear }: Props) {
         </div>
 
         <div>
-          <p className="font-body text-[0.6rem] font-semibold tracking-[0.1em] uppercase text-[var(--sub)] mb-4">Duration</p>
+          <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-4">Duration</p>
           <div className="glass rounded-2xl p-5">
             <ResponsiveContainer width="100%" height={340}>
               <BarChart data={data} margin={{left:0,right:8,top:8,bottom:40}}>

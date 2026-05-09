@@ -33,7 +33,7 @@ export default function CompositionTab({ movies }: { movies: Movie[] }) {
       <div className="grid grid-cols-2 gap-8">
         {/* Language donut */}
         <div>
-          <p className="font-body text-[0.6rem] font-semibold tracking-[0.14em] uppercase text-[var(--sub)] mb-1">Language</p>
+          <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-1">Language</p>
           <p className="font-display text-[1.5rem] font-light text-[var(--text)] mb-5">By Language</p>
           <div className="glass rounded-2xl p-5 flex items-center justify-center">
             <PieChart width={320} height={300}>
@@ -50,7 +50,7 @@ export default function CompositionTab({ movies }: { movies: Movie[] }) {
 
         {/* Genre bars — CSS implementation (bypasses Recharts axis rendering) */}
         <div>
-          <p className="font-body text-[0.6rem] font-semibold tracking-[0.14em] uppercase text-[var(--sub)] mb-1">Genre</p>
+          <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-1">Genre</p>
           <p className="font-display text-[1.5rem] font-light text-[var(--text)] mb-5">Top Genres</p>
           <div className="glass rounded-2xl p-5 space-y-2.5">
             {(() => {
@@ -77,7 +77,7 @@ export default function CompositionTab({ movies }: { movies: Movie[] }) {
 
       {/* Directors */}
       <div>
-        <p className="font-body text-[0.6rem] font-semibold tracking-[0.14em] uppercase text-[var(--sub)] mb-1">Filmmakers</p>
+        <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-1">Filmmakers</p>
         <p className="font-display text-[1.5rem] font-light text-[var(--text)] mb-5">Top Directors</p>
         <div className="glass rounded-2xl p-5">
           <ResponsiveContainer width="100%" height={380}>
