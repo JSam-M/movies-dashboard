@@ -36,8 +36,8 @@ export default function MultiSelect({ options, selected, onChange, placeholder =
 
   const inputStyle: React.CSSProperties = {
     width: '100%', padding: '7px 10px',
-    borderRadius: '10px', border: '1px solid rgba(0,0,0,0.08)',
-    background: 'rgba(0,0,0,0.04)', fontFamily: 'inherit',
+    borderRadius: '10px', border: '1px solid rgba(0,0,0,0.12)',
+    background: 'white', fontFamily: 'inherit',
     fontSize: '0.78rem', color: 'var(--text)', outline: 'none',
   }
 
