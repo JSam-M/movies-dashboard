@@ -5,6 +5,7 @@ import type { Movie } from '@/lib/movies'
 import ChatPanel from '@/components/ChatPanel'
 import MultiSelect from '@/components/MultiSelect'
 import AboutModal from '@/components/AboutModal'
+import ScrollJump from '@/components/ScrollJump'
 import Link from 'next/link'
 
 type SortKey = 'rating' | 'rewatched' | 'date'
@@ -213,7 +214,7 @@ export default function DiscoverPage() {
             </div>
           </div>
 
-          {/* Quick prompts — glass style */}
+          {/* Quick prompts */}
           <div style={{display:'flex',flexWrap:'wrap',gap:'8px',justifyContent:'center',marginTop:'14px'}}>
             {['Something feel-good','I loved Parasite — suggest similar','Best Tamil films','Under 2 hours','Hidden gems','Watch with family'].map(q=>(
               <button key={q} onClick={()=>{setInitialMsg(q);setChatOpen(true)}}
@@ -308,10 +309,11 @@ export default function DiscoverPage() {
                   </p>
                   <p className="font-body text-[0.7rem] text-[var(--sub)]">{m.releaseYear} · {m.director.split(',')[0].trim()} · {m.runtime}</p>
                 </div>
-                <div className="hidden sm:flex gap-2 flex-shrink-0 items-center">
+                {/* Fix 2: rewatch badge always visible, language/genre hidden on mobile */}
+                <div className="flex gap-2 flex-shrink-0 items-center">
                   {m.timesWatched>=2&&<span className="font-body text-[0.62rem] px-2 py-1 rounded-full font-semibold" style={{background:'rgba(251,191,36,0.12)',color:'#d97706'}}>{m.timesWatched}×</span>}
-                  <span className="font-body text-[0.62rem] px-2 py-1 rounded-full" style={{background:'rgba(0,0,0,0.04)',color:'var(--sub)'}}>{m.language}</span>
-                  <span className="font-body text-[0.62rem] px-2 py-1 rounded-full" style={{background:'rgba(0,0,0,0.04)',color:'var(--sub)'}}>{m.genre.split(',')[0].trim()}</span>
+                  <span className="hidden sm:inline font-body text-[0.62rem] px-2 py-1 rounded-full" style={{background:'rgba(0,0,0,0.04)',color:'var(--sub)'}}>{m.language}</span>
+                  <span className="hidden sm:inline font-body text-[0.62rem] px-2 py-1 rounded-full" style={{background:'rgba(0,0,0,0.04)',color:'var(--sub)'}}>{m.genre.split(',')[0].trim()}</span>
                 </div>
               </button>
             ))}
@@ -344,6 +346,7 @@ export default function DiscoverPage() {
         </svg>
       </button>
 
+      <ScrollJump />
       {selectedMovie && <MovieModal movie={selectedMovie} onClose={()=>setSelectedMovie(null)}/>}
       {aboutOpen && <AboutModal onClose={() => setAboutOpen(false)} />}
       {chatOpen && <ChatPanel movies={allMovies} initialMessage={initialMsg} onClose={()=>{setChatOpen(false);setInitialMsg('')}}/>}
