@@ -1,7 +1,7 @@
 'use client'
 
 import type { Movie } from '@/lib/movies'
-import { PieChart, Pie, Cell, Tooltip, BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from 'recharts'
+import { PieChart, Pie, Cell, Tooltip, BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LabelList } from 'recharts'
 
 const COLORS = ['#0071e3','#ff9500','#34c759','#ff3b30','#5856d6','#ff2d55','#af52de','#00c7be']
 
@@ -54,19 +54,14 @@ export default function CompositionTab({ movies }: { movies: Movie[] }) {
           <p className="font-display text-[1.5rem] font-light text-[var(--text)] mb-5">Top Genres</p>
           <div className="glass rounded-2xl p-5">
             <ResponsiveContainer width="100%" height={360}>
-              <BarChart data={[...genreData].reverse()} layout="vertical" margin={{left:0,right:36,top:4,bottom:0}}>
+              <BarChart data={[...genreData].reverse()} layout="vertical" margin={{left:0,right:16,top:4,bottom:0}}>
                 <XAxis type="number" tick={{fontFamily:'DM Sans',fontSize:10,fill:'#86868b'}} axisLine={false} tickLine={false} />
-                <YAxis type="category" dataKey="name" width={110} interval={0}
-                  ticks={[...genreData].reverse().map(d => d.name)}
-                  tick={(props: {x:number;y:number;payload:{value:string}}) => (
-                    <g transform={`translate(${props.x},${props.y})`}>
-                      <text x={-4} y={0} dy="0.35em" textAnchor="end" fill="#1d1d1f" fontSize={11} fontFamily="DM Sans, sans-serif">{props.payload.value}</text>
-                    </g>
-                  )}
-                  axisLine={false} tickLine={false} />
+                <YAxis type="category" dataKey="name" width={110} tick={false} axisLine={false} tickLine={false} />
                 <Tooltip {...tooltip} />
-                <Bar dataKey="value" radius={[0,4,4,0]} label={{position:'right',fontSize:10,fill:'#86868b',fontFamily:'DM Sans'}}>
-                  {genreData.map((_,i) => <Cell key={i} fill={`hsl(${210+i*8},${75-i*3}%,${50+i*2}%)`} />)}
+                <Bar dataKey="value" radius={[0,4,4,0]}>
+                  <LabelList dataKey="name" position="left" offset={8}
+                    style={{fill:'#1d1d1f',fontSize:11,fontFamily:'DM Sans, sans-serif',textAnchor:'end'}} />
+                  {[...genreData].reverse().map((_,i) => <Cell key={i} fill={`hsl(${210+i*8},${75-i*3}%,${50+i*2}%)`} />)}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
