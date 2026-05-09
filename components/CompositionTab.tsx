@@ -1,7 +1,7 @@
 'use client'
 
 import type { Movie } from '@/lib/movies'
-import { PieChart, Pie, Cell, Tooltip, BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LabelList } from 'recharts'
+import { PieChart, Pie, Cell, Tooltip, BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from 'recharts'
 
 const COLORS = ['#0071e3','#ff9500','#34c759','#ff3b30','#5856d6','#ff2d55','#af52de','#00c7be']
 
