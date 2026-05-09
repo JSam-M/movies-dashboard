@@ -201,6 +201,7 @@ export default function DiscoverPage() {
               <input ref={aiInputRef} value={aiQuery} onChange={e=>setAiQuery(e.target.value)}
                 onKeyDown={e=>e.key==='Enter'&&handleAiSearch()}
                 placeholder="What should I watch tonight?"
+                className="hero-search"
                 style={{flex:1,background:'transparent',border:'none',outline:'none',color:'white',fontSize:'1rem',fontFamily:'inherit',colorScheme:'light'}}
               />
               <button onClick={handleAiSearch} style={{width:'38px',height:'38px',borderRadius:'100px',flexShrink:0,background:'rgba(255,255,255,0.2)',border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}
