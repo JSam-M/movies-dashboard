@@ -27,7 +27,7 @@ export default function ScrollJump() {
   return (
     <button
       onClick={jump}
-      className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 transition-all hover:scale-110"
+      className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 transition-all hover:scale-[1.04]"
       style={{
         width: '36px', height: '36px', borderRadius: '9999px',
         background: 'rgba(255,255,255,0.85)',

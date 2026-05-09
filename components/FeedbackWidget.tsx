@@ -40,7 +40,7 @@ export default function FeedbackWidget() {
       <button
         onClick={() => setOpen(true)}
         title="Send feedback"
-        className="fixed bottom-8 left-8 z-50 w-9 h-9 rounded-full flex items-center justify-center transition-all hover:scale-110"
+        className="fixed bottom-8 left-8 z-50 w-9 h-9 rounded-full flex items-center justify-center transition-all hover:scale-[1.04]"
         style={{
           background: 'rgba(255,255,255,0.7)',
           border: '1px solid rgba(0,0,0,0.08)',

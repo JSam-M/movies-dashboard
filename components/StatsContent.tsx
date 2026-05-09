@@ -289,7 +289,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
           <KPICard value={String(totalDays)} unit="d" label="Days in Cinema"  sectionId="section-trends"     dot="#ff3b30" sub={`${totalHours}h total`} />
           <KPICard value={String(rewatched.length)}   label="Rewatched"       sectionId="section-rewatched"  dot="#af52de" sub="personal picks" />
           <KPICard value={topDirStr}                  label="Top Director"    sectionId="section-directors"  dot="#00c7be" />
-          <KPICard value={peakYear}                   label="Peak Year"       sectionId="section-trends"     dot="#ffcc00" />
+          <KPICard value={peakYear}                   label="Peak Year"       sectionId="section-trends"     dot="var(--yellow)" />
         </div>
       </Section>
 

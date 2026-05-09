@@ -131,7 +131,7 @@ export default function StatsPage() {
           <div className="flex items-center gap-2 sm:gap-3">
             <Link href="/" className="flex items-center gap-2 hover:opacity-70 transition-opacity">
               <div style={{width:'22px',height:'22px',borderRadius:'6px',background:'#0071e3',display:'inline-flex',alignItems:'center',justifyContent:'center',fontFamily:'Georgia,serif',fontSize:'12px',fontWeight:300,color:'white',letterSpacing:'-0.5px',flexShrink:0}}>fc</div>
-              <span className="font-display text-lg font-light text-[var(--text)] hidden sm:inline">Film Collection</span>
+              <span className="font-display text-[1rem] font-light text-[var(--text)] hidden sm:inline">Film Collection</span>
             </Link>
             <span className="text-black/20 hidden sm:inline">/</span>
             <span className="font-body text-[0.75rem] font-semibold text-[var(--sub)]">Stats</span>
@@ -300,7 +300,7 @@ export default function StatsPage() {
       {/* FLOATING CHAT */}
       {!chatOpen && (
         <button onClick={() => setChatOpen(true)}
-          className="fixed bottom-8 right-8 z-50 w-14 h-14 rounded-full flex items-center justify-center text-white shadow-2xl transition-all hover:scale-105"
+          className="fixed bottom-8 right-8 z-50 w-14 h-14 rounded-full flex items-center justify-center text-white shadow-2xl transition-all hover:scale-[1.04]"
           style={{background:'linear-gradient(135deg,#0071e3,#34aadc)',boxShadow:'0 8px 32px rgba(0,113,227,0.4)'}}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
