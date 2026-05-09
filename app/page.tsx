@@ -329,7 +329,7 @@ export default function DiscoverPage() {
 
         <div className="mt-12 sm:mt-16 pt-6 border-t border-black/7 text-center">
           <p className="font-body text-[0.65rem] tracking-[0.1em] uppercase text-[rgba(0,0,0,0.2)]">
-            {stats.total as number} films · v2.0 · {new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'})}
+            {stats.total as number} films · {new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'})}
           </p>
         </div>
       </div>
