@@ -162,177 +162,136 @@ export default function StatsPage() {
         </div>
       </nav>
 
-      {/* BODY */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* SIDEBAR */}
-        {sidebarOpen && (
-          <>
-            <div className="fixed inset-0 bg-black/20 z-20 sm:hidden" onClick={() => setSidebarOpen(false)} />
-            <aside className="fixed left-0 z-30 border-r border-black/7 overflow-y-auto"
-              style={{
-                top: '56px', bottom: 0,
-                width: '260px',
-                background: 'rgba(255,255,255,0.97)',
-                backdropFilter: 'blur(24px)',
-              }}>
-              <div className="p-5">
-                <div className="flex items-center justify-between mb-5">
-                  <p style={{...labelStyle, marginBottom:0}}>Refine</p>
-                  <div className="flex items-center gap-3">
-                    {activeFilters > 0 && (
-                      <button onClick={resetFilters} className="font-body text-[0.65rem] text-[var(--blue)] hover:opacity-70">Clear all</button>
-                    )}
-                    <button onClick={() => setSidebarOpen(false)} className="text-[var(--muted)] hover:text-[var(--text)]">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
+      {/* FILTER PANEL */}
+      {sidebarOpen && (
+        <div className="sticky z-30 border-b border-black/7 animate-fade-in flex-shrink-0"
+          style={{top:'56px',background:'rgba(245,245,247,0.95)',backdropFilter:'blur(24px)'}}>
+          <div className="max-w-[1200px] mx-auto px-4 sm:px-8 py-4 space-y-3">
 
-                <div className="space-y-5">
-                  {/* Film multi-select */}
-                  <div ref={filmRef}>
-                    <label style={labelStyle}>Film</label>
-                    {/* Selected film chips */}
-                    {selectedFilms.length > 0 && (
-                      <div style={{display:'flex',flexWrap:'wrap',gap:'4px',marginBottom:'6px'}}>
-                        {selectedFilms.map(f => (
-                          <span key={f} style={{
-                            display:'inline-flex',alignItems:'center',gap:'4px',
-                            padding:'3px 8px',borderRadius:'100px',
-                            background:'rgba(0,113,227,0.1)',color:'#0071e3',
-                            fontSize:'0.72rem',fontFamily:'inherit',
-                          }}>
-                            {f}
-                            <button onClick={() => setSelectedFilms(prev => prev.filter(x => x !== f))}
-                              style={{background:'none',border:'none',cursor:'pointer',color:'#0071e3',fontSize:'13px',lineHeight:1,padding:0,opacity:0.7}}>
-                              ×
-                            </button>
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                    <div style={{position:'relative'}}>
-                      <input
-                        value={filmQuery}
-                        onChange={e => { setFilmQuery(e.target.value); setFilmDropOpen(true) }}
-                        onFocus={() => setFilmDropOpen(true)}
-                        placeholder={selectedFilms.length > 0 ? 'Add more films…' : 'Search film title…'}
-                        style={inputStyle}
-                      />
-                    </div>
-                    {filmDropOpen && filmSuggestions.length > 0 && (
-                      <div style={{
-                        position:'absolute', left:'20px', right:'20px',
-                        background:'white', border:'1px solid rgba(0,0,0,0.1)',
-                        borderRadius:'12px', boxShadow:'0 8px 24px rgba(0,0,0,0.1)',
-                        zIndex:200, overflow:'hidden', maxHeight:'220px', overflowY:'auto',
+            {/* Row 1: Searchable filters */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              {/* Film */}
+              <div ref={filmRef} style={{position:'relative'}}>
+                <label style={labelStyle}>Film</label>
+                {selectedFilms.length > 0 && (
+                  <div style={{display:'flex',flexWrap:'wrap',gap:'4px',marginBottom:'6px'}}>
+                    {selectedFilms.map(f => (
+                      <span key={f} style={{
+                        display:'inline-flex',alignItems:'center',gap:'4px',
+                        padding:'3px 8px',borderRadius:'100px',
+                        background:'rgba(0,113,227,0.1)',color:'#0071e3',
+                        fontSize:'0.72rem',fontFamily:'inherit',
                       }}>
-                        {filmSuggestions.map(m => (
-                          <div
-                            key={m.name}
-                            onClick={() => {
-                              setSelectedFilms(prev => [...prev, m.name])
-                              setFilmQuery('')
-                              setFilmDropOpen(false)
-                            }}
-                            style={{
-                              padding:'9px 14px', fontSize:'0.8rem', cursor:'pointer',
-                              fontFamily:'inherit', color:'var(--text)',
-                              borderBottom:'1px solid rgba(0,0,0,0.04)',
-                            }}
-                            onMouseEnter={e => (e.currentTarget.style.background='rgba(0,0,0,0.03)')}
-                            onMouseLeave={e => (e.currentTarget.style.background='white')}
-                          >
-                            <span style={{fontWeight:500}}>{m.name}</span>
-                            <span style={{color:'var(--muted)',marginLeft:'6px',fontSize:'0.72rem'}}>{m.releaseYear} · {m.language}</span>
-                          </div>
-                        ))}
+                        {f}
+                        <button onClick={() => setSelectedFilms(prev => prev.filter(x => x !== f))}
+                          style={{background:'none',border:'none',cursor:'pointer',color:'#0071e3',fontSize:'13px',lineHeight:1,padding:0,opacity:0.7}}>
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <input
+                  value={filmQuery}
+                  onChange={e => { setFilmQuery(e.target.value); setFilmDropOpen(true) }}
+                  onFocus={() => setFilmDropOpen(true)}
+                  placeholder={selectedFilms.length > 0 ? 'Add more films…' : 'Search film title…'}
+                  style={inputStyle}
+                />
+                {filmDropOpen && filmSuggestions.length > 0 && (
+                  <div style={{
+                    position:'absolute', left:0, right:0, top:'calc(100% + 4px)',
+                    background:'white', border:'1px solid rgba(0,0,0,0.1)',
+                    borderRadius:'12px', boxShadow:'0 8px 24px rgba(0,0,0,0.1)',
+                    zIndex:200, overflow:'hidden', maxHeight:'220px', overflowY:'auto',
+                  }}>
+                    {filmSuggestions.map(m => (
+                      <div key={m.name}
+                        onClick={() => { setSelectedFilms(prev => [...prev, m.name]); setFilmQuery(''); setFilmDropOpen(false) }}
+                        style={{padding:'9px 14px',fontSize:'0.8rem',cursor:'pointer',fontFamily:'inherit',color:'var(--text)',borderBottom:'1px solid rgba(0,0,0,0.04)'}}
+                        onMouseEnter={e => (e.currentTarget.style.background='rgba(0,0,0,0.03)')}
+                        onMouseLeave={e => (e.currentTarget.style.background='white')}
+                      >
+                        <span style={{fontWeight:500}}>{m.name}</span>
+                        <span style={{color:'var(--muted)',marginLeft:'6px',fontSize:'0.72rem'}}>{m.releaseYear} · {m.language}</span>
                       </div>
-                    )}
+                    ))}
                   </div>
+                )}
+              </div>
 
-                  {/* Language */}
-                  <MultiSelect label="Language" options={languages} selected={selLanguages} onChange={setSelLanguages} placeholder="Search languages…" />
+              <MultiSelect label="Language" options={languages} selected={selLanguages} onChange={setSelLanguages} placeholder="Search languages…" />
+              <MultiSelect label="Genre" options={genres} selected={selGenres} onChange={setSelGenres} placeholder="Search genres…" />
+              <MultiSelect label="Director" options={directors.slice(0,300)} selected={selDirectors} onChange={setSelDirectors} placeholder="Search directors…" />
+            </div>
 
-                  {/* Genre */}
-                  <MultiSelect label="Genre" options={genres} selected={selGenres} onChange={setSelGenres} placeholder="Search genres…" />
+            {/* Row 2: Range, year chips, rewatch, count */}
+            <div className="flex flex-wrap items-end gap-4 pt-1">
+              {/* Min Rating */}
+              <div style={{minWidth:'140px',flex:'1 1 140px'}}>
+                <label style={labelStyle}>Min Rating — {minRating.toFixed(1)}</label>
+                <input type="range" min="0" max="10" step="0.5" value={minRating}
+                  onChange={e => setMinRating(parseFloat(e.target.value))}
+                  className="w-full accent-blue-500" style={{marginTop:'6px'}} />
+              </div>
 
-                  {/* Director */}
-                  <MultiSelect label="Director" options={directors.slice(0,300)} selected={selDirectors} onChange={setSelDirectors} placeholder="Search directors…" />
-
-                  {/* Min Rating */}
-                  <div>
-                    <label style={labelStyle}>Min Rating — {minRating.toFixed(1)}</label>
-                    <input type="range" min="0" max="10" step="0.5" value={minRating}
-                      onChange={e => setMinRating(parseFloat(e.target.value))}
-                      className="w-full accent-blue-500" />
-                    <div className="flex justify-between font-body text-[0.58rem] text-[var(--muted)] mt-1">
-                      <span>0</span><span>10</span>
-                    </div>
-                  </div>
-
-                  {/* Watch Year */}
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <label style={{...labelStyle, marginBottom:0}}>Watch Year</label>
-                      {watchYears.length > 0 && (
-                        <button onClick={() => setWatchYears([])} className="font-body text-[0.6rem] text-[var(--blue)]">Clear</button>
-                      )}
-                    </div>
-                    <div className="grid grid-cols-3 gap-1.5">
-                      {allYears.map(y => (
-                        <button key={y} onClick={() => toggleYear(y)}
-                          className="py-1.5 rounded-lg font-body text-[0.7rem] font-medium transition-all"
-                          style={{
-                            background: watchYears.includes(y) ? 'var(--blue)' : 'rgba(0,0,0,0.04)',
-                            color: watchYears.includes(y) ? 'white' : 'var(--sub)',
-                            border: `1px solid ${watchYears.includes(y) ? 'var(--blue)' : 'rgba(0,0,0,0.08)'}`,
-                          }}>
-                          {y}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Rewatch */}
-                  <div>
-                    <label style={labelStyle}>View</label>
-                    <div className="flex flex-col gap-1.5">
-                      {['All','Rewatched','First watch'].map(opt => (
-                        <button key={opt} onClick={() => setRewatchFilter(opt)}
-                          className="py-1.5 rounded-lg font-body text-[0.72rem] font-medium text-left px-3 transition-all"
-                          style={{
-                            background: rewatchFilter===opt ? 'var(--blue)' : 'rgba(0,0,0,0.04)',
-                            color: rewatchFilter===opt ? 'white' : 'var(--sub)',
-                            border: `1px solid ${rewatchFilter===opt ? 'var(--blue)' : 'rgba(0,0,0,0.08)'}`,
-                          }}>
-                          {opt}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="pt-3 border-t border-black/7">
-                    <p className="font-body text-[0.7rem] text-[var(--muted)]">
-                      <span style={{color:'var(--text)',fontWeight:600}}>{filtered.length}</span> of {allMovies.length} films
-                    </p>
-                  </div>
+              {/* Watch Year */}
+              <div style={{flex:'2 1 200px'}}>
+                <label style={labelStyle}>Watch Year</label>
+                <div className="flex flex-wrap gap-1.5" style={{marginTop:'6px'}}>
+                  {allYears.map(y => (
+                    <button key={y} onClick={() => toggleYear(y)}
+                      className="px-3 py-1 rounded-lg font-body text-[0.7rem] font-medium transition-all"
+                      style={{
+                        background: watchYears.includes(y) ? 'var(--blue)' : 'rgba(0,0,0,0.04)',
+                        color: watchYears.includes(y) ? 'white' : 'var(--sub)',
+                        border: `1px solid ${watchYears.includes(y) ? 'var(--blue)' : 'rgba(0,0,0,0.08)'}`,
+                      }}>
+                      {y}
+                    </button>
+                  ))}
                 </div>
               </div>
-            </aside>
-          </>
-        )}
 
-        {/* MAIN */}
-        <main className="flex-1 overflow-y-auto transition-all duration-300"
-          style={{marginLeft: sidebarOpen ? '260px' : '0'}}>
-          <div className="max-w-[1200px] mx-auto px-4 sm:px-8 py-8">
-            <StatsContent movies={filtered} allEntries={allEntries} watchYears={watchYears} />
+              {/* Rewatch */}
+              <div>
+                <label style={labelStyle}>View</label>
+                <div className="flex gap-1.5" style={{marginTop:'6px'}}>
+                  {['All','Rewatched','First watch'].map(opt => (
+                    <button key={opt} onClick={() => setRewatchFilter(opt)}
+                      className="px-3 py-1 rounded-lg font-body text-[0.72rem] font-medium transition-all"
+                      style={{
+                        background: rewatchFilter===opt ? 'var(--blue)' : 'rgba(0,0,0,0.04)',
+                        color: rewatchFilter===opt ? 'white' : 'var(--sub)',
+                        border: `1px solid ${rewatchFilter===opt ? 'var(--blue)' : 'rgba(0,0,0,0.08)'}`,
+                      }}>
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Count + Clear */}
+              <div className="flex items-center gap-3 ml-auto pb-0.5">
+                {activeFilters > 0 && (
+                  <button onClick={resetFilters} className="font-body text-[0.65rem] text-[var(--blue)] hover:opacity-70">Clear all</button>
+                )}
+                <p className="font-body text-[0.7rem] text-[var(--muted)]">
+                  <span style={{color:'var(--text)',fontWeight:600}}>{filtered.length}</span> of {allMovies.length}
+                </p>
+              </div>
+            </div>
+
           </div>
-        </main>
-      </div>
+        </div>
+      )}
+
+      {/* MAIN */}
+      <main className="flex-1">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-8 py-8">
+          <StatsContent movies={filtered} allEntries={allEntries} watchYears={watchYears} />
+        </div>
+      </main>
 
       {chatOpen && <ChatPanel movies={allMovies} onClose={() => setChatOpen(false)} />}
       {aboutOpen && <AboutModal onClose={() => setAboutOpen(false)} />}
