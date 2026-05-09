@@ -9,9 +9,9 @@ export default function ScrollJump() {
   useEffect(() => {
     const onScroll = () => {
       const scrolled  = window.scrollY
-      const maxScroll = document.body.scrollHeight - window.innerHeight
-      setVisible(scrolled > 300)
-      setAtBottom(scrolled > maxScroll * 0.5)
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight
+      setVisible(scrolled > 200)
+      setAtBottom(maxScroll > 0 && scrolled / maxScroll > 0.4)
     }
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
