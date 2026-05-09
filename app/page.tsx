@@ -217,7 +217,7 @@ export default function DiscoverPage() {
           {/* Quick prompts */}
           <div style={{display:'flex',flexWrap:'wrap',gap:'8px',justifyContent:'center',marginTop:'14px'}}>
             {['Something feel-good','I loved Parasite — suggest similar','Best Tamil films','Under 2 hours','Hidden gems','Watch with family'].map(q=>(
-              <button key={q} onClick={()=>{setInitialMsg(q);setChatOpen(true)}} style={{padding:'6px 14px',borderRadius:'100px',border:'1px solid rgba(0,0,0,0.1)',background:'white',fontSize:'0.75rem',fontFamily:'inherit',color:'var(--sub)',cursor:'pointer'}}>{q}</button>
+              <button key={q} onClick={()=>{setInitialMsg(q);setChatOpen(true)}} style={{padding:'6px 14px',borderRadius:'100px',border:'1px solid rgba(0,0,0,0.06)',background:'rgba(255,255,255,0.6)',backdropFilter:'blur(12px)',fontSize:'0.75rem',fontFamily:'inherit',color:'var(--sub)',cursor:'pointer'}}>{q}</button>
             ))}
           </div>
           <p className="font-body text-[0.7rem] text-[var(--muted)] mt-3">AI recommends only from films actually watched</p>
