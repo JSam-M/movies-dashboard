@@ -109,3 +109,7 @@ textarea::placeholder {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+.multiselect-input::placeholder {
+  color: #6e6e73 !important;
+  opacity: 1 !important;
+}
