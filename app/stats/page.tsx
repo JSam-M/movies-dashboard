@@ -6,7 +6,7 @@ import ChatPanel from '@/components/ChatPanel'
 import Link from 'next/link'
 import StatsContent from '@/components/StatsContent'
 import MultiSelect from '@/components/MultiSelect'
-import FeedbackWidget from '@/components/FeedbackWidget'
+
 import AboutModal from '@/components/AboutModal'
 
 export default function StatsPage() {
@@ -329,7 +329,7 @@ export default function StatsPage() {
 
       {chatOpen && <ChatPanel movies={allMovies} onClose={() => setChatOpen(false)} />}
       {aboutOpen && <AboutModal onClose={() => setAboutOpen(false)} />}
-      <FeedbackWidget />
+      
 
       {/* FLOATING CHAT */}
       <button onClick={() => setChatOpen(true)}
