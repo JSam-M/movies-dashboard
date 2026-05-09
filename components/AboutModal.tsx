@@ -82,13 +82,12 @@ export default function AboutModal({ onClose }: Props) {
       onClick={onClose}
     >
       <div
-        className="relative w-full animate-fade-up"
+        className="relative w-full animate-fade-up rounded-3xl"
         style={{
           maxWidth: '520px',
           background: 'rgba(255,255,255,0.97)',
-          borderRadius: '28px',
           padding: '48px 44px',
-          boxShadow: '0 32px 80px rgba(0,0,0,0.16), 0 8px 24px rgba(0,0,0,0.06)',
+          boxShadow: '0 32px 80px rgba(0,0,0,0.18), 0 8px 24px rgba(0,0,0,0.06)',
           border: '1px solid rgba(255,255,255,0.95)',
         }}
         onClick={e => e.stopPropagation()}
@@ -105,7 +104,7 @@ export default function AboutModal({ onClose }: Props) {
         <div
           className="mb-8"
           style={{
-            width: '36px', height: '36px', borderRadius: '8px',
+            width: '36px', height: '36px', borderRadius: '10px',
             background: '#0071e3',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontFamily: 'Georgia, serif', fontSize: '16px', fontWeight: 300,
@@ -127,13 +126,13 @@ export default function AboutModal({ onClose }: Props) {
         </h2>
 
         <div className="space-y-4">
-          <p className="font-body text-[0.88rem] text-[var(--sub)] leading-relaxed">
+          <p className="font-body text-[0.85rem] text-[var(--sub)] leading-relaxed">
             I watch a lot of films. When people find out, the first thing they ask is — <em className="text-[var(--text)] not-italic">&ldquo;can you share your list?&rdquo;</em> For years, that list lived in a spreadsheet. This is the spreadsheet, made beautiful.
           </p>
-          <p className="font-body text-[0.88rem] text-[var(--sub)] leading-relaxed">
+          <p className="font-body text-[0.85rem] text-[var(--sub)] leading-relaxed">
             The second thing people ask is <em className="text-[var(--text)] not-italic">&ldquo;what should I watch tonight?&rdquo;</em> The AI on this page knows every film here — it can match your mood, your language, your taste. It only recommends from films I&apos;ve actually watched.
           </p>
-          <p className="font-body text-[0.88rem] text-[var(--sub)] leading-relaxed">
+          <p className="font-body text-[0.85rem] text-[var(--sub)] leading-relaxed">
             And the third reason — I was curious about my own habits. The stats page is just for me.
           </p>
         </div>

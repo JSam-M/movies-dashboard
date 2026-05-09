@@ -36,7 +36,7 @@ export default function KPIBar({ movies, allEntries, watchYear }: Props) {
   return (
     <div className="grid grid-cols-5 gap-4 mt-8">
       {kpis.map(k => (
-        <div key={k.label} className="glass rounded-[18px] p-6 relative overflow-hidden"
+        <div key={k.label} className="glass rounded-2xl p-6 relative overflow-hidden"
           style={{ minHeight: '110px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
           <div className="absolute top-4 right-4 w-2 h-2 rounded-full" style={{ background: k.dot, opacity: 0.7 }} />
           <div className="font-display text-[2.6rem] font-light leading-none tracking-tight text-[var(--text)]">

@@ -59,6 +59,17 @@ html, body {
     radial-gradient(ellipse 40vw 40vh at 55% 50%,  rgba(255,149,0,.04)  0%, transparent 60%);
 }
 
+/*
+  Type scale — use only these sizes:
+  0.6rem  → eyebrow labels (UPPERCASE, tracked)
+  0.7rem  → captions, metadata
+  0.75rem → small body, secondary text
+  0.85rem → body text
+  1rem    → large body, subtitles
+  1.5rem  → section headings
+  2rem    → page headings
+*/
+
 /* Animations */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(16px); }

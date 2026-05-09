@@ -29,7 +29,7 @@ export default function ScrollJump() {
       onClick={jump}
       className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 transition-all hover:scale-110"
       style={{
-        width: '36px', height: '36px', borderRadius: '100px',
+        width: '36px', height: '36px', borderRadius: '9999px',
         background: 'rgba(255,255,255,0.85)',
         backdropFilter: 'blur(12px)',
         border: '1px solid rgba(0,0,0,0.08)',

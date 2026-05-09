@@ -105,7 +105,7 @@ export default function ChatPanel({ movies, onClose, initialMessage }: Props) {
           </div>
           <div>
             <p className="font-body text-[0.85rem] font-semibold text-[var(--text)]">Film Recommender</p>
-            <p className="font-body text-[0.68rem] text-[var(--sub)]">{movies.length} films in collection</p>
+            <p className="font-body text-[0.7rem] text-[var(--sub)]">{movies.length} films in collection</p>
           </div>
           <button onClick={onClose} className="ml-auto p-1.5 rounded-full hover:bg-black/5 transition-colors">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -123,7 +123,7 @@ export default function ChatPanel({ movies, onClose, initialMessage }: Props) {
                   style={{ background: 'linear-gradient(135deg,#0071e3,#34aadc)' }} />
               )}
               <div
-                className={`max-w-[85%] px-4 py-3 font-body text-[0.83rem] leading-relaxed ${m.role === 'user' ? 'chat-bubble-user' : 'chat-bubble-ai'}`}
+                className={`max-w-[85%] px-4 py-3 font-body text-[0.85rem] leading-relaxed ${m.role === 'user' ? 'chat-bubble-user' : 'chat-bubble-ai'}`}
                 style={{ whiteSpace: 'pre-wrap' }}
               >
                 {formatMessage(m.content)}
@@ -146,7 +146,7 @@ export default function ChatPanel({ movies, onClose, initialMessage }: Props) {
           )}
           {messages.length === 1 && (
             <div className="pt-2 space-y-2">
-              <p className="font-body text-[0.65rem] font-semibold tracking-[0.1em] uppercase text-[var(--muted)] px-1">Quick start</p>
+              <p className="font-body text-[0.6rem] font-semibold tracking-[0.1em] uppercase text-[var(--muted)] px-1">Quick start</p>
               <div className="flex flex-wrap gap-2">
                 {QUICK_PROMPTS.map(q => (
                   <button key={q} onClick={() => send(q)}
@@ -188,7 +188,7 @@ export default function ChatPanel({ movies, onClose, initialMessage }: Props) {
               </svg>
             </button>
           </div>
-          <p className="font-body text-[0.62rem] text-[var(--muted)] text-center mt-2">
+          <p className="font-body text-[0.6rem] text-[var(--muted)] text-center mt-2">
             Recommends only from films in this collection
           </p>
         </div>

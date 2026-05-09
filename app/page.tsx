@@ -37,8 +37,8 @@ function MovieModal({ movie, onClose }: { movie: Movie; onClose: () => void }) {
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-8"
       style={{background:'rgba(0,0,0,0.25)',backdropFilter:'blur(12px)'}}
       onClick={onClose}>
-      <div className="relative w-full animate-fade-up"
-        style={{maxWidth:'480px',background:'rgba(255,255,255,0.96)',borderRadius:'24px',padding:'28px',boxShadow:'0 32px 80px rgba(0,0,0,0.18)',border:'1px solid rgba(255,255,255,0.9)'}}
+      <div className="relative w-full animate-fade-up rounded-3xl"
+        style={{maxWidth:'480px',background:'rgba(255,255,255,0.96)',padding:'28px',boxShadow:'0 32px 80px rgba(0,0,0,0.18)',border:'1px solid rgba(255,255,255,0.9)'}}
         onClick={e => e.stopPropagation()}>
         <button onClick={onClose} className="absolute top-5 right-5 text-[var(--muted)] hover:text-[var(--text)] transition-colors">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -47,7 +47,7 @@ function MovieModal({ movie, onClose }: { movie: Movie; onClose: () => void }) {
         </button>
         <div className="flex items-start justify-between mb-4 pr-8">
           <div>
-            <p className="font-body text-[0.62rem] font-semibold tracking-[0.1em] uppercase px-2 py-1 rounded-full mb-3 inline-block"
+            <p className="font-body text-[0.6rem] font-semibold tracking-[0.1em] uppercase px-2 py-1 rounded-full mb-3 inline-block"
               style={{background:'rgba(0,113,227,0.07)',color:'var(--blue)'}}>
               {movie.genre.split(',')[0].trim()}
             </p>
@@ -64,10 +64,10 @@ function MovieModal({ movie, onClose }: { movie: Movie; onClose: () => void }) {
         </div>
         <p className="font-body text-[0.85rem] text-[var(--sub)] leading-relaxed mb-5">{movie.overview || 'No overview available.'}</p>
         <div className="flex flex-wrap gap-2 pt-4 border-t border-black/7">
-          <span className="font-body text-[0.72rem] text-[var(--sub)]">Director:</span>
-          <span className="font-body text-[0.72rem] text-[var(--text)]">{movie.director.split(',')[0].trim()}</span>
+          <span className="font-body text-[0.75rem] text-[var(--sub)]">Director:</span>
+          <span className="font-body text-[0.75rem] text-[var(--text)]">{movie.director.split(',')[0].trim()}</span>
           {movie.genre.split(',').slice(0,3).map(g => (
-            <span key={g} className="font-body text-[0.65rem] px-2 py-0.5 rounded-full"
+            <span key={g} className="font-body text-[0.6rem] px-2 py-0.5 rounded-full"
               style={{background:'rgba(0,0,0,0.05)',color:'var(--sub)'}}>{g.trim()}</span>
           ))}
         </div>
@@ -137,11 +137,11 @@ export default function DiscoverPage() {
   const allLangOpts  = Array.from(new Set(allMovies.map(m => m.language))).sort()
 
   const btnStyle = (active: boolean): React.CSSProperties => ({
-    padding:'8px 14px', borderRadius:'100px',
+    padding:'8px 14px', borderRadius:'9999px',
     border:`1px solid ${active?'#0071e3':'rgba(0,0,0,0.08)'}`,
     background: active ? '#0071e3' : 'white',
     color: active ? 'white' : 'var(--sub)',
-    fontSize:'0.78rem', fontFamily:'inherit', cursor:'pointer',
+    fontSize:'0.75rem', fontFamily:'inherit', cursor:'pointer',
     fontWeight: active ? 500 : 400, transition:'all 0.15s',
   })
 
@@ -231,7 +231,7 @@ export default function DiscoverPage() {
           <div className="flex items-end justify-between mb-6">
             <div>
               <p className="font-body text-[0.6rem] font-semibold tracking-[0.16em] uppercase text-[var(--sub)] mb-2">Today&apos;s Picks</p>
-              <p className="font-display text-[1.6rem] sm:text-[2rem] font-light text-[var(--text)]">Featured Films</p>
+              <p className="font-display text-[1.5rem] sm:text-[2rem] font-light text-[var(--text)]">Featured Films</p>
             </div>
             <p className="font-body text-[0.72rem] text-[var(--muted)] hidden sm:block">Refreshes daily · Click for details</p>
           </div>
@@ -239,18 +239,18 @@ export default function DiscoverPage() {
             {dailyPicks.map(m=>(
               <button key={m.name} onClick={()=>setSelectedMovie(m)} className="glass rounded-2xl p-5 text-left hover:shadow-lg transition-all hover:scale-[1.01]" style={{cursor:'pointer'}}>
                 <div className="flex items-start justify-between mb-3">
-                  <span className="font-body text-[0.62rem] font-semibold tracking-[0.08em] uppercase px-2 py-1 rounded-full"
+                  <span className="font-body text-[0.6rem] font-semibold tracking-[0.08em] uppercase px-2 py-1 rounded-full"
                     style={{background:'rgba(0,113,227,0.07)',color:'var(--blue)'}}>
                     {m.genre.split(',')[0].trim()}
                   </span>
                   <div className="text-right">
-                    <span className="font-display text-[1.3rem] font-light" style={{color:'var(--blue)'}}>{m.tmdbRating.toFixed(1)}</span>
+                    <span className="font-display text-[1.2rem] font-light" style={{color:'var(--blue)'}}>{m.tmdbRating.toFixed(1)}</span>
                     {m.timesWatched>=2&&<span className="block font-body text-[0.6rem] text-amber-500 font-semibold">{m.timesWatched}× watched</span>}
                   </div>
                 </div>
                 <p className="font-display text-[1.1rem] font-light text-[var(--text)] leading-tight mb-1">{m.name}</p>
                 <p className="font-body text-[0.7rem] text-[var(--sub)] mb-2">{m.releaseYear} · {m.language} · {m.runtime}</p>
-                <p className="font-body text-[0.76rem] text-[var(--sub)] leading-relaxed line-clamp-2">{m.overview}</p>
+                <p className="font-body text-[0.75rem] text-[var(--sub)] leading-relaxed line-clamp-2">{m.overview}</p>
               </button>
             ))}
           </div>
@@ -261,7 +261,7 @@ export default function DiscoverPage() {
           <div className="flex items-end justify-between mb-6">
             <div>
               <p className="font-body text-[0.6rem] font-semibold tracking-[0.16em] uppercase text-[var(--sub)] mb-2">Browse</p>
-              <p className="font-display text-[1.6rem] sm:text-[2rem] font-light text-[var(--text)]">Collection</p>
+              <p className="font-display text-[1.5rem] sm:text-[2rem] font-light text-[var(--text)]">Collection</p>
             </div>
             <p className="font-body text-[0.75rem] text-[var(--muted)]">{filtered.length} films</p>
           </div>
@@ -304,23 +304,23 @@ export default function DiscoverPage() {
                   {m.tmdbRating>0?m.tmdbRating.toFixed(1):'—'}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-body text-[0.88rem] font-medium text-[var(--text)] truncate">
+                  <p className="font-body text-[0.85rem] font-medium text-[var(--text)] truncate">
                     {m.name}{m.timesWatched>=2&&<span className="text-amber-400 ml-1">★</span>}
                   </p>
                   <p className="font-body text-[0.7rem] text-[var(--sub)]">{m.releaseYear} · {m.director.split(',')[0].trim()} · {m.runtime}</p>
                 </div>
                 {/* Fix 2: rewatch badge always visible, language/genre hidden on mobile */}
                 <div className="flex gap-2 flex-shrink-0 items-center">
-                  {m.timesWatched>=2&&<span className="font-body text-[0.62rem] px-2 py-1 rounded-full font-semibold" style={{background:'rgba(251,191,36,0.12)',color:'#d97706'}}>{m.timesWatched}×</span>}
-                  <span className="hidden sm:inline font-body text-[0.62rem] px-2 py-1 rounded-full" style={{background:'rgba(0,0,0,0.04)',color:'var(--sub)'}}>{m.language}</span>
-                  <span className="hidden sm:inline font-body text-[0.62rem] px-2 py-1 rounded-full" style={{background:'rgba(0,0,0,0.04)',color:'var(--sub)'}}>{m.genre.split(',')[0].trim()}</span>
+                  {m.timesWatched>=2&&<span className="font-body text-[0.6rem] px-2 py-1 rounded-full font-semibold" style={{background:'rgba(251,191,36,0.12)',color:'#d97706'}}>{m.timesWatched}×</span>}
+                  <span className="hidden sm:inline font-body text-[0.6rem] px-2 py-1 rounded-full" style={{background:'rgba(0,0,0,0.04)',color:'var(--sub)'}}>{m.language}</span>
+                  <span className="hidden sm:inline font-body text-[0.6rem] px-2 py-1 rounded-full" style={{background:'rgba(0,0,0,0.04)',color:'var(--sub)'}}>{m.genre.split(',')[0].trim()}</span>
                 </div>
               </button>
             ))}
 
             {filtered.length > 60 && (
               <div className="glass rounded-xl px-5 py-5 text-center">
-                <p className="font-body text-[0.82rem] text-[var(--text)] mb-1">Showing 60 of {filtered.length} films</p>
+                <p className="font-body text-[0.85rem] text-[var(--text)] mb-1">Showing 60 of {filtered.length} films</p>
                 <p className="font-body text-[0.75rem] text-[var(--sub)] mb-3">Refine filters above, or browse the complete list on the Stats page.</p>
                 <Link href="/stats#section-catalogue" className="font-body text-[0.78rem] font-semibold text-[var(--blue)] hover:opacity-70 transition-opacity">
                   View full collection on Stats →
@@ -331,7 +331,7 @@ export default function DiscoverPage() {
         </div>
 
         <div className="mt-12 sm:mt-16 pt-6 border-t border-black/7 text-center">
-          <p className="font-body text-[0.65rem] tracking-[0.1em] uppercase text-[rgba(0,0,0,0.2)]">
+          <p className="font-body text-[0.6rem] tracking-[0.1em] uppercase text-[rgba(0,0,0,0.2)]">
             {stats.total as number} films · {new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'})}
           </p>
         </div>

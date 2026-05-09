@@ -36,7 +36,7 @@ export default function MultiSelect({ options, selected, onChange, placeholder =
 
   const inputStyle: React.CSSProperties = {
     width: '100%', padding: '7px 10px',
-    borderRadius: '10px', border: '1px solid rgba(0,0,0,0.12)',
+    borderRadius: '12px', border: '1px solid rgba(0,0,0,0.12)',
     background: 'white', fontFamily: 'inherit',
     fontSize: '0.78rem', color: 'var(--text)', outline: 'none',
   }
@@ -57,7 +57,7 @@ export default function MultiSelect({ options, selected, onChange, placeholder =
           {selected.map(s => (
             <span key={s} style={{
               display: 'inline-flex', alignItems: 'center', gap: '4px',
-              padding: '3px 8px', borderRadius: '100px',
+              padding: '3px 8px', borderRadius: '9999px',
               background: 'rgba(0,113,227,0.1)', color: '#0071e3',
               fontSize: '0.72rem', fontFamily: 'inherit',
             }}>
@@ -87,7 +87,7 @@ export default function MultiSelect({ options, selected, onChange, placeholder =
         <div style={{
           position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0,
           background: 'white', border: '1px solid rgba(0,0,0,0.1)',
-          borderRadius: '12px', boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
+          borderRadius: '16px', boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
           zIndex: 100, overflow: 'hidden', maxHeight: '220px', overflowY: 'auto',
         }}>
           {(query.length > 0 ? filtered : options.filter(o => o !== 'All').slice(0,20)).map(opt => {
