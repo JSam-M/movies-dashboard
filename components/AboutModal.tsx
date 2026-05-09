@@ -13,10 +13,10 @@ function FeedbackTrigger() {
     if (!text.trim() || status === 'sending') return
     setStatus('sending')
     try {
-      const res = await fetch('https://api.github.com/repos/JSam-M/movies-dashboard/issues', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/vnd.github+json' },
-        body: JSON.stringify({ title: 'Feedback', body: text.trim(), labels: ['feedback'] }),
+      const res = await fetch('/api/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ body: text.trim() }),
       })
       setStatus(res.ok ? 'done' : 'error')
       if (res.ok) { setText(''); setTimeout(() => setStatus('idle'), 2000) }
