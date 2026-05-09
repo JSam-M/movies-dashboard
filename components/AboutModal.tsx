@@ -1,8 +1,72 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
 
 interface Props { onClose: () => void }
+
+function FeedbackTrigger() {
+  const [open, setOpen]     = useState(false)
+  const [text, setText]     = useState('')
+  const [status, setStatus] = useState<'idle'|'sending'|'done'|'error'>('idle')
+
+  const submit = async () => {
+    if (!text.trim() || status === 'sending') return
+    setStatus('sending')
+    try {
+      const res = await fetch('https://api.github.com/repos/JSam-M/movies-dashboard/issues', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/vnd.github+json' },
+        body: JSON.stringify({ title: 'Feedback', body: text.trim(), labels: ['feedback'] }),
+      })
+      setStatus(res.ok ? 'done' : 'error')
+      if (res.ok) { setText(''); setTimeout(() => setStatus('idle'), 2000) }
+      else setTimeout(() => setStatus('idle'), 3000)
+    } catch {
+      setStatus('error')
+      setTimeout(() => setStatus('idle'), 3000)
+    }
+  }
+
+  if (!open) return (
+    <button
+      onClick={() => setOpen(true)}
+      className="font-body text-[0.7rem] text-[var(--blue)] hover:opacity-70 transition-opacity"
+    >
+      Share feedback
+    </button>
+  )
+
+  return (
+    <div className="w-full mt-4">
+      {status === 'done' ? (
+        <p className="font-body text-[0.72rem] text-[var(--sub)]">Thank you ✓</p>
+      ) : (
+        <div className="flex gap-2">
+          <input
+            value={text}
+            onChange={e => setText(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && submit()}
+            placeholder="Your thoughts…"
+            className="flex-1 rounded-lg font-body text-[0.78rem] outline-none"
+            style={{ background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.08)', padding: '7px 10px' }}
+          />
+          <button
+            onClick={submit}
+            disabled={!text.trim()}
+            className="px-3 rounded-lg font-body text-[0.75rem] font-medium transition-all"
+            style={{
+              background: text.trim() ? '#0071e3' : 'rgba(0,0,0,0.1)',
+              color: text.trim() ? 'white' : 'var(--muted)',
+            }}
+          >
+            {status === 'sending' ? '…' : 'Send'}
+          </button>
+        </div>
+      )}
+      {status === 'error' && <p className="font-body text-[0.65rem] text-red-400 mt-1">Something went wrong. Try again.</p>}
+    </div>
+  )
+}
 
 export default function AboutModal({ onClose }: Props) {
   useEffect(() => {
@@ -38,7 +102,6 @@ export default function AboutModal({ onClose }: Props) {
           </svg>
         </button>
 
-        {/* Logo mark */}
         <div
           className="mb-8"
           style={{
@@ -54,7 +117,7 @@ export default function AboutModal({ onClose }: Props) {
 
         <p
           className="font-body mb-1"
-          style={{ fontSize: '0.62rem', fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--sub)' }}
+          style={{ fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--sub)' }}
         >
           Personal Archive · Since 2019
         </p>
@@ -65,10 +128,10 @@ export default function AboutModal({ onClose }: Props) {
 
         <div className="space-y-4">
           <p className="font-body text-[0.88rem] text-[var(--sub)] leading-relaxed">
-            I watch a lot of films. When people find out, the first thing they ask is — <em className="text-[var(--text)] not-italic">"can you share your list?"</em> For years, that list lived in a spreadsheet. This is the spreadsheet, made beautiful.
+            I watch a lot of films. When people find out, the first thing they ask is — <em className="text-[var(--text)] not-italic">&ldquo;can you share your list?&rdquo;</em> For years, that list lived in a spreadsheet. This is the spreadsheet, made beautiful.
           </p>
           <p className="font-body text-[0.88rem] text-[var(--sub)] leading-relaxed">
-            The second thing people ask is <em className="text-[var(--text)] not-italic">"what should I watch tonight?"</em> The AI on this page knows every film here — it can match your mood, your language, your taste. It only recommends from films I&apos;ve actually watched.
+            The second thing people ask is <em className="text-[var(--text)] not-italic">&ldquo;what should I watch tonight?&rdquo;</em> The AI on this page knows every film here — it can match your mood, your language, your taste. It only recommends from films I&apos;ve actually watched.
           </p>
           <p className="font-body text-[0.88rem] text-[var(--sub)] leading-relaxed">
             And the third reason — I was curious about my own habits. The stats page is just for me.
@@ -76,12 +139,11 @@ export default function AboutModal({ onClose }: Props) {
         </div>
 
         <div
-          className="mt-8 pt-6"
+          className="mt-8 pt-6 flex items-center justify-between"
           style={{ borderTop: '1px solid rgba(0,0,0,0.06)' }}
         >
-          <p className="font-body text-[0.7rem] text-[var(--muted)]">
-            800+ films · 2019 – present
-          </p>
+          <p className="font-body text-[0.7rem] text-[var(--muted)]">800+ films · 2019 – present</p>
+          <FeedbackTrigger />
         </div>
       </div>
     </div>

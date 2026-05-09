@@ -5,7 +5,6 @@ import type { Movie } from '@/lib/movies'
 import ChatPanel from '@/components/ChatPanel'
 import MultiSelect from '@/components/MultiSelect'
 import AboutModal from '@/components/AboutModal'
-
 import Link from 'next/link'
 
 type SortKey = 'rating' | 'rewatched' | 'date'
@@ -183,7 +182,7 @@ export default function DiscoverPage() {
 
         {/* HERO */}
         <div className="text-center mb-12 sm:mb-20">
-          <p className="font-body text-[0.65rem] font-semibold tracking-[0.2em] uppercase text-[var(--sub)] mb-5">Personal Film Archive · Since 2019</p>
+          <p className="font-body text-[0.6rem] font-semibold tracking-[0.2em] uppercase text-[var(--sub)] mb-5">Personal Film Archive · Since 2019</p>
           <h1 className="font-display text-[clamp(2.8rem,7vw,6.5rem)] font-light leading-[0.9] tracking-tight text-[var(--text)] mb-8">
             A life in{' '}
             <em style={{fontStyle:'italic',background:'linear-gradient(135deg,#0071e3,#34aadc)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>cinema</em>
@@ -214,10 +213,13 @@ export default function DiscoverPage() {
             </div>
           </div>
 
-          {/* Quick prompts */}
+          {/* Quick prompts — glass style */}
           <div style={{display:'flex',flexWrap:'wrap',gap:'8px',justifyContent:'center',marginTop:'14px'}}>
             {['Something feel-good','I loved Parasite — suggest similar','Best Tamil films','Under 2 hours','Hidden gems','Watch with family'].map(q=>(
-              <button key={q} onClick={()=>{setInitialMsg(q);setChatOpen(true)}} style={{padding:'6px 14px',borderRadius:'100px',border:'1px solid rgba(0,0,0,0.06)',background:'rgba(255,255,255,0.6)',backdropFilter:'blur(12px)',fontSize:'0.75rem',fontFamily:'inherit',color:'var(--sub)',cursor:'pointer'}}>{q}</button>
+              <button key={q} onClick={()=>{setInitialMsg(q);setChatOpen(true)}}
+                style={{padding:'6px 14px',borderRadius:'100px',border:'1px solid rgba(0,0,0,0.06)',background:'rgba(255,255,255,0.6)',backdropFilter:'blur(12px)',fontSize:'0.75rem',fontFamily:'inherit',color:'var(--sub)',cursor:'pointer'}}>
+                {q}
+              </button>
             ))}
           </div>
           <p className="font-body text-[0.7rem] text-[var(--muted)] mt-3">AI recommends only from films actually watched</p>
@@ -248,7 +250,6 @@ export default function DiscoverPage() {
                 <p className="font-display text-[1.1rem] font-light text-[var(--text)] leading-tight mb-1">{m.name}</p>
                 <p className="font-body text-[0.7rem] text-[var(--sub)] mb-2">{m.releaseYear} · {m.language} · {m.runtime}</p>
                 <p className="font-body text-[0.76rem] text-[var(--sub)] leading-relaxed line-clamp-2">{m.overview}</p>
-          
               </button>
             ))}
           </div>
@@ -346,7 +347,6 @@ export default function DiscoverPage() {
       {selectedMovie && <MovieModal movie={selectedMovie} onClose={()=>setSelectedMovie(null)}/>}
       {aboutOpen && <AboutModal onClose={() => setAboutOpen(false)} />}
       {chatOpen && <ChatPanel movies={allMovies} initialMessage={initialMsg} onClose={()=>{setChatOpen(false);setInitialMsg('')}}/>}
-      
     </div>
   )
 }
