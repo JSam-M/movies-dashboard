@@ -53,7 +53,7 @@ export default function CompositionTab({ movies }: { movies: Movie[] }) {
           <p className="font-body text-[0.6rem] font-semibold tracking-[0.14em] uppercase text-[var(--sub)] mb-1">Genre</p>
           <p className="font-display text-[1.5rem] font-light text-[var(--text)] mb-5">Top Genres</p>
           <div className="glass rounded-2xl p-5">
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={360}>
               <BarChart data={[...genreData].reverse()} layout="vertical" margin={{left:0,right:36,top:4,bottom:0}}>
                 <XAxis type="number" tick={{fontFamily:'DM Sans',fontSize:10,fill:'#86868b'}} axisLine={false} tickLine={false} />
                 <YAxis type="category" dataKey="name" width={100} interval={0} tick={{fontFamily:'DM Sans',fontSize:11,fill:'#1d1d1f'}} axisLine={false} tickLine={false} />
