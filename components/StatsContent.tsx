@@ -24,6 +24,11 @@ const tt = {
   cursor: { fill:'rgba(0,0,0,0.03)' }
 }
 
+function scrollTo(id: string) {
+  const el = document.getElementById(id)
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
 function Section({ eyebrow, title, children, id }: { eyebrow: string; title: string; children: React.ReactNode; id?: string }) {
   return (
     <div className="mb-14" id={id}>
@@ -34,11 +39,26 @@ function Section({ eyebrow, title, children, id }: { eyebrow: string; title: str
   )
 }
 
-function KPICard({ value, unit, label, sub, dot, sectionId }: { value: string; unit?: string; label: string; sub?: string; dot: string; sectionId?: string }) {
+function KPICard({ value, unit, label, sub, dot, sectionId }: {
+  value: string; unit?: string; label: string; sub?: string; dot: string; sectionId?: string
+}) {
   const isText = value.length > 5
+  const clickable = !!sectionId
   return (
-    <div className="glass rounded-2xl p-6 relative overflow-hidden" style={{minHeight:'110px',display:'flex',flexDirection:'column',justifyContent:'flex-end'}}>
-      <div className="absolute top-4 right-4 w-2 h-2 rounded-full" style={{background:dot,opacity:0.8}} />
+    <div
+      className={`glass rounded-2xl p-6 relative overflow-hidden transition-all${clickable ? ' cursor-pointer hover:shadow-md hover:scale-[1.01]' : ''}`}
+      style={{ minHeight: '110px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}
+      onClick={() => sectionId && scrollTo(sectionId)}
+      title={clickable ? 'Click to view detail' : undefined}
+    >
+      <div className="absolute top-4 right-4 w-2 h-2 rounded-full" style={{ background: dot, opacity: 0.8 }} />
+      {clickable && (
+        <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+      )}
       <div className={`font-light leading-none tracking-tight text-[var(--text)] ${isText ? 'font-body text-[1.1rem]' : 'font-display text-[2.4rem]'}`}>
         {value}{unit && <sup className="font-body text-[0.75rem] text-[var(--muted)] align-super ml-0.5">{unit}</sup>}
       </div>
@@ -47,7 +67,6 @@ function KPICard({ value, unit, label, sub, dot, sectionId }: { value: string; u
     </div>
   )
 }
-
 
 function CatalogueSection({ movies }: { movies: Movie[] }) {
   const [sortCol, setSortCol] = React.useState<'name'|'releaseYear'|'tmdbRating'|'timesWatched'|'genre'|'director'|'runtime'|'language'>('tmdbRating')
@@ -75,7 +94,7 @@ function CatalogueSection({ movies }: { movies: Movie[] }) {
 
   return (
     <Section eyebrow="Browse" title="Complete Catalogue">
-      <div className="glass rounded-2xl overflow-hidden">
+      <div className="glass rounded-2xl overflow-x-auto">
         <table style={{width:'100%',borderCollapse:'collapse',fontSize:'0.8rem'}}>
           <thead>
             <tr>
@@ -135,28 +154,21 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
   const highRated  = movies.filter(m => m.tmdbRating >= 7.5).length
   const pctHighRated = movies.length > 0 ? Math.round(highRated / movies.length * 100) : 0
 
-  // Peak year
   const yearCount: Record<number,number> = {}
   entries.forEach(e => {
     const y = parseInt('20' + e.date.split('/')[2])
     if (!isNaN(y)) yearCount[y] = (yearCount[y]||0)+1
   })
-  const peakEntry  = Object.entries(yearCount).sort((a,b)=>+b[1]-+a[1])[0]
-  const peakYear   = peakEntry ? `${peakEntry[0]} · ${peakEntry[1]} films` : '—'
+  const peakEntry = Object.entries(yearCount).sort((a,b)=>+b[1]-+a[1])[0]
+  const peakYear  = peakEntry ? `${peakEntry[0]} · ${peakEntry[1]} films` : '—'
 
-  // Top director
   const dirCount: Record<string,number> = {}
   movies.forEach(m => m.director.split(',').forEach(d => {
     const t = d.trim(); if (t && t !== 'N/A') dirCount[t] = (dirCount[t]||0)+1
   }))
-  const topDir = Object.entries(dirCount).sort((a,b)=>b[1]-a[1])[0]
+  const topDir    = Object.entries(dirCount).sort((a,b)=>b[1]-a[1])[0]
   const topDirStr = topDir ? `${topDir[0].split(' ').pop()} · ${topDir[1]}` : '—'
 
-  // Most recent film
-  const recent = [...entries].sort((a,b) => b.date.localeCompare(a.date))[0]
-  const recentStr = recent ? `${recent.name.slice(0,18)}${recent.name.length>18?'…':''}` : '—'
-
-  // ── Viewing timeline by year-month ──
   const monthData: Record<string,{movies:number,hours:number}> = {}
   entriesWithMins.forEach((e) => {
     const [d,mo,y] = e.date.split('/')
@@ -170,25 +182,19 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
   const timelineData = Object.entries(monthData).sort((a,b)=>a[0].localeCompare(b[0]))
     .map(([k,v]) => ({ period: k, films: v.movies, hours: Math.round(v.hours) }))
 
-  // Annual summary
   const annualData = Object.entries(yearCount).sort((a,b)=>+a[0]-+b[0])
     .map(([y,c]) => ({ year: y, films: c }))
 
-  // Language
   const langData = Object.entries(movies.reduce((a,m)=>{a[m.language]=(a[m.language]||0)+1;return a},{} as Record<string,number>))
     .sort((a,b)=>b[1]-a[1]).map(([name,value])=>({name,value}))
 
-  // Genre
   const gc: Record<string,number> = {}
   movies.forEach(m => m.genre.split(',').forEach(g=>{const t=g.trim();if(t)gc[t]=(gc[t]||0)+1}))
-  const genreData = Object.entries(gc).sort((a,b)=>b[1]-a[1]).slice(0,10)
-    .map(([name,value])=>({name,value}))
+  const genreData = Object.entries(gc).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([name,value])=>({name,value}))
 
-  // Directors
   const dirData = Object.entries(dirCount).sort((a,b)=>b[1]-a[1]).slice(0,12)
-    .map(([name,value])=>({name:name.length>24?name.slice(0,21)+'…':name,value}))
+    .map(([name,value])=>({name:name.length>24?name.slice(0,21)+'\u2026':name,value}))
 
-  // Rating distribution
   const ratingBuckets: Record<string,number> = {'<5':0,'5–6':0,'6–7':0,'7–8':0,'8–9':0,'9–10':0}
   movies.filter(m=>m.tmdbRating>0).forEach(m => {
     if (m.tmdbRating < 5) ratingBuckets['<5']++
@@ -200,37 +206,35 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
   })
   const ratingData = Object.entries(ratingBuckets).map(([name,value])=>({name,value}))
 
-  // Top rewatched
   const topRewatched = rewatched.sort((a,b)=>b.timesWatched-a.timesWatched).slice(0,8)
-    .map(m=>({name:m.name.length>26?m.name.slice(0,23)+'…':m.name, times:m.timesWatched, rating:m.tmdbRating}))
+    .map(m=>({name:m.name.length>26?m.name.slice(0,23)+'\u2026':m.name, times:m.timesWatched, rating:m.tmdbRating}))
 
   return (
     <div>
-      {/* Page header */}
       <div className="mb-10 pb-8 border-b border-black/7">
         <p className="font-body text-[0.6rem] font-semibold tracking-[0.16em] uppercase text-[var(--sub)] mb-2">Personal Archive</p>
         <h1 className="font-display text-[2.8rem] font-light text-[var(--text)] leading-tight">My Film Stats</h1>
       </div>
 
-      {/* ── KPIs ── */}
+      {/* KPIs — each card scrolls to the relevant section */}
       <Section eyebrow="Overview" title="At a Glance" id="section-overview">
-        <div className="grid grid-cols-4 gap-4 mb-4">
-          <KPICard value={String(movies.length)}   label="Unique Films" sectionId="section-catalogue"       dot="#0071e3" />
-          <KPICard value={String(entries.length)}  label="Total Watches" sectionId="section-trends"      dot="#5856d6" sub="incl. rewatches" />
-          <KPICard value={avgRating}               label="Avg TMDb Rating" sectionId="section-quality"    dot="#ff9500" sub="out of 10" />
-          <KPICard value={pctHighRated+"%"}        label="Rated ≥7.5" sectionId="section-quality"         dot="#34c759" sub={`${highRated} films`} />
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+          <KPICard value={String(movies.length)}      label="Unique Films"    sectionId="section-catalogue"  dot="#0071e3" />
+          <KPICard value={String(entries.length)}     label="Total Watches"   sectionId="section-trends"     dot="#5856d6" sub="incl. rewatches" />
+          <KPICard value={avgRating}                  label="Avg TMDb Rating" sectionId="section-quality"    dot="#ff9500" sub="out of 10" />
+          <KPICard value={pctHighRated+'%'}           label="Rated ≥7.5"      sectionId="section-quality"    dot="#34c759" sub={`${highRated} films`} />
         </div>
-        <div className="grid grid-cols-4 gap-4">
-          <KPICard value={String(totalDays)} unit="d" label="Days in Cinema" sectionId="section-trends"  dot="#ff3b30" sub={`${totalHours}h total`} />
-          <KPICard value={String(rewatched.length)} label="Rewatched" sectionId="section-rewatched"         dot="#af52de" sub="personal picks" />
-          <KPICard value={topDirStr}               label="Top Director" sectionId="section-directors"       dot="#00c7be" />
-          <KPICard value={peakYear}                label="Peak Year" sectionId="section-trends"          dot="#ffcc00" />
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <KPICard value={String(totalDays)} unit="d" label="Days in Cinema"  sectionId="section-trends"     dot="#ff3b30" sub={`${totalHours}h total`} />
+          <KPICard value={String(rewatched.length)}   label="Rewatched"       sectionId="section-rewatched"  dot="#af52de" sub="personal picks" />
+          <KPICard value={topDirStr}                  label="Top Director"    sectionId="section-directors"  dot="#00c7be" />
+          <KPICard value={peakYear}                   label="Peak Year"       sectionId="section-trends"     dot="#ffcc00" />
         </div>
       </Section>
 
-      {/* ── TIMELINE ── */}
+      {/* TIMELINE */}
       <Section eyebrow="Trends" title="Viewing Over Time" id="section-trends">
-        <div className="glass rounded-2xl p-6 mb-4">
+        <div className="glass rounded-2xl p-4 sm:p-6 mb-4">
           <p className="font-body text-[0.65rem] font-semibold tracking-[0.1em] uppercase text-[var(--sub)] mb-4">Films per Month</p>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={timelineData} margin={{left:0,right:8,top:4,bottom:40}}>
@@ -242,7 +246,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
             </LineChart>
           </ResponsiveContainer>
         </div>
-        <div className="glass rounded-2xl p-6">
+        <div className="glass rounded-2xl p-4 sm:p-6">
           <p className="font-body text-[0.65rem] font-semibold tracking-[0.1em] uppercase text-[var(--sub)] mb-4">Films per Year</p>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={annualData} margin={{left:0,right:8,top:4,bottom:0}}>
@@ -256,10 +260,10 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
         </div>
       </Section>
 
-      {/* ── LANGUAGE & GENRE ── */}
+      {/* LANGUAGE & GENRE */}
       <Section eyebrow="Composition" title="Language & Genre" id="section-composition">
-        <div className="grid grid-cols-2 gap-6">
-          <div className="glass rounded-2xl p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="glass rounded-2xl p-4 sm:p-6">
             <p className="font-body text-[0.65rem] font-semibold tracking-[0.1em] uppercase text-[var(--sub)] mb-4">By Language</p>
             <div className="flex items-center gap-4">
               <PieChart width={160} height={160}>
@@ -281,7 +285,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
               </div>
             </div>
           </div>
-          <div className="glass rounded-2xl p-6">
+          <div className="glass rounded-2xl p-4 sm:p-6">
             <p className="font-body text-[0.65rem] font-semibold tracking-[0.1em] uppercase text-[var(--sub)] mb-4">Top Genres</p>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={[...genreData].reverse()} layout="vertical" margin={{left:0,right:36,top:0,bottom:0}}>
@@ -296,10 +300,10 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
         </div>
       </Section>
 
-      {/* ── RATING DISTRIBUTION ── */}
+      {/* RATING DISTRIBUTION */}
       <Section eyebrow="Quality" title="Rating Distribution" id="section-quality">
-        <div className="grid grid-cols-2 gap-6">
-          <div className="glass rounded-2xl p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="glass rounded-2xl p-4 sm:p-6">
             <p className="font-body text-[0.65rem] font-semibold tracking-[0.1em] uppercase text-[var(--sub)] mb-4">Films by TMDb Score</p>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={ratingData} margin={{left:0,right:8,top:4,bottom:0}}>
@@ -311,9 +315,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
               </BarChart>
             </ResponsiveContainer>
           </div>
-
-          {/* Top rated */}
-          <div className="glass rounded-2xl p-6">
+          <div className="glass rounded-2xl p-4 sm:p-6">
             <p className="font-body text-[0.65rem] font-semibold tracking-[0.1em] uppercase text-[var(--sub)] mb-4">Highest Rated</p>
             <div className="space-y-2.5">
               {[...movies].sort((a,b)=>b.tmdbRating-a.tmdbRating).slice(0,6).map((m,i)=>(
@@ -331,9 +333,9 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
         </div>
       </Section>
 
-      {/* ── DIRECTORS ── */}
+      {/* DIRECTORS */}
       <Section eyebrow="Filmmakers" title="Top Directors" id="section-directors">
-        <div className="glass rounded-2xl p-6">
+        <div className="glass rounded-2xl p-4 sm:p-6">
           <ResponsiveContainer width="100%" height={340}>
             <BarChart data={[...dirData].reverse()} layout="vertical" margin={{left:0,right:36,top:0,bottom:0}}>
               <XAxis type="number" tick={{fontFamily:'inherit',fontSize:9,fill:'#86868b'}} axisLine={false} tickLine={false} />
@@ -346,10 +348,10 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
         </div>
       </Section>
 
-      {/* ── REWATCHED ── */}
+      {/* REWATCHED */}
       {topRewatched.length > 0 && (
         <Section eyebrow="Personal Picks" title="Most Rewatched" id="section-rewatched">
-          <div className="glass rounded-2xl p-6">
+          <div className="glass rounded-2xl p-4 sm:p-6">
             <ResponsiveContainer width="100%" height={280}>
               <BarChart data={[...topRewatched].reverse()} layout="vertical" margin={{left:0,right:40,top:0,bottom:0}}>
                 <XAxis type="number" tick={{fontFamily:'inherit',fontSize:9,fill:'#86868b'}} axisLine={false} tickLine={false} />
@@ -363,7 +365,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
         </Section>
       )}
 
-      {/* ── CATALOGUE ── */}
+      {/* CATALOGUE */}
       <div id="section-catalogue"><CatalogueSection movies={movies} /></div>
 
       <div className="pt-6 border-t border-black/7 text-center pb-8">
