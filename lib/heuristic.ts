@@ -1,5 +1,4 @@
 // Heuristic recommender — runs client-side, no API call needed for common queries.
-// needsApiCall() returns true for queries that require Claude fallback.
 
 export interface HeuristicMovie {
   name: string
@@ -48,6 +47,8 @@ const LANG_MAP: Record<string, string[]> = {
 
 const SIMILAR_RE = /(?:similar to|like|loved?|enjoyed?|watched?|fan of)\s+["']?([A-Z][^,.!?]+?)["']?(?:\s*[,—–.!?]|$)/gi
 
+function parseRuntime(r: string): number { const n = parseInt(r); return isNaN(n) ? 0 : n }
+
 function tokenize(q: string): string[] {
   return q.toLowerCase().replace(/[^\w\s-]/g, ' ').split(/\s+/).filter(Boolean)
 }
@@ -68,22 +69,19 @@ export function heuristicRecommend(query: string, movies: HeuristicMovie[]): str
   const q = query.toLowerCase()
   const toks = tokenize(q)
 
-  // Language filter
   let langFilter: string | null = null
   for (const [lang, kws] of Object.entries(LANG_MAP)) {
     if (toks.some(t => kws.includes(t))) { langFilter = lang; break }
   }
 
-  // Runtime filter
   let maxRuntime: number | null = null
-  if (q.includes('under 2') || q.includes('under two') || q.includes('90 min')) maxRuntime = 115
+  if (q.includes('under 2') || q.includes('under two') || q.includes('90 min')) maxRuntime = 110
   if (q.includes('under 1.5') || q.includes('under 90')) maxRuntime = 90
   if (q.includes('under 2.5') || q.includes('under 150')) maxRuntime = 150
 
-  const wantRewatch   = toks.some(t => MOOD_MAP['rewatch'].keywords.includes(t))
+  const wantRewatch = toks.some(t => MOOD_MAP['rewatch'].keywords.includes(t))
   const wantHiddenGem = toks.some(t => MOOD_MAP['hidden-gem'].keywords.includes(t))
 
-  // Build genre score map
   const moodScores = new Map<string, number>()
   for (const mood of Object.values(MOOD_MAP)) {
     const hit = toks.some(t => mood.keywords.includes(t))
@@ -103,19 +101,19 @@ export function heuristicRecommend(query: string, movies: HeuristicMovie[]): str
       if (boost > 0) { score += boost; reasons.push(g) }
     }
 
-    if (m.tmdbRating >= 8.0)      score += 3
+    if (m.tmdbRating >= 8.0) score += 3
     else if (m.tmdbRating >= 7.5) score += 2
     else if (m.tmdbRating >= 7.0) score += 1
-    else if (m.tmdbRating < 6.0)  score -= 2
+    else if (m.tmdbRating < 6.0) score -= 2
 
-    if (wantRewatch && m.timesWatched >= 2) { score += 4; reasons.push(`${m.timesWatched}× watched`) }
+    if (wantRewatch && m.timesWatched >= 2) { score += 4; reasons.push(`watched ${m.timesWatched}×`) }
     if (m.timesWatched >= 3) score += 1
     if (wantHiddenGem && m.tmdbRating >= 7.0 && m.tmdbRating < 7.8) score += 2
 
-    const mins = parseInt(m.runtime)
-    if (maxRuntime && !isNaN(mins) && mins > maxRuntime) score -= 20
+    const mins = parseRuntime(m.runtime)
+    if (maxRuntime && mins > 0 && mins > maxRuntime) score -= 20
 
-    const reason = reasons.length > 0 ? reasons.slice(0, 2).join(', ') : filmGenres[0]
+    const reason = reasons.length > 0 ? reasons.slice(0, 2).join(', ') : m.genre.split(',')[0].trim()
     return { ...m, score, reason }
   })
 
@@ -132,8 +130,7 @@ export function heuristicRecommend(query: string, movies: HeuristicMovie[]): str
 
   const lines = results.map(m => {
     const rw = m.timesWatched >= 2 ? ' ★' : ''
-    return `**${m.name}** (${m.releaseYear}, ${m.language}) — ${m.genre.split(',')[0].trim()}, rated ${m.tmdbRating.toFixed(1)}${rw}.`
+    return `**${m.name}** (${m.releaseYear}, ${m.language}) — ${m.genre.split(',')[0].trim()}, ${m.tmdbRating.toFixed(1)} on TMDb${rw}.`
   })
-
   return lines.join('\n\n') + '\n\nWant something different? Tell me more about your mood or a film you love.'
 }
