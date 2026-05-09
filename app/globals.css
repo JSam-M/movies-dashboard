@@ -91,7 +91,7 @@ html, body {
 /* Placeholder visibility fix */
 input::placeholder,
 textarea::placeholder {
-  color: var(--muted);
+  color: #86868b;
   opacity: 1;
 }
 
@@ -108,6 +108,8 @@ textarea::placeholder {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-input, textarea, select {
-  font-size: 16px !important;
+@media (max-width: 768px) {
+  input, textarea, select {
+    font-size: 16px !important;
+  }
 }
