@@ -288,10 +288,10 @@ export default function DiscoverPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="glass rounded-xl p-4" style={{overflow:'visible', position:'relative', zIndex:30}}>
-                <MultiSelect label="Genre" .../>
+                <MultiSelect label="Genre" options={allGenreOpts} selected={genres} onChange={setGenres} placeholder="Search genres…"/>
               </div>
               <div className="glass rounded-xl p-4" style={{overflow:'visible', position:'relative', zIndex:20}}>
-                <MultiSelect label="Language" .../>
+                <MultiSelect label="Language" options={allLangOpts} selected={languages} onChange={setLanguages} placeholder="Search languages…"/>
               </div>
             </div>
           </div>
