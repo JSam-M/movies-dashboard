@@ -28,6 +28,7 @@ html, body {
   color: var(--text);
   font-family: 'DM Sans', -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
+  color-scheme: light;
 }
 
 /* Scrollbar */
