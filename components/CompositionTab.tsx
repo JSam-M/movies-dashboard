@@ -48,23 +48,29 @@ export default function CompositionTab({ movies }: { movies: Movie[] }) {
           </div>
         </div>
 
-        {/* Genre bars */}
+        {/* Genre bars — CSS implementation (bypasses Recharts axis rendering) */}
         <div>
           <p className="font-body text-[0.6rem] font-semibold tracking-[0.14em] uppercase text-[var(--sub)] mb-1">Genre</p>
           <p className="font-display text-[1.5rem] font-light text-[var(--text)] mb-5">Top Genres</p>
-          <div className="glass rounded-2xl p-5">
-            <ResponsiveContainer width="100%" height={360}>
-              <BarChart data={[...genreData].reverse()} layout="vertical" margin={{left:0,right:16,top:4,bottom:0}}>
-                <XAxis type="number" tick={{fontFamily:'DM Sans',fontSize:10,fill:'#86868b'}} axisLine={false} tickLine={false} />
-                <YAxis type="category" dataKey="name" width={110} tick={false} axisLine={false} tickLine={false} />
-                <Tooltip {...tooltip} />
-                <Bar dataKey="value" radius={[0,4,4,0]}>
-                  <LabelList dataKey="name" position="left" offset={8}
-                    style={{fill:'#1d1d1f',fontSize:11,fontFamily:'DM Sans, sans-serif',textAnchor:'end'}} />
-                  {[...genreData].reverse().map((_,i) => <Cell key={i} fill={`hsl(${210+i*8},${75-i*3}%,${50+i*2}%)`} />)}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+          <div className="glass rounded-2xl p-5 space-y-2.5">
+            {(() => {
+              const max = genreData[0]?.value || 1
+              return genreData.map((item, i) => (
+                <div key={item.name} className="flex items-center gap-3">
+                  <span className="font-body text-[0.75rem] text-[var(--text)] text-right flex-shrink-0"
+                    style={{width:'90px'}}>{item.name}</span>
+                  <div className="flex-1 h-[28px] rounded-[4px] overflow-hidden" style={{background:'rgba(0,0,0,0.04)'}}>
+                    <div className="h-full rounded-[4px] transition-all"
+                      style={{
+                        width:`${(item.value/max)*100}%`,
+                        background:`hsl(${210+i*8},${75-i*3}%,${50+i*2}%)`,
+                      }} />
+                  </div>
+                  <span className="font-body text-[0.7rem] text-[var(--muted)] flex-shrink-0"
+                    style={{width:'28px'}}>{item.value}</span>
+                </div>
+              ))
+            })()}
           </div>
         </div>
       </div>
