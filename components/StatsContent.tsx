@@ -52,13 +52,6 @@ function KPICard({ value, unit, label, sub, dot, sectionId }: {
       title={clickable ? 'Click to view detail' : undefined}
     >
       <div className="absolute top-4 right-4 w-2 h-2 rounded-full" style={{ background: dot, opacity: 0.8 }} />
-      {clickable && (
-        <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="2">
-            <polyline points="6 9 12 15 18 9"/>
-          </svg>
-        </div>
-      )}
       <div className={`font-light leading-none tracking-tight text-[var(--text)] ${isText ? 'font-body text-[1.1rem]' : 'font-display text-[2.4rem]'}`}>
         {value}{unit && <sup className="font-body text-[0.75rem] text-[var(--muted)] align-super ml-0.5">{unit}</sup>}
       </div>
@@ -216,7 +209,6 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
         <h1 className="font-display text-[2.8rem] font-light text-[var(--text)] leading-tight">My Film Stats</h1>
       </div>
 
-      {/* KPIs — each card scrolls to the relevant section */}
       <Section eyebrow="Overview" title="At a Glance" id="section-overview">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
           <KPICard value={String(movies.length)}      label="Unique Films"    sectionId="section-catalogue"  dot="#0071e3" />
@@ -232,7 +224,6 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
         </div>
       </Section>
 
-      {/* TIMELINE */}
       <Section eyebrow="Trends" title="Viewing Over Time" id="section-trends">
         <div className="glass rounded-2xl p-4 sm:p-6 mb-4">
           <p className="font-body text-[0.65rem] font-semibold tracking-[0.1em] uppercase text-[var(--sub)] mb-4">Films per Month</p>
@@ -260,7 +251,6 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
         </div>
       </Section>
 
-      {/* LANGUAGE & GENRE */}
       <Section eyebrow="Composition" title="Language & Genre" id="section-composition">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="glass rounded-2xl p-4 sm:p-6">
@@ -300,7 +290,6 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
         </div>
       </Section>
 
-      {/* RATING DISTRIBUTION */}
       <Section eyebrow="Quality" title="Rating Distribution" id="section-quality">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="glass rounded-2xl p-4 sm:p-6">
@@ -333,7 +322,6 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
         </div>
       </Section>
 
-      {/* DIRECTORS */}
       <Section eyebrow="Filmmakers" title="Top Directors" id="section-directors">
         <div className="glass rounded-2xl p-4 sm:p-6">
           <ResponsiveContainer width="100%" height={340}>
@@ -348,7 +336,6 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
         </div>
       </Section>
 
-      {/* REWATCHED */}
       {topRewatched.length > 0 && (
         <Section eyebrow="Personal Picks" title="Most Rewatched" id="section-rewatched">
           <div className="glass rounded-2xl p-4 sm:p-6">
@@ -365,12 +352,11 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
         </Section>
       )}
 
-      {/* CATALOGUE */}
       <div id="section-catalogue"><CatalogueSection movies={movies} /></div>
 
       <div className="pt-6 border-t border-black/7 text-center pb-8">
         <p className="font-body text-[0.65rem] tracking-[0.1em] uppercase text-[rgba(0,0,0,0.2)]">
-          {movies.length} films · v2.0 · {new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'})}
+          {movies.length} films · {new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'})}
         </p>
       </div>
     </div>
