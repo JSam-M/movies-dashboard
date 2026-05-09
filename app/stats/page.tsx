@@ -69,7 +69,16 @@ export default function StatsPage() {
   }, [allMovies, allEntries, selectedFilm, selLanguages, selGenres, selDirectors, minRating, watchYears, rewatchFilter])
 
   useEffect(() => { applyFilters() }, [applyFilters])
-
+  useEffect(() => {
+    if (typeof window === 'undefined' || loading) return
+    const hash = window.location.hash
+    if (!hash) return
+    const timer = setTimeout(() => {
+      const el = document.querySelector(hash)
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 800)
+    return () => clearTimeout(timer)
+  }, [loading])
   const languages = ['All', ...Array.from(new Set(allMovies.map(m => m.language))).sort()]
   const genres    = ['All', ...Array.from(new Set(allMovies.flatMap(m => m.genre.split(',').map(g => g.trim()).filter(Boolean)))).sort()]
   const directors = ['All', ...Array.from(new Set(allMovies.flatMap(m => m.director.split(',').map(d => d.trim()).filter(d => d && d !== 'N/A')))).sort()]
