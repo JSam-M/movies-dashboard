@@ -5,7 +5,7 @@ import type { Movie } from '@/lib/movies'
 import ChatPanel from '@/components/ChatPanel'
 import MultiSelect from '@/components/MultiSelect'
 import AboutModal from '@/components/AboutModal'
-import FeedbackWidget from '@/components/FeedbackWidget'
+
 import Link from 'next/link'
 
 type SortKey = 'rating' | 'rewatched' | 'date'
@@ -346,7 +346,7 @@ export default function DiscoverPage() {
       {selectedMovie && <MovieModal movie={selectedMovie} onClose={()=>setSelectedMovie(null)}/>}
       {aboutOpen && <AboutModal onClose={() => setAboutOpen(false)} />}
       {chatOpen && <ChatPanel movies={allMovies} initialMessage={initialMsg} onClose={()=>{setChatOpen(false);setInitialMsg('')}}/>}
-      <FeedbackWidget />
+      
     </div>
   )
 }
