@@ -57,6 +57,7 @@ export default function CompositionTab({ movies }: { movies: Movie[] }) {
               <BarChart data={[...genreData].reverse()} layout="vertical" margin={{left:0,right:36,top:4,bottom:0}}>
                 <XAxis type="number" tick={{fontFamily:'DM Sans',fontSize:10,fill:'#86868b'}} axisLine={false} tickLine={false} />
                 <YAxis type="category" dataKey="name" width={110} interval={0}
+                  ticks={[...genreData].reverse().map(d => d.name)}
                   tick={(props: {x:number;y:number;payload:{value:string}}) => (
                     <g transform={`translate(${props.x},${props.y})`}>
                       <text x={-4} y={0} dy="0.35em" textAnchor="end" fill="#1d1d1f" fontSize={11} fontFamily="DM Sans, sans-serif">{props.payload.value}</text>
