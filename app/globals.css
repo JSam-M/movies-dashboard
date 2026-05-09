@@ -113,7 +113,3 @@ textarea::placeholder {
   input, textarea, select {
     font-size: 16px !important;
   }
-}
-input {
-  background-color: rgba(0,0,0,0.06) !important;
-}
