@@ -148,7 +148,7 @@ export default function DiscoverPage() {
   if (loading) return (
     <div className="min-h-screen mesh-bg flex items-center justify-center">
       <div className="flex gap-2">
-        {[0,1,2].map(i=><div key={i} className="w-2 h-2 rounded-full bg-blue-300" style={{animation:`pulse-dot 1.2s ease ${i*0.2}s infinite`}}/>)}
+        {[0,1,2].map(i=><div key={i} className="w-2 h-2 rounded-full" style={{background:'var(--blue)',opacity:0.4,animation:`pulse-dot 1.2s ease ${i*0.2}s infinite`}}/>)}
       </div>
     </div>
   )

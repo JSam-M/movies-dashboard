@@ -106,7 +106,7 @@ export default function StatsPage() {
   if (loading) return (
     <div className="min-h-screen mesh-bg flex items-center justify-center">
       <div className="flex gap-2">
-        {[0,1,2].map(i => <div key={i} className="w-2 h-2 rounded-full bg-blue-300" style={{animation:`pulse-dot 1.2s ease ${i*0.2}s infinite`}} />)}
+        {[0,1,2].map(i => <div key={i} className="w-2 h-2 rounded-full" style={{background:'var(--blue)',opacity:0.4,animation:`pulse-dot 1.2s ease ${i*0.2}s infinite`}} />)}
       </div>
     </div>
   )
@@ -155,7 +155,7 @@ export default function StatsPage() {
               </svg>
               <span className="hidden sm:inline">Filters</span>
               {activeFilters > 0 && (
-                <span className="w-4 h-4 rounded-full text-[0.6rem] font-bold bg-blue-500 text-white flex items-center justify-center">{activeFilters}</span>
+                <span className="w-4 h-4 rounded-full text-[0.6rem] font-medium text-white flex items-center justify-center" style={{background:'var(--blue)'}}>{activeFilters}</span>
               )}
             </button>
           </div>
@@ -232,7 +232,7 @@ export default function StatsPage() {
                 <label style={labelStyle}>Min Rating — {minRating.toFixed(1)}</label>
                 <input type="range" min="0" max="10" step="0.5" value={minRating}
                   onChange={e => setMinRating(parseFloat(e.target.value))}
-                  className="w-full accent-blue-500" style={{marginTop:'6px'}} />
+                  className="w-full" style={{marginTop:'6px',accentColor:'var(--blue)'}} />
               </div>
 
               {/* Watch Year */}

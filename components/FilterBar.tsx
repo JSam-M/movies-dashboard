@@ -101,7 +101,7 @@ export default function FilterBar(p: Props) {
               </label>
               <input type="range" min="0" max="10" step="0.5" value={p.minRating}
                 onChange={e => p.setMinRating(parseFloat(e.target.value))}
-                className="w-full accent-blue-500" />
+                className="w-full" style={{accentColor:'var(--blue)'}} />
             </div>
 
             {/* Watch Year */}

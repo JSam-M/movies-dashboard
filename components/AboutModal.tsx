@@ -63,7 +63,7 @@ function FeedbackTrigger() {
           </button>
         </div>
       )}
-      {status === 'error' && <p className="font-body text-[0.6rem] text-red-400 mt-1">Something went wrong. Try again.</p>}
+      {status === 'error' && <p className="font-body text-[0.6rem] mt-1" style={{color:'#ff3b30'}}>Something went wrong. Try again.</p>}
     </div>
   )
 }

@@ -99,7 +99,7 @@ export default function FeedbackWidget() {
                   }}
                 />
                 {status === 'error' && (
-                  <p className="font-body text-[0.7rem] text-red-400 mt-2">Something went wrong. Try again.</p>
+                  <p className="font-body text-[0.7rem] mt-2" style={{color:'#ff3b30'}}>Something went wrong. Try again.</p>
                 )}
                 <div className="flex gap-3 mt-4">
                   <button
