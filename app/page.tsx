@@ -54,7 +54,7 @@ function MovieModal({ movie, onClose }: { movie: Movie; onClose: () => void }) {
             <h2 className="font-display text-[1.5rem] font-light text-[var(--text)] leading-tight">{movie.name}</h2>
             <p className="font-body text-[0.75rem] text-[var(--sub)] mt-1">
               {movie.releaseYear} · {movie.language} · {movie.runtime}
-              {movie.timesWatched >= 2 && <span className="text-amber-500 ml-2">★ Watched {movie.timesWatched}×</span>}
+              {movie.timesWatched >= 2 && <span style={{color:'var(--gold)'}} className="ml-2">★ Watched {movie.timesWatched}×</span>}
             </p>
           </div>
           <div className="text-right flex-shrink-0 ml-4">
@@ -159,7 +159,7 @@ export default function DiscoverPage() {
       <nav className="sticky top-0 z-40 border-b border-black/7" style={{background:'rgba(245,245,247,0.85)',backdropFilter:'blur(20px)'}}>
         <div className="max-w-[1200px] mx-auto px-4 sm:px-8 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div style={{width:'22px',height:'22px',borderRadius:'5px',background:'#0071e3',display:'inline-flex',alignItems:'center',justifyContent:'center',fontFamily:'Georgia,serif',fontSize:'12px',fontWeight:300,color:'white',letterSpacing:'-0.5px',flexShrink:0}}>fc</div>
+            <div style={{width:'22px',height:'22px',borderRadius:'6px',background:'#0071e3',display:'inline-flex',alignItems:'center',justifyContent:'center',fontFamily:'Georgia,serif',fontSize:'12px',fontWeight:300,color:'white',letterSpacing:'-0.5px',flexShrink:0}}>fc</div>
             <span className="font-display text-lg font-light text-[var(--text)] hidden sm:inline">Film Collection</span>
           </div>
           <div className="flex items-center gap-4">
@@ -201,9 +201,8 @@ export default function DiscoverPage() {
               <input ref={aiInputRef} value={aiQuery} onChange={e=>setAiQuery(e.target.value)}
                 onKeyDown={e=>e.key==='Enter'&&handleAiSearch()}
                 placeholder="What should I watch tonight?"
-                style={{flex:1,background:'transparent',border:'none',outline:'none',color:'white',fontSize:'0.95rem',fontFamily:'inherit',colorScheme:'light'}}
+                style={{flex:1,background:'transparent',border:'none',outline:'none',color:'white',fontSize:'1rem',fontFamily:'inherit',colorScheme:'light'}}
               />
-              <style>{`input::placeholder { color: rgba(255,255,255,0.75); }`}</style>
               <button onClick={handleAiSearch} style={{width:'38px',height:'38px',borderRadius:'100px',flexShrink:0,background:'rgba(255,255,255,0.2)',border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}
                 onMouseEnter={e=>(e.currentTarget.style.background='rgba(255,255,255,0.3)')}
                 onMouseLeave={e=>(e.currentTarget.style.background='rgba(255,255,255,0.2)')}>
@@ -245,7 +244,7 @@ export default function DiscoverPage() {
                   </span>
                   <div className="text-right">
                     <span className="font-display text-[1.2rem] font-light" style={{color:'var(--blue)'}}>{m.tmdbRating.toFixed(1)}</span>
-                    {m.timesWatched>=2&&<span className="block font-body text-[0.6rem] text-amber-500 font-semibold">{m.timesWatched}× watched</span>}
+                    {m.timesWatched>=2&&<span className="block font-body text-[0.6rem] font-semibold" style={{color:'var(--gold)'}}>{m.timesWatched}× watched</span>}
                   </div>
                 </div>
                 <p className="font-display text-[1.1rem] font-light text-[var(--text)] leading-tight mb-1">{m.name}</p>
@@ -273,7 +272,7 @@ export default function DiscoverPage() {
                   <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
                 </svg>
                 <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search films or directors…"
-                  className="w-full pl-9 pr-4 py-2.5 rounded-xl font-body text-sm outline-none multiselect-input"
+                  className="w-full pl-9 pr-4 py-2.5 rounded-xl font-body text-[0.85rem] outline-none multiselect-input"
                   style={{background:'white',border:'1px solid rgba(0,0,0,0.08)',color:'var(--text)'}}/>
               </div>
               <div className="flex gap-1.5 sm:gap-2 flex-wrap">
@@ -305,13 +304,12 @@ export default function DiscoverPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-body text-[0.85rem] font-medium text-[var(--text)] truncate">
-                    {m.name}{m.timesWatched>=2&&<span className="text-amber-400 ml-1">★</span>}
+                    {m.name}{m.timesWatched>=2&&<span style={{color:'var(--gold)'}} className="ml-1">★</span>}
                   </p>
                   <p className="font-body text-[0.7rem] text-[var(--sub)]">{m.releaseYear} · {m.director.split(',')[0].trim()} · {m.runtime}</p>
                 </div>
-                {/* Fix 2: rewatch badge always visible, language/genre hidden on mobile */}
                 <div className="flex gap-2 flex-shrink-0 items-center">
-                  {m.timesWatched>=2&&<span className="font-body text-[0.6rem] px-2 py-1 rounded-full font-semibold" style={{background:'rgba(251,191,36,0.12)',color:'#d97706'}}>{m.timesWatched}×</span>}
+                  {m.timesWatched>=2&&<span className="font-body text-[0.6rem] px-2 py-1 rounded-full font-semibold" style={{background:'var(--gold-bg)',color:'var(--gold)'}}>{m.timesWatched}×</span>}
                   <span className="hidden sm:inline font-body text-[0.6rem] px-2 py-1 rounded-full" style={{background:'rgba(0,0,0,0.04)',color:'var(--sub)'}}>{m.language}</span>
                   <span className="hidden sm:inline font-body text-[0.6rem] px-2 py-1 rounded-full" style={{background:'rgba(0,0,0,0.04)',color:'var(--sub)'}}>{m.genre.split(',')[0].trim()}</span>
                 </div>
@@ -322,7 +320,7 @@ export default function DiscoverPage() {
               <div className="glass rounded-xl px-5 py-5 text-center">
                 <p className="font-body text-[0.85rem] text-[var(--text)] mb-1">Showing 60 of {filtered.length} films</p>
                 <p className="font-body text-[0.75rem] text-[var(--sub)] mb-3">Refine filters above, or browse the complete list on the Stats page.</p>
-                <Link href="/stats#section-catalogue" className="font-body text-[0.78rem] font-semibold text-[var(--blue)] hover:opacity-70 transition-opacity">
+                <Link href="/stats#section-catalogue" className="font-body text-[0.75rem] font-semibold text-[var(--blue)] hover:opacity-70 transition-opacity">
                   View full collection on Stats →
                 </Link>
               </div>

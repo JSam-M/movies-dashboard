@@ -33,7 +33,7 @@ function Section({ eyebrow, title, children, id }: { eyebrow: string; title: str
   return (
     <div className="mb-14" id={id}>
       <p className="font-body text-[0.6rem] font-semibold tracking-[0.16em] uppercase text-[var(--sub)] mb-1">{eyebrow}</p>
-      <p className="font-display text-[1.8rem] font-light text-[var(--text)] mb-6">{title}</p>
+      <p className="font-display text-[1.5rem] font-light text-[var(--text)] mb-6">{title}</p>
       {children}
     </div>
   )
@@ -111,7 +111,7 @@ function CatalogueSection({ movies }: { movies: Movie[] }) {
                 <h2 className="font-display text-[1.6rem] font-light text-[var(--text)] leading-tight">{selectedMovie.name}</h2>
                 <p className="font-body text-[0.75rem] text-[var(--sub)] mt-1">
                   {selectedMovie.releaseYear} · {selectedMovie.language} · {selectedMovie.runtime}
-                  {selectedMovie.timesWatched >= 2 && <span className="text-amber-500 ml-2">★ Watched {selectedMovie.timesWatched}×</span>}
+                  {selectedMovie.timesWatched >= 2 && <span style={{color:'var(--gold)'}} className="ml-2">★ Watched {selectedMovie.timesWatched}×</span>}
                 </p>
               </div>
               <div className="text-right flex-shrink-0 ml-4">
@@ -153,7 +153,7 @@ function CatalogueSection({ movies }: { movies: Movie[] }) {
                 className="hover:bg-black/[0.02] transition-colors cursor-pointer"
                 onClick={() => setSelectedMovie(m)}>
                 <td style={{padding:'9px 14px',fontWeight:500,color:'var(--text)',fontFamily:'inherit'}}>
-                  {m.name}{m.timesWatched>=2 && <span style={{color:'#fbbf24',marginLeft:'4px'}}>★</span>}
+                  {m.name}{m.timesWatched>=2 && <span style={{color:'var(--gold)',marginLeft:'4px'}}>★</span>}
                 </td>
                 <td style={{padding:'9px 14px',color:'var(--sub)',fontFamily:'inherit'}}>{m.releaseYear}</td>
                 <td style={{padding:'9px 14px',color:'var(--sub)',fontFamily:'inherit'}}>{m.tmdbRating.toFixed(1)}</td>
@@ -178,13 +178,13 @@ function CatalogueSection({ movies }: { movies: Movie[] }) {
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-body text-[0.88rem] font-medium text-[var(--text)] truncate">
-                {m.name}{m.timesWatched>=2&&<span className="text-amber-400 ml-1">★</span>}
+                {m.name}{m.timesWatched>=2&&<span style={{color:'var(--gold)'}} className="ml-1">★</span>}
               </p>
               <p className="font-body text-[0.7rem] text-[var(--sub)]">{m.releaseYear} · {m.director.split(',')[0].trim()} · {m.runtime}</p>
             </div>
             {m.timesWatched>=2&&(
               <span className="font-body text-[0.62rem] px-2 py-1 rounded-full font-semibold flex-shrink-0"
-                style={{background:'rgba(251,191,36,0.12)',color:'#d97706'}}>{m.timesWatched}×</span>
+                style={{background:'var(--gold-bg)',color:'var(--gold)'}}>{m.timesWatched}×</span>
             )}
           </button>
         ))}

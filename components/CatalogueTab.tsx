@@ -51,7 +51,7 @@ export default function CatalogueTab({ movies }: { movies: Movie[] }) {
               <tr key={m.name} style={{ borderBottom: i < sorted.length-1 ? '1px solid rgba(0,0,0,0.04)' : 'none' }}
                 className="hover:bg-black/[0.02] transition-colors">
                 <td className="px-5 py-3 font-body text-[0.85rem] text-[var(--text)] font-medium">
-                  {m.name} {m.timesWatched >= 2 ? <span className="text-amber-500 ml-1">★</span> : ''}
+                  {m.name} {m.timesWatched >= 2 ? <span style={{color:'var(--gold)'}} className="ml-1">★</span> : ''}
                 </td>
                 <td className="px-5 py-3 font-body text-[0.85rem] text-[var(--sub)]">{m.releaseYear}</td>
                 <td className="px-5 py-3 font-body text-[0.85rem] text-[var(--sub)]">{m.tmdbRating.toFixed(1)}</td>

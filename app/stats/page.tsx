@@ -113,8 +113,8 @@ export default function StatsPage() {
 
   const inputStyle = {
     background:'rgba(0,0,0,0.04)', border:'1px solid rgba(0,0,0,0.08)',
-    borderRadius:'10px', padding:'8px 10px', fontFamily:'inherit',
-    fontSize:'0.78rem', color:'var(--text)', width:'100%', outline:'none'
+    borderRadius:'12px', padding:'8px 10px', fontFamily:'inherit',
+    fontSize:'0.75rem', color:'var(--text)', width:'100%', outline:'none'
   }
   const labelStyle = {
     display:'block', fontFamily:'inherit', fontSize:'0.6rem', fontWeight:600,
@@ -130,7 +130,7 @@ export default function StatsPage() {
         <div className="max-w-[1200px] mx-auto px-4 sm:px-8 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2 sm:gap-3">
             <Link href="/" className="flex items-center gap-2 hover:opacity-70 transition-opacity">
-              <div style={{width:'22px',height:'22px',borderRadius:'5px',background:'#0071e3',display:'inline-flex',alignItems:'center',justifyContent:'center',fontFamily:'Georgia,serif',fontSize:'12px',fontWeight:300,color:'white',letterSpacing:'-0.5px',flexShrink:0}}>fc</div>
+              <div style={{width:'22px',height:'22px',borderRadius:'6px',background:'#0071e3',display:'inline-flex',alignItems:'center',justifyContent:'center',fontFamily:'Georgia,serif',fontSize:'12px',fontWeight:300,color:'white',letterSpacing:'-0.5px',flexShrink:0}}>fc</div>
               <span className="font-display text-lg font-light text-[var(--text)] hidden sm:inline">Film Collection</span>
             </Link>
             <span className="text-black/20 hidden sm:inline">/</span>
@@ -144,7 +144,7 @@ export default function StatsPage() {
               About
             </button>
             <button onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg font-body text-[0.72rem] font-medium transition-all"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg font-body text-[0.7rem] font-medium transition-all"
               style={{
                 background: sidebarOpen ? 'rgba(0,113,227,0.08)' : 'rgba(0,0,0,0.04)',
                 color: sidebarOpen ? 'var(--blue)' : 'var(--sub)',
@@ -155,7 +155,7 @@ export default function StatsPage() {
               </svg>
               <span className="hidden sm:inline">Filters</span>
               {activeFilters > 0 && (
-                <span className="w-4 h-4 rounded-full text-[0.58rem] font-bold bg-blue-500 text-white flex items-center justify-center">{activeFilters}</span>
+                <span className="w-4 h-4 rounded-full text-[0.6rem] font-bold bg-blue-500 text-white flex items-center justify-center">{activeFilters}</span>
               )}
             </button>
           </div>
@@ -180,7 +180,7 @@ export default function StatsPage() {
                         display:'inline-flex',alignItems:'center',gap:'4px',
                         padding:'3px 8px',borderRadius:'100px',
                         background:'rgba(0,113,227,0.1)',color:'#0071e3',
-                        fontSize:'0.72rem',fontFamily:'inherit',
+                        fontSize:'0.7rem',fontFamily:'inherit',
                       }}>
                         {f}
                         <button onClick={() => setSelectedFilms(prev => prev.filter(x => x !== f))}
@@ -208,12 +208,12 @@ export default function StatsPage() {
                     {filmSuggestions.map(m => (
                       <div key={m.name}
                         onClick={() => { setSelectedFilms(prev => [...prev, m.name]); setFilmQuery(''); setFilmDropOpen(false) }}
-                        style={{padding:'9px 14px',fontSize:'0.8rem',cursor:'pointer',fontFamily:'inherit',color:'var(--text)',borderBottom:'1px solid rgba(0,0,0,0.04)'}}
+                        style={{padding:'9px 14px',fontSize:'0.85rem',cursor:'pointer',fontFamily:'inherit',color:'var(--text)',borderBottom:'1px solid rgba(0,0,0,0.04)'}}
                         onMouseEnter={e => (e.currentTarget.style.background='rgba(0,0,0,0.03)')}
                         onMouseLeave={e => (e.currentTarget.style.background='white')}
                       >
                         <span style={{fontWeight:500}}>{m.name}</span>
-                        <span style={{color:'var(--muted)',marginLeft:'6px',fontSize:'0.72rem'}}>{m.releaseYear} · {m.language}</span>
+                        <span style={{color:'var(--muted)',marginLeft:'6px',fontSize:'0.7rem'}}>{m.releaseYear} · {m.language}</span>
                       </div>
                     ))}
                   </div>
@@ -241,7 +241,7 @@ export default function StatsPage() {
                 <div className="flex flex-wrap gap-1.5" style={{marginTop:'6px'}}>
                   {allYears.map(y => (
                     <button key={y} onClick={() => toggleYear(y)}
-                      className="px-3 py-1 rounded-lg font-body text-[0.7rem] font-medium transition-all"
+                      className="px-3 py-1 rounded-full font-body text-[0.7rem] font-medium transition-all"
                       style={{
                         background: watchYears.includes(y) ? 'var(--blue)' : 'rgba(0,0,0,0.04)',
                         color: watchYears.includes(y) ? 'white' : 'var(--sub)',
@@ -259,7 +259,7 @@ export default function StatsPage() {
                 <div className="flex gap-1.5" style={{marginTop:'6px'}}>
                   {['All','Rewatched','First watch'].map(opt => (
                     <button key={opt} onClick={() => setRewatchFilter(opt)}
-                      className="px-3 py-1 rounded-lg font-body text-[0.72rem] font-medium transition-all"
+                      className="px-3 py-1 rounded-full font-body text-[0.7rem] font-medium transition-all"
                       style={{
                         background: rewatchFilter===opt ? 'var(--blue)' : 'rgba(0,0,0,0.04)',
                         color: rewatchFilter===opt ? 'white' : 'var(--sub)',
@@ -274,7 +274,7 @@ export default function StatsPage() {
               {/* Count + Clear */}
               <div className="flex items-center gap-3 ml-auto pb-0.5">
                 {activeFilters > 0 && (
-                  <button onClick={resetFilters} className="font-body text-[0.65rem] text-[var(--blue)] hover:opacity-70">Clear all</button>
+                  <button onClick={resetFilters} className="font-body text-[0.6rem] text-[var(--blue)] hover:opacity-70">Clear all</button>
                 )}
                 <p className="font-body text-[0.7rem] text-[var(--muted)]">
                   <span style={{color:'var(--text)',fontWeight:600}}>{filtered.length}</span> of {allMovies.length}
