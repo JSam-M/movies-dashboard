@@ -252,7 +252,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
 
   const gc: Record<string,number> = {}
   movies.forEach(m => m.genre.split(',').forEach(g=>{const t=g.trim();if(t)gc[t]=(gc[t]||0)+1}))
-  const genreData = Object.entries(gc).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([name,value])=>({name,value}))
+  const genreData = Object.entries(gc).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([name,value])=>({name,value}))
 
   const dirData = Object.entries(dirCount).sort((a,b)=>b[1]-a[1]).slice(0,12)
     .map(([name,value])=>({name:name.length>24?name.slice(0,21)+'\u2026':name,value}))
@@ -346,14 +346,14 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
           </div>
           <div className="glass rounded-2xl p-4 sm:p-6 flex flex-col">
             <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-4">Top Genres</p>
-            <div className="flex-1 flex flex-col justify-center space-y-2">
+            <div className="flex-1 flex flex-col justify-center space-y-1.5">
               {(() => {
                 const max = genreData[0]?.value || 1
                 return genreData.map((item, i) => (
                   <div key={item.name} className="flex items-center gap-3">
                     <span className="font-body text-[0.75rem] text-[var(--text)] text-right flex-shrink-0"
                       style={{width:'100px'}}>{item.name}</span>
-                    <div className="flex-1 h-[22px] rounded-[4px] overflow-hidden" style={{background:'rgba(0,0,0,0.04)'}}>
+                    <div className="flex-1 h-[18px] rounded-[4px] overflow-hidden" style={{background:'rgba(0,0,0,0.04)'}}>
                       <div className="h-full rounded-[4px] transition-all"
                         style={{width:`${(item.value/max)*100}%`, background:`hsl(${210+i*8},${75-i*3}%,${50+i*2}%)`}} />
                     </div>
@@ -368,10 +368,10 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
       </Section>
 
       <Section eyebrow="Quality" title="Rating Distribution" id="section-quality">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div className="glass rounded-2xl p-4 sm:p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-stretch">
+          <div className="glass rounded-2xl p-4 sm:p-6 flex flex-col">
             <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-4">Films by TMDb Score</p>
-            <ResponsiveContainer width="100%" height={200}>
+            <ResponsiveContainer width="100%" height={200} className="flex-1">
               <BarChart data={ratingData} margin={{left:0,right:8,top:4,bottom:0}}>
                 <XAxis dataKey="name" tick={{fontFamily:'inherit',fontSize:11,fill:'#86868b'}} axisLine={false} tickLine={false} />
                 <YAxis tick={{fontFamily:'inherit',fontSize:10,fill:'#86868b'}} axisLine={false} tickLine={false} />
