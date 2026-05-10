@@ -324,21 +324,21 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
           <div className="glass rounded-2xl p-4 sm:p-6">
             <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-4">By Language</p>
-            <div className="flex flex-col items-center gap-5">
-              <PieChart width={220} height={220}>
-                <Pie data={langData} cx={110} cy={110} innerRadius={68} outerRadius={100} dataKey="value" paddingAngle={2}>
+            <div className="flex items-center gap-4">
+              <PieChart width={180} height={180}>
+                <Pie data={langData} cx={90} cy={90} innerRadius={56} outerRadius={82} dataKey="value" paddingAngle={2}>
                   {langData.map((_,i)=><Cell key={i} fill={QUAL[i%QUAL.length]} />)}
                 </Pie>
                 <Tooltip {...tt} />
               </PieChart>
-              <div className="w-full space-y-1.5">
+              <div className="flex-1 space-y-2">
                 {langData.slice(0,6).map((l,i)=>(
-                  <div key={l.name} className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
+                  <div key={l.name} className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
                       <div className="w-2 h-2 rounded-full flex-shrink-0" style={{background:QUAL[i%QUAL.length]}} />
-                      <span className="font-body text-[0.75rem] text-[var(--text)]">{l.name}</span>
+                      <span className="font-body text-[0.75rem] text-[var(--text)] truncate">{l.name}</span>
                     </div>
-                    <span className="font-body text-[0.7rem] text-[var(--sub)]">{l.value}</span>
+                    <span className="font-body text-[0.7rem] text-[var(--sub)] flex-shrink-0">{l.value}</span>
                   </div>
                 ))}
               </div>
