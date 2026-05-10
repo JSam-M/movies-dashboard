@@ -13,7 +13,7 @@ interface Props {
   watchYears: number[]
 }
 
-const QUAL = ['#0071e3','#ff9500','#34c759','#ff3b30','#5856d6','#ff2d55','#af52de','#32ade6','#32ade6','#ffcc00']
+const QUAL = ['#0071e3','#ff9500','#34c759','#ff3b30','#5856d6','#ff2d55','#af52de','#32ade6','#30b0c7','#ffcc00']
 
 const tt = {
   contentStyle: {
