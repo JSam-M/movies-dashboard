@@ -368,10 +368,10 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
       </Section>
 
       <Section eyebrow="Quality" title="Rating Distribution" id="section-quality">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-stretch">
-          <div className="glass rounded-2xl p-4 sm:p-6 flex flex-col">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
+          <div className="glass rounded-2xl p-4 sm:p-6">
             <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-4">Films by TMDb Score</p>
-            <ResponsiveContainer width="100%" height={200} className="flex-1">
+            <ResponsiveContainer width="100%" height={200}>
               <BarChart data={ratingData} margin={{left:0,right:8,top:4,bottom:0}}>
                 <XAxis dataKey="name" tick={{fontFamily:'inherit',fontSize:11,fill:'#86868b'}} axisLine={false} tickLine={false} />
                 <YAxis tick={{fontFamily:'inherit',fontSize:10,fill:'#86868b'}} axisLine={false} tickLine={false} />
@@ -383,8 +383,8 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
           </div>
           <div className="glass rounded-2xl p-4 sm:p-6">
             <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-4">Highest Rated</p>
-            <div className="space-y-2.5">
-              {[...movies].sort((a,b)=>b.tmdbRating-a.tmdbRating).slice(0,6).map((m,i)=>(
+            <div className="space-y-1.5">
+              {[...movies].sort((a,b)=>b.tmdbRating-a.tmdbRating).slice(0,5).map((m,i)=>(
                 <div key={m.name} className="flex items-center gap-3">
                   <span className="font-body text-[0.6rem] text-[var(--muted)] w-4">{i+1}</span>
                   <div className="flex-1 min-w-0">
