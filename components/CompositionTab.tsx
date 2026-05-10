@@ -27,7 +27,7 @@ export default function CompositionTab({ movies }: { movies: Movie[] }) {
   const tooltip = {
     contentStyle: { background:'var(--modal-bg)', border:'1px solid var(--fill-border)', borderRadius:'12px', boxShadow:'0 4px 16px rgba(0,0,0,0.1)', fontFamily:'DM Sans,sans-serif', fontSize:'12px' },
     labelStyle: { color:'var(--text)', fontWeight:500 },
-    itemStyle: { color:'var(--sub)' },
+    itemStyle: { color:'var(--text)' },
   }
 
   return (

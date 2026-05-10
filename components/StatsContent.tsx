@@ -22,7 +22,7 @@ const tt = {
     fontFamily:'inherit', fontSize:'12px'
   },
   labelStyle: { color:'var(--text)', fontWeight:500 },
-  itemStyle: { color:'var(--sub)' },
+  itemStyle: { color:'var(--text)' },
   cursor: { fill:'var(--fill)' }
 }
 
