@@ -368,10 +368,10 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
       </Section>
 
       <Section eyebrow="Quality" title="Rating Distribution" id="section-quality">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
-          <div className="glass rounded-2xl p-4 sm:p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-stretch">
+          <div className="glass rounded-2xl p-4 sm:p-6 flex flex-col">
             <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-4">Films by TMDb Score</p>
-            <ResponsiveContainer width="100%" height={200}>
+            <ResponsiveContainer width="100%" height="100%">
               <BarChart data={ratingData} margin={{left:0,right:8,top:4,bottom:0}}>
                 <XAxis dataKey="name" tick={{fontFamily:'inherit',fontSize:11,fill:'#86868b'}} axisLine={false} tickLine={false} />
                 <YAxis tick={{fontFamily:'inherit',fontSize:10,fill:'#86868b'}} axisLine={false} tickLine={false} />
