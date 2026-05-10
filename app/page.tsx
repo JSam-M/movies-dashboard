@@ -184,7 +184,7 @@ export default function DiscoverPage() {
       <div className="max-w-[1200px] mx-auto px-4 sm:px-8 py-12 sm:py-20">
 
         {/* HERO */}
-        <div className="text-center mb-12 sm:mb-20">
+        <div className="text-center mb-4 sm:mb-6">
           <p className="font-body text-[0.6rem] font-semibold tracking-[0.2em] uppercase text-[var(--sub)] mb-5">Personal Film Archive · Since 2019</p>
           <h1 className="font-display text-[clamp(2.8rem,7vw,6.5rem)] font-light leading-[0.9] tracking-tight text-[var(--text)] mb-8">
             A life in{' '}
@@ -239,17 +239,16 @@ export default function DiscoverPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {dailyPicks.map(m=>(
               <button key={m.name} onClick={()=>setSelectedMovie(m)} className="glass rounded-2xl p-5 text-left transition-all hover:opacity-90">
-                <div className="flex items-start justify-between mb-3">
-                  <span className="font-body text-[0.6rem] font-semibold tracking-[0.08em] uppercase px-2 py-1 rounded-full"
-                    style={{background:'rgba(0,113,227,0.07)',color:'var(--blue)'}}>
+                <div className="flex items-start justify-between mb-1">
+                  <em className="font-display text-[0.85rem] font-light" style={{fontStyle:'italic',color:'var(--sub)'}}>
                     {m.genre.split(',')[0].trim()}
-                  </span>
+                  </em>
                   <div className="text-right">
                     <span className="font-display text-[1.2rem] font-light" style={{color:'var(--blue)'}}>{m.tmdbRating.toFixed(1)}</span>
                     {m.timesWatched>=2&&<span className="block font-body text-[0.6rem] font-semibold" style={{color:'var(--gold)'}}>{m.timesWatched}× watched</span>}
                   </div>
                 </div>
-                <p className="font-display text-[1rem] font-light text-[var(--text)] leading-tight mb-1">{m.name}</p>
+                <p className="font-display text-[1rem] font-light leading-tight mb-1" style={{color:'var(--blue)'}}>{m.name}</p>
                 <p className="font-body text-[0.7rem] text-[var(--sub)] mb-2">{m.releaseYear} · {m.language} · {m.runtime}</p>
                 <p className="font-body text-[0.75rem] text-[var(--sub)] leading-relaxed line-clamp-2">{m.overview}</p>
               </button>
@@ -303,10 +302,14 @@ export default function DiscoverPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-2" style={{position:'relative',zIndex:10}}>
-            {filtered.slice(0,60).map(m=>(
+            {filtered.slice(0,60).map(m=>{
+              const accentColor = m.tmdbRating>=8.5?'#34c759':m.tmdbRating>=7.5?'#0071e3':m.tmdbRating>=6.5?'#ff9500':'#ff3b30'
+              return (
               <button key={m.name} onClick={()=>setSelectedMovie(m)}
-                className="glass rounded-xl px-4 sm:px-5 py-3.5 flex items-center gap-3 sm:gap-5 hover:bg-white/90 transition-all text-left w-full">
-                <div className="font-display text-[1.5rem] font-light w-10 sm:w-12 text-center flex-shrink-0" style={{color:'var(--blue)'}}>
+                className="glass rounded-xl flex items-center gap-3 sm:gap-5 hover:bg-white/90 transition-all text-left w-full"
+                style={{paddingTop:'14px',paddingBottom:'14px',paddingRight:'20px',paddingLeft:0,overflow:'hidden',position:'relative'}}>
+                <div style={{position:'absolute',left:0,top:0,bottom:0,width:'3px',background:accentColor}} />
+                <div className="font-display text-[1.5rem] font-light w-10 sm:w-12 text-center flex-shrink-0" style={{color:accentColor,marginLeft:'20px'}}>
                   {m.tmdbRating>0?m.tmdbRating.toFixed(1):'—'}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -321,7 +324,7 @@ export default function DiscoverPage() {
                   <span className="hidden sm:inline font-body text-[0.6rem] px-2 py-1 rounded-full" style={{background:'var(--fill)',color:'var(--sub)'}}>{m.genre.split(',')[0].trim()}</span>
                 </div>
               </button>
-            ))}
+            )})}
 
             {filtered.length > 60 && (
               <div className="py-6 text-center">
