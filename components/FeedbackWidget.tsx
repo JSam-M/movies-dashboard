@@ -75,7 +75,7 @@ export default function FeedbackWidget() {
           >
             {status === 'done' ? (
               <div className="text-center py-4">
-                <div className="text-2xl mb-3">✓</div>
+                <div className="font-display text-[1.5rem] font-light mb-3">✓</div>
                 <p className="font-display text-[1rem] font-light text-[var(--text)]">Thank you</p>
                 <p className="font-body text-[0.75rem] text-[var(--sub)] mt-1">Your feedback was received.</p>
               </div>

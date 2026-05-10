@@ -46,7 +46,7 @@ function KPICard({ value, unit, label, sub, dot, sectionId }: {
   const clickable = !!sectionId
   return (
     <div
-      className={`glass rounded-2xl p-6 relative overflow-hidden transition-all${clickable ? ' cursor-pointer hover:shadow-md hover:scale-[1.01]' : ''}`}
+      className={`glass rounded-2xl p-6 relative overflow-hidden transition-all${clickable ? ' cursor-pointer hover:bg-white/90' : ''}`}
       style={{ height: '130px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}
       onClick={() => sectionId && scrollTo(sectionId)}
       title={clickable ? 'Click to view detail' : undefined}

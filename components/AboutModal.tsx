@@ -53,7 +53,7 @@ function FeedbackTrigger() {
           <button
             onClick={submit}
             disabled={!text.trim()}
-            className="px-3 rounded-lg font-body text-[0.75rem] font-medium transition-all"
+            className="px-3 rounded-xl font-body text-[0.75rem] font-medium transition-all"
             style={{
               background: text.trim() ? '#0071e3' : 'rgba(0,0,0,0.1)',
               color: text.trim() ? 'white' : 'var(--muted)',
