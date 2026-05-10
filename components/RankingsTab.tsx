@@ -13,7 +13,9 @@ export default function RankingsTab({ movies }: { movies: Movie[] }) {
     .map(m => ({ name: m.name.length > 28 ? m.name.slice(0,25)+'…' : m.name, times: m.timesWatched }))
 
   const tooltip = {
-    contentStyle: { background:'var(--modal-bg)', border:'1px solid var(--fill-border)', borderRadius:'12px', boxShadow:'0 4px 16px rgba(0,0,0,0.1)', fontFamily:'DM Sans,sans-serif', fontSize:'12px', color:'var(--text)' },
+    contentStyle: { background:'var(--modal-bg)', border:'1px solid var(--fill-border)', borderRadius:'12px', boxShadow:'0 4px 16px rgba(0,0,0,0.1)', fontFamily:'DM Sans,sans-serif', fontSize:'12px' },
+    labelStyle: { color:'var(--text)', fontWeight:500 },
+    itemStyle: { color:'var(--sub)' },
     cursor: { fill: 'var(--fill)' },
   }
 
