@@ -1,25 +1,36 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 export default function ScrollJump() {
-  const [visible, setVisible]   = useState(false)
-  const [atBottom, setAtBottom] = useState(false)
+  const [visible,   setVisible]   = useState(false)
+  const [goingDown, setGoingDown] = useState(true)
+  const lastY    = useRef(0)
+  const debounce = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     const onScroll = () => {
-      const scrolled  = window.scrollY
-      const maxScroll = document.documentElement.scrollHeight - window.innerHeight
-      setVisible(scrolled > 200)
-      setAtBottom(maxScroll > 0 && scrolled / maxScroll > 0.4)
+      const y = window.scrollY
+      setVisible(y > 200)
+
+      if (y !== lastY.current) {
+        const down = y > lastY.current
+        lastY.current = y
+
+        if (debounce.current) clearTimeout(debounce.current)
+        debounce.current = setTimeout(() => setGoingDown(down), 150)
+      }
     }
     window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      if (debounce.current) clearTimeout(debounce.current)
+    }
   }, [])
 
   const jump = () => {
-    if (atBottom) window.scrollTo({ top: 0, behavior: 'smooth' })
-    else window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+    if (goingDown) window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+    else window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   if (!visible) return null
@@ -38,9 +49,9 @@ export default function ScrollJump() {
         color: 'var(--sub)', fontSize: '0.85rem',
         cursor: 'pointer',
       }}
-      title={atBottom ? 'Back to top' : 'Jump to bottom'}
+      title={goingDown ? 'Jump to bottom' : 'Back to top'}
     >
-      {atBottom ? '↑' : '↓'}
+      {goingDown ? '↓' : '↑'}
     </button>
   )
 }
