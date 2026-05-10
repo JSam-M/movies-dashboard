@@ -243,13 +243,13 @@ export default function DiscoverPage() {
                   <em className="font-display text-[0.85rem] font-light" style={{fontStyle:'italic',color:'var(--sub)'}}>
                     {m.genre.split(',')[0].trim()}
                   </em>
-                  <div className="text-right">
-                    <span className="font-display text-[1.2rem] font-light" style={{color:'var(--blue)'}}>{m.tmdbRating.toFixed(1)}</span>
-                    {m.timesWatched>=2&&<span className="block font-body text-[0.6rem] font-semibold" style={{color:'var(--gold)'}}>{m.timesWatched}× watched</span>}
-                  </div>
+                  <span className="font-display text-[1.2rem] font-light" style={{color:'var(--blue)'}}>{m.tmdbRating.toFixed(1)}</span>
                 </div>
                 <p className="font-display text-[1rem] font-light leading-tight mb-1" style={{color:'var(--blue)'}}>{m.name}</p>
-                <p className="font-body text-[0.7rem] text-[var(--sub)] mb-2">{m.releaseYear} · {m.language} · {m.runtime}</p>
+                <p className="font-body text-[0.7rem] text-[var(--sub)] mb-2">
+                  {m.releaseYear} · {m.language} · {m.runtime}
+                  {m.timesWatched>=2&&<span className="font-semibold ml-2" style={{color:'var(--gold)'}}>{m.timesWatched}× watched</span>}
+                </p>
                 <p className="font-body text-[0.75rem] text-[var(--sub)] leading-relaxed line-clamp-2">{m.overview}</p>
               </button>
             ))}
