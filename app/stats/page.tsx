@@ -125,8 +125,8 @@ export default function StatsPage() {
 
   return (
     <div className="min-h-screen mesh-bg flex flex-col">
-      {/* NAV */}
-      <nav className="liquid-nav sticky top-0 z-40 border-b border-black/7 flex-shrink-0">
+      {/* NAV + FILTER — single unified glass surface */}
+      <div className="liquid-nav sticky top-0 z-40 border-b border-black/7 flex-shrink-0">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-8 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2 sm:gap-3">
             <Link href="/" className="flex items-center gap-2 hover:opacity-70 transition-opacity">
@@ -161,13 +161,16 @@ export default function StatsPage() {
             </button>
           </div>
         </div>
-      </nav>
 
-      {/* FILTER PANEL */}
-      {sidebarOpen && (
-        <div className="liquid-nav sticky z-30 border-b border-black/7 animate-fade-in flex-shrink-0"
-          style={{top:'56px'}}>
-          <div className="max-w-[1200px] mx-auto px-4 sm:px-8 py-4 space-y-3">
+        {/* FILTER PANEL — rolls down inside the same glass surface */}
+        <div style={{
+          display:'grid',
+          gridTemplateRows: sidebarOpen ? '1fr' : '0fr',
+          transition:'grid-template-rows 0.28s cubic-bezier(0.4,0,0.2,1)',
+        }}>
+          <div style={{overflow:'hidden'}}>
+            <div style={{borderTop:'1px solid var(--separator)'}}>
+              <div className="max-w-[1200px] mx-auto px-4 sm:px-8 py-4 space-y-3">
 
             {/* Row 1: Searchable filters */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -283,9 +286,11 @@ export default function StatsPage() {
               </div>
             </div>
 
+              </div>
+            </div>
           </div>
         </div>
-      )}
+      </div>
 
       {/* MAIN */}
       <main className="flex-1">
