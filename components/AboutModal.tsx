@@ -104,7 +104,7 @@ export default function AboutModal({ onClose }: Props) {
         <div
           className="mb-8"
           style={{
-            width: '36px', height: '36px', borderRadius: '10px',
+            width: '36px', height: '36px', borderRadius: '12px',
             background: '#0071e3',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontFamily: 'Georgia, serif', fontSize: '16px', fontWeight: 300,

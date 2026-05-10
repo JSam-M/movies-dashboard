@@ -81,7 +81,7 @@ function CatalogueSection({ movies }: { movies: Movie[] }) {
 
   const thStyle = (col: typeof sortCol): React.CSSProperties => ({
     padding:'10px 14px', textAlign:'left', fontSize:'0.6rem', fontWeight:600,
-    letterSpacing:'0.1em', textTransform:'uppercase',
+    letterSpacing:'0.12em', textTransform:'uppercase',
     color: sortCol === col ? '#0071e3' : '#86868b',
     cursor:'pointer', userSelect:'none', whiteSpace:'nowrap',
     borderBottom:'1px solid rgba(0,0,0,0.06)', fontFamily:'inherit',

@@ -87,7 +87,7 @@ export default function MultiSelect({ options, selected, onChange, placeholder =
         <div style={{
           position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0,
           background: 'white', border: '1px solid rgba(0,0,0,0.1)',
-          borderRadius: '16px', boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
+          borderRadius: '12px', boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
           zIndex: 100, overflow: 'hidden', maxHeight: '220px', overflowY: 'auto',
         }}>
           {(query.length > 0 ? filtered : options.filter(o => o !== 'All').slice(0,20)).map(opt => {
