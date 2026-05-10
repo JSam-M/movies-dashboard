@@ -64,7 +64,7 @@ export default function MultiSelect({ options, selected, onChange, placeholder =
               {s}
               <button onClick={() => remove(s)} style={{
                 background: 'none', border: 'none', cursor: 'pointer',
-                color: '#0071e3', fontSize: '13px', lineHeight: 1,
+                color: '#0071e3', fontSize: '0.85rem', lineHeight: 1,
                 padding: 0, opacity: 0.7,
               }}>×</button>
             </span>

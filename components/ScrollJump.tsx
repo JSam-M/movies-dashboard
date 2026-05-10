@@ -35,7 +35,7 @@ export default function ScrollJump() {
         border: '1px solid rgba(0,0,0,0.08)',
         boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        color: 'var(--sub)', fontSize: '14px',
+        color: 'var(--sub)', fontSize: '0.85rem',
         cursor: 'pointer',
       }}
       title={atBottom ? 'Back to top' : 'Jump to bottom'}
