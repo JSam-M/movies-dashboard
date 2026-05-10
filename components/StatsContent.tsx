@@ -321,8 +321,8 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
       </Section>
 
       <Section eyebrow="Composition" title="Language & Genre" id="section-composition">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
-          <div className="glass rounded-2xl p-4 sm:p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-stretch">
+          <div className="glass rounded-2xl p-4 sm:p-6 flex flex-col justify-center">
             <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-4">By Language</p>
             <div className="flex items-center gap-4">
               <PieChart width={180} height={180}>
@@ -344,7 +344,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
               </div>
             </div>
           </div>
-          <div className="glass rounded-2xl p-4 sm:p-6">
+          <div className="glass rounded-2xl p-4 sm:p-6 flex flex-col justify-center">
             <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-4">Top Genres</p>
             <div className="space-y-1.5">
               {(() => {
@@ -371,15 +371,17 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-stretch">
           <div className="glass rounded-2xl p-4 sm:p-6 flex flex-col">
             <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-4">Films by TMDb Score</p>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={ratingData} margin={{left:0,right:8,top:4,bottom:0}}>
-                <XAxis dataKey="name" tick={{fontFamily:'inherit',fontSize:11,fill:'#86868b'}} axisLine={false} tickLine={false} />
-                <YAxis tick={{fontFamily:'inherit',fontSize:10,fill:'#86868b'}} axisLine={false} tickLine={false} />
-                <Tooltip {...tt} />
-                <Bar dataKey="value" radius={[4,4,0,0]} fill="#0071e3"
-                  label={{position:'top',fontSize:10,fill:'#86868b',fontFamily:'inherit'}} />
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="flex-1" style={{minHeight:'200px'}}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={ratingData} margin={{left:0,right:8,top:4,bottom:0}}>
+                  <XAxis dataKey="name" tick={{fontFamily:'inherit',fontSize:11,fill:'#86868b'}} axisLine={false} tickLine={false} />
+                  <YAxis tick={{fontFamily:'inherit',fontSize:10,fill:'#86868b'}} axisLine={false} tickLine={false} />
+                  <Tooltip {...tt} />
+                  <Bar dataKey="value" radius={[4,4,0,0]} fill="#0071e3"
+                    label={{position:'top',fontSize:10,fill:'#86868b',fontFamily:'inherit'}} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
           <div className="glass rounded-2xl p-4 sm:p-6">
             <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-4">Highest Rated</p>
