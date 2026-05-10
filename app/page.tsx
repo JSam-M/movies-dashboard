@@ -64,7 +64,7 @@ function MovieModal({ movie, onClose }: { movie: Movie; onClose: () => void }) {
           </div>
         </div>
         <p className="font-body text-[0.85rem] text-[var(--sub)] leading-relaxed mb-5">{movie.overview || 'No overview available.'}</p>
-        <div className="flex flex-wrap gap-2 pt-4 border-t border-black/7">
+        <div className="flex flex-wrap gap-2 pt-4" style={{borderTop:'1px solid var(--separator)'}}>
           <span className="font-body text-[0.75rem] text-[var(--sub)]">Director:</span>
           <span className="font-body text-[0.75rem] text-[var(--text)]">{movie.director.split(',')[0].trim()}</span>
           {movie.genre.split(',').slice(0,3).map(g => (
@@ -164,7 +164,6 @@ export default function DiscoverPage() {
             <span className="font-display text-[1rem] font-light text-[var(--text)] hidden sm:inline">Film Collection</span>
           </div>
           <div className="flex items-center gap-3">
-            <ThemeToggle />
             <button
               onClick={() => setAboutOpen(true)}
               className="font-body text-[0.75rem] font-medium text-[var(--sub)] hover:text-[var(--text)] transition-colors"
@@ -177,6 +176,7 @@ export default function DiscoverPage() {
               </svg>
               <span className="hidden sm:inline">My Stats</span>
             </Link>
+            <ThemeToggle />
           </div>
         </div>
       </nav>
@@ -232,14 +232,13 @@ export default function DiscoverPage() {
         <div className="mb-12 sm:mb-16">
           <div className="flex items-end justify-between mb-6">
             <div>
-              <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-2">Today&apos;s Picks</p>
-              <p className="font-display text-[1.5rem] sm:text-[2rem] font-light text-[var(--text)]">Featured Films</p>
+              <p className="font-display text-[1.5rem] sm:text-[2rem] font-light text-[var(--text)]">Today&apos;s Picks</p>
             </div>
             <p className="font-body text-[0.7rem] text-[var(--muted)] hidden sm:block">Refreshes daily · Click for details</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {dailyPicks.map(m=>(
-              <button key={m.name} onClick={()=>setSelectedMovie(m)} className="glass rounded-2xl p-5 text-left transition-all hover:scale-[1.01] hover:bg-white/90">
+              <button key={m.name} onClick={()=>setSelectedMovie(m)} className="glass rounded-2xl p-5 text-left transition-all hover:opacity-90">
                 <div className="flex items-start justify-between mb-3">
                   <span className="font-body text-[0.6rem] font-semibold tracking-[0.08em] uppercase px-2 py-1 rounded-full"
                     style={{background:'rgba(0,113,227,0.07)',color:'var(--blue)'}}>
@@ -271,7 +270,7 @@ export default function DiscoverPage() {
           <div className="mb-6 space-y-4" style={{position:'relative',zIndex:20}}>
             <div className="flex gap-2 sm:gap-3 flex-wrap items-center">
               <div className="relative flex-1 min-w-[160px]">
-                <svg className="absolute left-3 top-1/2 -translate-y-1/2" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#86868b" strokeWidth="2">
+                <svg className="absolute left-3 top-1/2 -translate-y-1/2" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="2">
                   <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
                 </svg>
                 <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search films or directors…"
@@ -285,7 +284,12 @@ export default function DiscoverPage() {
                   </button>
                 ))}
               </div>
-              <button onClick={()=>setShowRewatched(!showRewatched)} style={btnStyle(showRewatched)}>★ Favourites</button>
+              <button onClick={()=>setShowRewatched(!showRewatched)} style={{...btnStyle(showRewatched), display:'flex', alignItems:'center', gap:'5px'}}>
+                <svg width="12" height="11" viewBox="0 0 24 24" fill={showRewatched ? 'white' : 'none'} stroke={showRewatched ? 'white' : 'var(--sub)'} strokeWidth="2">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+                Favourites
+              </button>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -320,18 +324,17 @@ export default function DiscoverPage() {
             ))}
 
             {filtered.length > 60 && (
-              <div className="glass rounded-xl px-5 py-5 text-center">
-                <p className="font-body text-[0.85rem] text-[var(--text)] mb-1">Showing 60 of {filtered.length} films</p>
-                <p className="font-body text-[0.75rem] text-[var(--sub)] mb-3">Refine filters above, or browse the complete list on the Stats page.</p>
-                <Link href="/stats#section-catalogue" className="font-body text-[0.75rem] font-semibold text-[var(--blue)] hover:opacity-70 transition-opacity">
-                  View full collection on Stats →
+              <div className="py-6 text-center">
+                <p className="font-body text-[0.75rem] text-[var(--muted)] mb-2">Showing 60 of {filtered.length} films</p>
+                <Link href="/stats#section-catalogue" className="font-body text-[0.75rem] font-medium text-[var(--blue)] hover:opacity-70 transition-opacity">
+                  View full collection →
                 </Link>
               </div>
             )}
           </div>
         </div>
 
-        <div className="mt-12 sm:mt-16 pt-6 border-t border-black/7 text-center">
+        <div className="mt-12 sm:mt-16 pt-6 text-center" style={{borderTop:'1px solid var(--separator)'}}>
           <p className="font-body text-[0.6rem] tracking-[0.12em] uppercase text-[var(--muted)]">
             {stats.total as number} films · {new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'})}
           </p>
@@ -341,9 +344,9 @@ export default function DiscoverPage() {
       {/* FLOATING CHAT */}
       {!chatOpen && (
         <button onClick={()=>setChatOpen(true)}
-          className="fixed bottom-8 right-8 z-50 w-14 h-14 rounded-full flex items-center justify-center text-white transition-all hover:scale-[1.04]"
-          style={{background:'linear-gradient(135deg,#0071e3,#34aadc)',boxShadow:'0 8px 32px rgba(0,113,227,0.4)'}}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          className="fixed bottom-8 right-8 z-50 w-12 h-12 rounded-full flex items-center justify-center text-white transition-all hover:opacity-90"
+          style={{background:'var(--blue)',boxShadow:'0 4px 16px rgba(0,0,0,0.2)'}}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
           </svg>
         </button>

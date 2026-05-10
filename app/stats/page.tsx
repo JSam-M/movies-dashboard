@@ -138,13 +138,13 @@ export default function StatsPage() {
             <span className="font-body text-[0.75rem] font-semibold text-[var(--sub)]">Stats</span>
           </div>
           <div className="flex items-center gap-3">
-            <ThemeToggle />
             <button
               onClick={() => setAboutOpen(true)}
               className="font-body text-[0.75rem] font-medium text-[var(--sub)] hover:text-[var(--text)] transition-colors"
             >
               About
             </button>
+            <ThemeToggle />
             <button onClick={() => setSidebarOpen(!sidebarOpen)}
               className="flex items-center gap-2 px-3 py-1.5 rounded-xl font-body text-[0.7rem] font-medium transition-all"
               style={{
@@ -302,9 +302,9 @@ export default function StatsPage() {
       {/* FLOATING CHAT */}
       {!chatOpen && (
         <button onClick={() => setChatOpen(true)}
-          className="fixed bottom-8 right-8 z-50 w-14 h-14 rounded-full flex items-center justify-center text-white transition-all hover:scale-[1.04]"
-          style={{background:'linear-gradient(135deg,#0071e3,#34aadc)',boxShadow:'0 8px 32px rgba(0,113,227,0.4)'}}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          className="fixed bottom-8 right-8 z-50 w-12 h-12 rounded-full flex items-center justify-center text-white transition-all hover:opacity-90"
+          style={{background:'var(--blue)',boxShadow:'0 4px 16px rgba(0,0,0,0.2)'}}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
           </svg>
         </button>

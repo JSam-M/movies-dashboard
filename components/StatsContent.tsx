@@ -122,7 +122,7 @@ function CatalogueSection({ movies }: { movies: Movie[] }) {
               </div>
             </div>
             <p className="font-body text-[0.85rem] text-[var(--sub)] leading-relaxed mb-5">{selectedMovie.overview || 'No overview available.'}</p>
-            <div className="flex flex-wrap gap-2 pt-4 border-t border-black/7">
+            <div className="flex flex-wrap gap-2 pt-4" style={{borderTop:'1px solid var(--separator)'}}>
               <span className="font-body text-[0.7rem] text-[var(--sub)]">Director:</span>
               <span className="font-body text-[0.7rem] text-[var(--text)]">{selectedMovie.director.split(',')[0].trim()}</span>
               {selectedMovie.genre.split(',').slice(0,3).map(g => (
@@ -275,7 +275,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
 
   return (
     <div>
-      <div className="mb-10 pb-8 border-b border-black/7">
+      <div className="mb-10 pb-8" style={{borderBottom:'1px solid var(--separator)'}}>
         <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-2">Personal Archive</p>
         <h1 className="font-display text-[2.8rem] font-light text-[var(--text)] leading-tight">My Film Stats</h1>
       </div>
@@ -304,7 +304,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
               <XAxis dataKey="period" tick={{fontFamily:'inherit',fontSize:9,fill:'#86868b'}} axisLine={false} tickLine={false} angle={-45} textAnchor="end" interval={5} />
               <YAxis tick={{fontFamily:'inherit',fontSize:10,fill:'#86868b'}} axisLine={false} tickLine={false} />
               <Tooltip {...tt} />
-              <Line type="monotone" dataKey="films" stroke="#0071e3" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="films" name="Films" stroke="#0071e3" strokeWidth={2} dot={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -315,7 +315,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
               <XAxis dataKey="year" tick={{fontFamily:'inherit',fontSize:11,fill:'#86868b'}} axisLine={false} tickLine={false} />
               <YAxis tick={{fontFamily:'inherit',fontSize:10,fill:'#86868b'}} axisLine={false} tickLine={false} />
               <Tooltip {...tt} />
-              <Bar dataKey="films" radius={[4,4,0,0]} fill="#0071e3"
+              <Bar dataKey="films" name="Films" radius={[4,4,0,0]} fill="#0071e3"
                 label={{position:'top',fontSize:10,fill:'#86868b',fontFamily:'inherit'}} />
             </BarChart>
           </ResponsiveContainer>
@@ -379,7 +379,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
                   <XAxis dataKey="name" tick={{fontFamily:'inherit',fontSize:11,fill:'#86868b'}} axisLine={false} tickLine={false} />
                   <YAxis tick={{fontFamily:'inherit',fontSize:10,fill:'#86868b'}} axisLine={false} tickLine={false} />
                   <Tooltip {...tt} />
-                  <Bar dataKey="value" radius={[4,4,0,0]} fill="#0071e3"
+                  <Bar dataKey="value" name="Films" radius={[4,4,0,0]} fill="#0071e3"
                     label={{position:'top',fontSize:10,fill:'#86868b',fontFamily:'inherit'}} />
                 </BarChart>
               </ResponsiveContainer>
@@ -408,9 +408,9 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
           <ResponsiveContainer width="100%" height={340}>
             <BarChart data={[...dirData].reverse()} layout="vertical" margin={{left:0,right:36,top:0,bottom:0}}>
               <XAxis type="number" tick={{fontFamily:'inherit',fontSize:9,fill:'#86868b'}} axisLine={false} tickLine={false} />
-              <YAxis type="category" dataKey="name" width={170} tick={{fontFamily:'inherit',fontSize:11,fill:'#1d1d1f'}} axisLine={false} tickLine={false} />
+              <YAxis type="category" dataKey="name" width={170} tick={{fontFamily:'inherit',fontSize:11,fill:'#86868b'}} axisLine={false} tickLine={false} />
               <Tooltip {...tt} />
-              <Bar dataKey="value" radius={[0,4,4,0]} fill="#32ade6"
+              <Bar dataKey="value" name="Films" radius={[0,4,4,0]} fill="#32ade6"
                 label={{position:'right',fontSize:10,fill:'#86868b',fontFamily:'inherit'}} />
             </BarChart>
           </ResponsiveContainer>
@@ -423,7 +423,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
             <ResponsiveContainer width="100%" height={280}>
               <BarChart data={[...topRewatched].reverse()} layout="vertical" margin={{left:0,right:40,top:0,bottom:0}}>
                 <XAxis type="number" tick={{fontFamily:'inherit',fontSize:9,fill:'#86868b'}} axisLine={false} tickLine={false} />
-                <YAxis type="category" dataKey="name" width={180} tick={{fontFamily:'inherit',fontSize:11,fill:'#1d1d1f'}} axisLine={false} tickLine={false} />
+                <YAxis type="category" dataKey="name" width={180} tick={{fontFamily:'inherit',fontSize:11,fill:'#86868b'}} axisLine={false} tickLine={false} />
                 <Tooltip {...tt} formatter={(v:number)=>[`${v}×`,'Times watched']} />
                 <Bar dataKey="times" radius={[0,4,4,0]} fill="#ff9500"
                   label={{position:'right',fontSize:11,fill:'#86868b',fontFamily:'inherit',formatter:(v:number)=>`${v}×`}} />
@@ -435,7 +435,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
 
       <div id="section-catalogue"><CatalogueSection movies={movies} /></div>
 
-      <div className="pt-6 border-t border-black/7 text-center pb-8">
+      <div className="pt-6 text-center pb-8" style={{borderTop:'1px solid var(--separator)'}}>
         <p className="font-body text-[0.6rem] tracking-[0.12em] uppercase text-[var(--muted)]">
           {movies.length} films · {new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'})}
         </p>
