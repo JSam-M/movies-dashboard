@@ -324,14 +324,14 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-stretch">
           <div className="glass rounded-2xl p-4 sm:p-6 flex flex-col">
             <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-4">By Language</p>
-            <div className="flex-1 flex items-center gap-4">
-              <PieChart width={160} height={160}>
-                <Pie data={langData} cx={80} cy={80} innerRadius={50} outerRadius={75} dataKey="value" paddingAngle={2}>
+            <div className="flex-1 flex flex-col items-center justify-center gap-5">
+              <PieChart width={220} height={220}>
+                <Pie data={langData} cx={110} cy={110} innerRadius={68} outerRadius={100} dataKey="value" paddingAngle={2}>
                   {langData.map((_,i)=><Cell key={i} fill={QUAL[i%QUAL.length]} />)}
                 </Pie>
                 <Tooltip {...tt} />
               </PieChart>
-              <div className="flex-1 space-y-1.5">
+              <div className="w-full space-y-1.5">
                 {langData.slice(0,6).map((l,i)=>(
                   <div key={l.name} className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
