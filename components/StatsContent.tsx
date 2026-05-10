@@ -321,10 +321,10 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
       </Section>
 
       <Section eyebrow="Composition" title="Language & Genre" id="section-composition">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div className="glass rounded-2xl p-4 sm:p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-stretch">
+          <div className="glass rounded-2xl p-4 sm:p-6 flex flex-col">
             <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-4">By Language</p>
-            <div className="flex items-center gap-4">
+            <div className="flex-1 flex items-center gap-4">
               <PieChart width={160} height={160}>
                 <Pie data={langData} cx={80} cy={80} innerRadius={50} outerRadius={75} dataKey="value" paddingAngle={2}>
                   {langData.map((_,i)=><Cell key={i} fill={QUAL[i%QUAL.length]} />)}
@@ -344,9 +344,9 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
               </div>
             </div>
           </div>
-          <div className="glass rounded-2xl p-4 sm:p-6">
+          <div className="glass rounded-2xl p-4 sm:p-6 flex flex-col">
             <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-4">Top Genres</p>
-            <div className="space-y-2">
+            <div className="flex-1 flex flex-col justify-center space-y-2">
               {(() => {
                 const max = genreData[0]?.value || 1
                 return genreData.map((item, i) => (
