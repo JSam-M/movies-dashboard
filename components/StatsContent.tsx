@@ -13,7 +13,7 @@ interface Props {
   watchYears: number[]
 }
 
-const QUAL = ['#0071e3','#ff9500','#34c759','#ff3b30','#5856d6','#ff2d55','#af52de','#00c7be','#32ade6','#ffcc00']
+const QUAL = ['#0071e3','#ff9500','#34c759','#ff3b30','#5856d6','#ff2d55','#af52de','#32ade6','#32ade6','#ffcc00']
 
 const tt = {
   contentStyle: {
@@ -288,7 +288,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <KPICard value={String(totalDays)} unit="d" label="Days in Cinema"  sectionId="section-trends"     dot="#ff3b30" sub={`${totalHours}h total`} />
           <KPICard value={String(rewatched.length)}   label="Rewatched"       sectionId="section-rewatched"  dot="#af52de" sub="personal picks" />
-          <KPICard value={topDirStr}                  label="Top Director"    sectionId="section-directors"  dot="#00c7be" />
+          <KPICard value={topDirStr}                  label="Top Director"    sectionId="section-directors"  dot="#32ade6" />
           <KPICard value={peakYear}                   label="Peak Year"       sectionId="section-trends"     dot="var(--yellow)" />
         </div>
       </Section>
@@ -398,7 +398,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
               <XAxis type="number" tick={{fontFamily:'inherit',fontSize:9,fill:'#86868b'}} axisLine={false} tickLine={false} />
               <YAxis type="category" dataKey="name" width={170} tick={{fontFamily:'inherit',fontSize:11,fill:'#1d1d1f'}} axisLine={false} tickLine={false} />
               <Tooltip {...tt} />
-              <Bar dataKey="value" radius={[0,4,4,0]} fill="#00c7be"
+              <Bar dataKey="value" radius={[0,4,4,0]} fill="#32ade6"
                 label={{position:'right',fontSize:10,fill:'#86868b',fontFamily:'inherit'}} />
             </BarChart>
           </ResponsiveContainer>
