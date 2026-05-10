@@ -17,11 +17,11 @@ const QUAL = ['#0071e3','#ff9500','#34c759','#ff3b30','#5856d6','#ff2d55','#af52
 
 const tt = {
   contentStyle: {
-    background:'rgba(255,255,255,0.97)', border:'1px solid rgba(0,0,0,0.08)',
+    background:'var(--modal-bg)', border:'1px solid var(--fill-border)',
     borderRadius:'12px', boxShadow:'0 4px 16px rgba(0,0,0,0.08)',
-    fontFamily:'inherit', fontSize:'12px'
+    fontFamily:'inherit', fontSize:'12px', color:'var(--text)'
   },
-  cursor: { fill:'rgba(0,0,0,0.03)' }
+  cursor: { fill:'var(--fill)' }
 }
 
 function scrollTo(id: string) {
@@ -84,7 +84,7 @@ function CatalogueSection({ movies }: { movies: Movie[] }) {
     letterSpacing:'0.12em', textTransform:'uppercase',
     color: sortCol === col ? '#0071e3' : '#86868b',
     cursor:'pointer', userSelect:'none', whiteSpace:'nowrap',
-    borderBottom:'1px solid rgba(0,0,0,0.06)', fontFamily:'inherit',
+    borderBottom:'1px solid var(--separator)', fontFamily:'inherit',
   })
 
   return (
@@ -95,7 +95,7 @@ function CatalogueSection({ movies }: { movies: Movie[] }) {
           style={{background:'rgba(0,0,0,0.25)',backdropFilter:'blur(12px)'}}
           onClick={() => setSelectedMovie(null)}>
           <div className="relative w-full animate-fade-up rounded-3xl"
-            style={{maxWidth:'480px',background:'rgba(255,255,255,0.96)',padding:'28px',boxShadow:'0 32px 80px rgba(0,0,0,0.18)',border:'1px solid rgba(255,255,255,0.9)'}}
+            style={{maxWidth:'480px',background:'var(--modal-bg)',padding:'28px',boxShadow:'0 32px 80px rgba(0,0,0,0.18)',border:'1px solid var(--glass-border)'}}
             onClick={e => e.stopPropagation()}>
             <button onClick={() => setSelectedMovie(null)} className="absolute top-5 right-5 text-[var(--muted)] hover:text-[var(--text)] transition-colors">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -125,7 +125,7 @@ function CatalogueSection({ movies }: { movies: Movie[] }) {
               <span className="font-body text-[0.7rem] text-[var(--text)]">{selectedMovie.director.split(',')[0].trim()}</span>
               {selectedMovie.genre.split(',').slice(0,3).map(g => (
                 <span key={g} className="font-body text-[0.6rem] px-2 py-0.5 rounded-full"
-                  style={{background:'rgba(0,0,0,0.05)',color:'var(--sub)'}}>{g.trim()}</span>
+                  style={{background:'var(--fill)',color:'var(--sub)'}}>{g.trim()}</span>
               ))}
             </div>
           </div>
@@ -149,7 +149,7 @@ function CatalogueSection({ movies }: { movies: Movie[] }) {
           </thead>
           <tbody>
             {sorted.map((m, i) => (
-              <tr key={m.name} style={{borderBottom: i < sorted.length-1 ? '1px solid rgba(0,0,0,0.04)' : 'none'}}
+              <tr key={m.name} style={{borderBottom: i < sorted.length-1 ? '1px solid var(--separator)' : 'none'}}
                 className="hover:bg-black/[0.02] transition-colors cursor-pointer"
                 onClick={() => setSelectedMovie(m)}>
                 <td style={{padding:'9px 14px',fontWeight:500,color:'var(--text)',fontFamily:'inherit'}}>
@@ -298,7 +298,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
           <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-4">Films per Month</p>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={timelineData} margin={{left:0,right:8,top:4,bottom:40}}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.05)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--separator)" />
               <XAxis dataKey="period" tick={{fontFamily:'inherit',fontSize:9,fill:'#86868b'}} axisLine={false} tickLine={false} angle={-45} textAnchor="end" interval={5} />
               <YAxis tick={{fontFamily:'inherit',fontSize:10,fill:'#86868b'}} axisLine={false} tickLine={false} />
               <Tooltip {...tt} />
@@ -353,7 +353,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
                   <div key={item.name} className="flex items-center gap-3">
                     <span className="font-body text-[0.75rem] text-[var(--text)] text-right flex-shrink-0"
                       style={{width:'100px'}}>{item.name}</span>
-                    <div className="flex-1 h-[18px] rounded-[4px] overflow-hidden" style={{background:'rgba(0,0,0,0.04)'}}>
+                    <div className="flex-1 h-[18px] rounded-[4px] overflow-hidden" style={{background:'var(--fill)'}}>
                       <div className="h-full rounded-[4px] transition-all"
                         style={{width:`${(item.value/max)*100}%`, background:`hsl(${210+i*8},${75-i*3}%,${50+i*2}%)`}} />
                     </div>
@@ -434,7 +434,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
       <div id="section-catalogue"><CatalogueSection movies={movies} /></div>
 
       <div className="pt-6 border-t border-black/7 text-center pb-8">
-        <p className="font-body text-[0.6rem] tracking-[0.12em] uppercase text-[rgba(0,0,0,0.2)]">
+        <p className="font-body text-[0.6rem] tracking-[0.12em] uppercase text-[var(--muted)]">
           {movies.length} films · {new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'})}
         </p>
       </div>

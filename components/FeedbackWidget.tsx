@@ -42,8 +42,8 @@ export default function FeedbackWidget() {
         title="Send feedback"
         className="fixed bottom-8 left-8 z-50 w-9 h-9 rounded-full flex items-center justify-center transition-all hover:scale-[1.04]"
         style={{
-          background: 'rgba(255,255,255,0.7)',
-          border: '1px solid rgba(0,0,0,0.08)',
+          background: 'var(--modal-bg)',
+          border: '1px solid var(--fill-border)',
           backdropFilter: 'blur(12px)',
           boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
           color: 'var(--muted)',
@@ -66,10 +66,10 @@ export default function FeedbackWidget() {
             className="w-full animate-fade-up rounded-3xl"
             style={{
               maxWidth: '400px',
-              background: 'rgba(255,255,255,0.97)',
+              background: 'var(--modal-bg)',
               padding: '28px',
               boxShadow: '0 32px 80px rgba(0,0,0,0.18), 0 8px 24px rgba(0,0,0,0.08)',
-              border: '1px solid rgba(255,255,255,0.9)',
+              border: '1px solid var(--glass-border)',
             }}
             onClick={e => e.stopPropagation()}
           >
@@ -92,8 +92,8 @@ export default function FeedbackWidget() {
                   rows={4}
                   className="w-full rounded-xl font-body text-[0.85rem] text-[var(--text)] outline-none resize-none"
                   style={{
-                    background: 'rgba(0,0,0,0.04)',
-                    border: '1px solid rgba(0,0,0,0.08)',
+                    background: 'var(--fill)',
+                    border: '1px solid var(--fill-border)',
                     padding: '12px 14px',
                     fontFamily: 'inherit',
                   }}
@@ -105,7 +105,7 @@ export default function FeedbackWidget() {
                   <button
                     onClick={() => { setOpen(false); setStatus('idle') }}
                     className="flex-1 py-2.5 rounded-xl font-body text-[0.75rem] font-medium transition-all"
-                    style={{ background: 'rgba(0,0,0,0.05)', color: 'var(--sub)' }}
+                    style={{ background: 'var(--fill)', color: 'var(--sub)' }}
                   >
                     Cancel
                   </button>
@@ -114,7 +114,7 @@ export default function FeedbackWidget() {
                     disabled={!text.trim() || status === 'sending'}
                     className="flex-1 py-2.5 rounded-xl font-body text-[0.75rem] font-medium text-white transition-all"
                     style={{
-                      background: text.trim() && status !== 'sending' ? '#0071e3' : 'rgba(0,0,0,0.12)',
+                      background: text.trim() && status !== 'sending' ? '#0071e3' : 'var(--fill-border)',
                       color: text.trim() && status !== 'sending' ? 'white' : 'var(--muted)',
                     }}
                   >

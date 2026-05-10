@@ -8,6 +8,7 @@ import StatsContent from '@/components/StatsContent'
 import MultiSelect from '@/components/MultiSelect'
 import ScrollJump from '@/components/ScrollJump'
 import AboutModal from '@/components/AboutModal'
+import ThemeToggle from '@/components/ThemeToggle'
 
 export default function StatsPage() {
   const [allMovies,   setAllMovies]   = useState<Movie[]>([])
@@ -112,7 +113,7 @@ export default function StatsPage() {
   )
 
   const inputStyle = {
-    background:'rgba(0,0,0,0.04)', border:'1px solid rgba(0,0,0,0.08)',
+    background:'var(--fill)', border:'1px solid var(--fill-border)',
     borderRadius:'12px', padding:'8px 10px', fontFamily:'inherit',
     fontSize:'0.75rem', color:'var(--text)', width:'100%', outline:'none'
   }
@@ -126,17 +127,18 @@ export default function StatsPage() {
     <div className="min-h-screen mesh-bg flex flex-col">
       {/* NAV */}
       <nav className="sticky top-0 z-40 border-b border-black/7 flex-shrink-0"
-        style={{background:'rgba(245,245,247,0.85)',backdropFilter:'blur(20px)'}}>
+        style={{background:'var(--nav-bg)',backdropFilter:'blur(20px)'}}>
         <div className="max-w-[1200px] mx-auto px-4 sm:px-8 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2 sm:gap-3">
             <Link href="/" className="flex items-center gap-2 hover:opacity-70 transition-opacity">
               <div style={{width:'22px',height:'22px',borderRadius:'6px',background:'#0071e3',display:'inline-flex',alignItems:'center',justifyContent:'center',fontFamily:'Georgia,serif',fontSize:'12px',fontWeight:300,color:'white',letterSpacing:'-0.5px',flexShrink:0}}>fc</div>
               <span className="font-display text-[1rem] font-light text-[var(--text)] hidden sm:inline">Film Collection</span>
             </Link>
-            <span className="text-black/20 hidden sm:inline">/</span>
+            <span className="text-[var(--border)] hidden sm:inline">/</span>
             <span className="font-body text-[0.75rem] font-semibold text-[var(--sub)]">Stats</span>
           </div>
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             <button
               onClick={() => setAboutOpen(true)}
               className="font-body text-[0.75rem] font-medium text-[var(--sub)] hover:text-[var(--text)] transition-colors"
@@ -146,9 +148,9 @@ export default function StatsPage() {
             <button onClick={() => setSidebarOpen(!sidebarOpen)}
               className="flex items-center gap-2 px-3 py-1.5 rounded-xl font-body text-[0.7rem] font-medium transition-all"
               style={{
-                background: sidebarOpen ? 'rgba(0,113,227,0.08)' : 'rgba(0,0,0,0.04)',
+                background: sidebarOpen ? 'rgba(0,113,227,0.08)' : 'var(--fill)',
                 color: sidebarOpen ? 'var(--blue)' : 'var(--sub)',
-                border: `1px solid ${sidebarOpen ? 'rgba(0,113,227,0.2)' : 'rgba(0,0,0,0.08)'}`,
+                border: `1px solid ${sidebarOpen ? 'rgba(0,113,227,0.2)' : 'var(--fill-border)'}`,
               }}>
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
@@ -165,7 +167,7 @@ export default function StatsPage() {
       {/* FILTER PANEL */}
       {sidebarOpen && (
         <div className="sticky z-30 border-b border-black/7 animate-fade-in flex-shrink-0"
-          style={{top:'56px',background:'rgba(245,245,247,0.95)',backdropFilter:'blur(24px)'}}>
+          style={{top:'56px',background:'var(--nav-bg)',backdropFilter:'blur(24px)'}}>
           <div className="max-w-[1200px] mx-auto px-4 sm:px-8 py-4 space-y-3">
 
             {/* Row 1: Searchable filters */}
@@ -201,16 +203,16 @@ export default function StatsPage() {
                 {filmDropOpen && filmSuggestions.length > 0 && (
                   <div style={{
                     position:'absolute', left:0, right:0, top:'calc(100% + 4px)',
-                    background:'white', border:'1px solid rgba(0,0,0,0.1)',
+                    background:'var(--surface)', border:'1px solid var(--fill-border)',
                     borderRadius:'12px', boxShadow:'0 8px 24px rgba(0,0,0,0.1)',
                     zIndex:200, overflow:'hidden', maxHeight:'220px', overflowY:'auto',
                   }}>
                     {filmSuggestions.map(m => (
                       <div key={m.name}
                         onClick={() => { setSelectedFilms(prev => [...prev, m.name]); setFilmQuery(''); setFilmDropOpen(false) }}
-                        style={{padding:'9px 14px',fontSize:'0.85rem',cursor:'pointer',fontFamily:'inherit',color:'var(--text)',borderBottom:'1px solid rgba(0,0,0,0.04)'}}
-                        onMouseEnter={e => (e.currentTarget.style.background='rgba(0,0,0,0.03)')}
-                        onMouseLeave={e => (e.currentTarget.style.background='white')}
+                        style={{padding:'9px 14px',fontSize:'0.85rem',cursor:'pointer',fontFamily:'inherit',color:'var(--text)',borderBottom:'1px solid var(--separator)'}}
+                        onMouseEnter={e => (e.currentTarget.style.background='var(--fill)')}
+                        onMouseLeave={e => (e.currentTarget.style.background='var(--surface)')}
                       >
                         <span style={{fontWeight:500}}>{m.name}</span>
                         <span style={{color:'var(--muted)',marginLeft:'6px',fontSize:'0.7rem'}}>{m.releaseYear} · {m.language}</span>
@@ -243,9 +245,9 @@ export default function StatsPage() {
                     <button key={y} onClick={() => toggleYear(y)}
                       className="px-3 py-1 rounded-full font-body text-[0.7rem] font-medium transition-all"
                       style={{
-                        background: watchYears.includes(y) ? 'var(--blue)' : 'rgba(0,0,0,0.04)',
+                        background: watchYears.includes(y) ? 'var(--blue)' : 'var(--fill)',
                         color: watchYears.includes(y) ? 'white' : 'var(--sub)',
-                        border: `1px solid ${watchYears.includes(y) ? 'var(--blue)' : 'rgba(0,0,0,0.08)'}`,
+                        border: `1px solid ${watchYears.includes(y) ? 'var(--blue)' : 'var(--fill-border)'}`,
                       }}>
                       {y}
                     </button>
@@ -261,9 +263,9 @@ export default function StatsPage() {
                     <button key={opt} onClick={() => setRewatchFilter(opt)}
                       className="px-3 py-1 rounded-full font-body text-[0.7rem] font-medium transition-all"
                       style={{
-                        background: rewatchFilter===opt ? 'var(--blue)' : 'rgba(0,0,0,0.04)',
+                        background: rewatchFilter===opt ? 'var(--blue)' : 'var(--fill)',
                         color: rewatchFilter===opt ? 'white' : 'var(--sub)',
-                        border: `1px solid ${rewatchFilter===opt ? 'var(--blue)' : 'rgba(0,0,0,0.08)'}`,
+                        border: `1px solid ${rewatchFilter===opt ? 'var(--blue)' : 'var(--fill-border)'}`,
                       }}>
                       {opt}
                     </button>

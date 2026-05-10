@@ -4,18 +4,45 @@
 @tailwind utilities;
 
 :root {
-  --bg:      #f5f5f7;
-  --surface: #ffffff;
-  --border:  rgba(0,0,0,0.07);
-  --text:    #1d1d1f;
-  --sub:     #6e6e73;
-  --muted:   #86868b;
-  --blue:    #0071e3;
-  --gold:    var(--sub);
-  --gold-bg: rgba(0,0,0,0.05);
-  --yellow:  #ffcc00;
-  --glass:   rgba(255,255,255,0.72);
-  --glass-border: rgba(255,255,255,0.9);
+  --bg:          #f5f5f7;
+  --surface:     #ffffff;
+  --border:      rgba(0,0,0,0.07);
+  --text:        #1d1d1f;
+  --sub:         #6e6e73;
+  --muted:       #86868b;
+  --blue:        #0071e3;
+  --gold:        var(--sub);
+  --gold-bg:     rgba(0,0,0,0.05);
+  --yellow:      #ffcc00;
+  --glass:       rgba(255,255,255,0.72);
+  --glass-border:rgba(255,255,255,0.9);
+  /* utility tokens */
+  --nav-bg:      rgba(245,245,247,0.85);
+  --modal-bg:    rgba(255,255,255,0.97);
+  --fill:        rgba(0,0,0,0.04);
+  --fill-border: rgba(0,0,0,0.08);
+  --separator:   rgba(0,0,0,0.05);
+}
+
+html.dark {
+  --bg:          #000000;
+  --surface:     #1c1c1e;
+  --border:      rgba(255,255,255,0.1);
+  --text:        #f5f5f7;
+  --sub:         #8e8e93;
+  --muted:       #48484a;
+  --blue:        #0a84ff;
+  --gold:        var(--sub);
+  --gold-bg:     rgba(255,255,255,0.08);
+  --yellow:      #ffd60a;
+  --glass:       rgba(28,28,30,0.82);
+  --glass-border:rgba(255,255,255,0.1);
+  --nav-bg:      rgba(0,0,0,0.85);
+  --modal-bg:    rgba(28,28,30,0.97);
+  --fill:        rgba(255,255,255,0.07);
+  --fill-border: rgba(255,255,255,0.12);
+  --separator:   rgba(255,255,255,0.06);
+  color-scheme:  dark;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -26,12 +53,14 @@ html, body {
   font-family: 'DM Sans', -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   color-scheme: light;
+  transition: background 0.25s ease, color 0.25s ease;
 }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 2px; }
+html.dark ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); }
 
 /* Glass */
 .glass {
@@ -40,6 +69,9 @@ html, body {
   -webkit-backdrop-filter: blur(20px) saturate(1.8);
   border: 1px solid var(--glass-border);
   box-shadow: 0 2px 12px rgba(0,0,0,.06), 0 1px 3px rgba(0,0,0,.04), inset 0 1px 0 rgba(255,255,255,1);
+}
+html.dark .glass {
+  box-shadow: 0 2px 12px rgba(0,0,0,.3), 0 1px 3px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,0.06);
 }
 
 /* Typography */
@@ -54,6 +86,12 @@ html, body {
     radial-gradient(ellipse 70vw 50vh at 10% 0%,   rgba(0,125,250,.06)  0%, transparent 60%),
     radial-gradient(ellipse 60vw 40vh at 90% 100%, rgba(100,210,255,.07) 0%, transparent 60%),
     radial-gradient(ellipse 40vw 40vh at 55% 50%,  rgba(255,149,0,.04)  0%, transparent 60%);
+}
+html.dark .mesh-bg::before {
+  background:
+    radial-gradient(ellipse 70vw 50vh at 10% 0%,   rgba(10,132,255,.07) 0%, transparent 60%),
+    radial-gradient(ellipse 60vw 40vh at 90% 100%, rgba(10,132,255,.05) 0%, transparent 60%),
+    radial-gradient(ellipse 40vw 40vh at 55% 50%,  rgba(255,149,0,.03)  0%, transparent 60%);
 }
 
 /*
@@ -91,7 +129,7 @@ html, body {
   border-radius: 18px 18px 4px 18px;
 }
 .chat-bubble-ai {
-  background: white;
+  background: var(--surface);
   color: var(--text);
   border: 1px solid var(--border);
   border-radius: 18px 18px 18px 4px;
@@ -100,9 +138,22 @@ html, body {
 /* Placeholder visibility fix */
 input::placeholder,
 textarea::placeholder {
-  color: #6e6e73;
+  color: var(--sub);
   opacity: 1;
 }
+
+/* Recharts dark-mode axis text override */
+html.dark .recharts-cartesian-axis-tick text,
+html.dark .recharts-label { fill: var(--sub) !important; }
+
+/* Tailwind border-black/* utility overrides for dark mode */
+html.dark .border-black\/7 { border-color: rgba(255,255,255,0.1) !important; }
+
+/* Table row hover in dark */
+html.dark .hover\:bg-black\/\[0\.02\]:hover { background: rgba(255,255,255,0.03) !important; }
+
+/* Card hover override dark */
+html.dark .hover\:bg-white\/90:hover { background: rgba(255,255,255,0.07) !important; }
 
 /* Line clamp utility */
 .line-clamp-2 {
@@ -118,7 +169,7 @@ textarea::placeholder {
   overflow: hidden;
 }
 .multiselect-input::placeholder {
-  color: #6e6e73 !important;
+  color: var(--sub) !important;
   opacity: 1 !important;
 }
 .hero-search::placeholder {

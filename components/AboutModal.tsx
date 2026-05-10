@@ -48,14 +48,14 @@ function FeedbackTrigger() {
             onKeyDown={e => e.key === 'Enter' && submit()}
             placeholder="Your thoughts…"
             className="flex-1 rounded-xl font-body text-[0.75rem] outline-none"
-            style={{ background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.08)', padding: '7px 10px' }}
+            style={{ background: 'var(--fill)', border: '1px solid var(--fill-border)', padding: '7px 10px' }}
           />
           <button
             onClick={submit}
             disabled={!text.trim()}
             className="px-3 rounded-xl font-body text-[0.75rem] font-medium transition-all"
             style={{
-              background: text.trim() ? '#0071e3' : 'rgba(0,0,0,0.1)',
+              background: text.trim() ? '#0071e3' : 'var(--fill-border)',
               color: text.trim() ? 'white' : 'var(--muted)',
             }}
           >
@@ -85,10 +85,10 @@ export default function AboutModal({ onClose }: Props) {
         className="relative w-full animate-fade-up rounded-3xl"
         style={{
           maxWidth: '520px',
-          background: 'rgba(255,255,255,0.97)',
+          background: 'var(--modal-bg)',
           padding: '48px 44px',
           boxShadow: '0 32px 80px rgba(0,0,0,0.18), 0 8px 24px rgba(0,0,0,0.06)',
-          border: '1px solid rgba(255,255,255,0.95)',
+          border: '1px solid var(--glass-border)',
         }}
         onClick={e => e.stopPropagation()}
       >
@@ -139,7 +139,7 @@ export default function AboutModal({ onClose }: Props) {
 
         <div
           className="mt-8 pt-6 flex items-center justify-between"
-          style={{ borderTop: '1px solid rgba(0,0,0,0.06)' }}
+          style={{ borderTop: '1px solid var(--separator)' }}
         >
           <p className="font-body text-[0.7rem] text-[var(--muted)]">800+ films · 2019 – present</p>
           <FeedbackTrigger />

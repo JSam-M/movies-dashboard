@@ -88,8 +88,8 @@ export default function TrendsTab({ movies, allEntries, watchYear }: Props) {
   ]
 
   const tooltip = {
-    contentStyle: { background:'rgba(255,255,255,0.95)', border:'1px solid rgba(0,0,0,0.08)', borderRadius:'12px', boxShadow:'0 4px 16px rgba(0,0,0,0.1)', fontFamily:'DM Sans,sans-serif', fontSize:'12px' },
-    cursor: { fill:'rgba(0,0,0,0.03)' },
+    contentStyle: { background:'var(--modal-bg)', border:'1px solid var(--fill-border)', borderRadius:'12px', boxShadow:'0 4px 16px rgba(0,0,0,0.1)', fontFamily:'DM Sans,sans-serif', fontSize:'12px', color:'var(--text)' },
+    cursor: { fill:'var(--fill)' },
   }
 
   return (
@@ -104,9 +104,9 @@ export default function TrendsTab({ movies, allEntries, watchYear }: Props) {
           <button key={v} onClick={()=>setView(v)}
             className="px-4 py-1.5 rounded-full font-body text-[0.75rem] font-medium transition-all"
             style={{
-              background: view===v ? 'var(--blue)' : 'white',
+              background: view===v ? 'var(--blue)' : 'var(--surface)',
               color: view===v ? 'white' : 'var(--sub)',
-              border: `1px solid ${view===v ? 'var(--blue)' : 'rgba(0,0,0,0.1)'}`,
+              border: `1px solid ${view===v ? 'var(--blue)' : 'var(--fill-border)'}`,
             }}>
             {v==='year'?'By Year':v==='month'?'By Month':'All Time'}
           </button>

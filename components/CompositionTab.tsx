@@ -25,7 +25,7 @@ export default function CompositionTab({ movies }: { movies: Movie[] }) {
   ).sort((a,b)=>b[1]-a[1]).slice(0,12).map(([name,value]) => ({name:name.length>22?name.slice(0,19)+'…':name,value}))
 
   const tooltip = {
-    contentStyle: { background:'rgba(255,255,255,0.95)', border:'1px solid rgba(0,0,0,0.08)', borderRadius:'12px', boxShadow:'0 4px 16px rgba(0,0,0,0.1)', fontFamily:'DM Sans,sans-serif', fontSize:'12px' },
+    contentStyle: { background:'var(--modal-bg)', border:'1px solid var(--fill-border)', borderRadius:'12px', boxShadow:'0 4px 16px rgba(0,0,0,0.1)', fontFamily:'DM Sans,sans-serif', fontSize:'12px', color:'var(--text)' },
   }
 
   return (
@@ -59,7 +59,7 @@ export default function CompositionTab({ movies }: { movies: Movie[] }) {
                 <div key={item.name} className="flex items-center gap-3">
                   <span className="font-body text-[0.75rem] text-[var(--text)] text-right flex-shrink-0"
                     style={{width:'90px'}}>{item.name}</span>
-                  <div className="flex-1 h-[28px] rounded-[4px] overflow-hidden" style={{background:'rgba(0,0,0,0.04)'}}>
+                  <div className="flex-1 h-[28px] rounded-[4px] overflow-hidden" style={{background:'var(--fill)'}}>
                     <div className="h-full rounded-[4px] transition-all"
                       style={{
                         width:`${(item.value/max)*100}%`,

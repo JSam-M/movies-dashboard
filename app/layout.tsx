@@ -19,8 +19,19 @@ export const viewport = {
 }
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" style={{touchAction: 'manipulation'}}>
-      <body>{children}</body>
+    <html lang="en" style={{touchAction: 'manipulation'}} suppressHydrationWarning>
+      <body>
+        <script dangerouslySetInnerHTML={{ __html: `
+          (function(){
+            try {
+              var s = localStorage.getItem('theme');
+              var p = window.matchMedia('(prefers-color-scheme: dark)').matches;
+              if (s === 'dark' || (!s && p)) document.documentElement.classList.add('dark');
+            } catch(e){}
+          })();
+        `}} />
+        {children}
+      </body>
     </html>
   )
 }

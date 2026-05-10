@@ -30,7 +30,7 @@ export default function ScrollJump() {
       className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 transition-all hover:scale-[1.04]"
       style={{
         width: '36px', height: '36px', borderRadius: '9999px',
-        background: 'rgba(255,255,255,0.85)',
+        background: 'var(--modal-bg)',
         backdropFilter: 'blur(12px)',
         border: '1px solid rgba(0,0,0,0.08)',
         boxShadow: '0 4px 16px rgba(0,0,0,0.1)',

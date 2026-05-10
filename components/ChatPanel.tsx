@@ -88,9 +88,9 @@ export default function ChatPanel({ movies, onClose, initialMessage }: Props) {
         style={{
           height: '85vh',
           maxHeight: '680px',
-          background: 'rgba(255,255,255,0.92)',
+          background: 'var(--modal-bg)',
           backdropFilter: 'blur(40px) saturate(1.8)',
-          border: '1px solid rgba(255,255,255,0.9)',
+          border: '1px solid var(--glass-border)',
           boxShadow: '0 32px 80px rgba(0,0,0,0.18), 0 8px 24px rgba(0,0,0,0.08)',
           animation: 'fadeUp 0.35s cubic-bezier(0.16,1,0.3,1) forwards',
         }}
@@ -151,7 +151,7 @@ export default function ChatPanel({ movies, onClose, initialMessage }: Props) {
                 {QUICK_PROMPTS.map(q => (
                   <button key={q} onClick={() => send(q)}
                     className="px-3 py-1.5 rounded-full font-body text-[0.75rem] text-[var(--sub)] transition-all hover:bg-white hover:shadow-sm"
-                    style={{ background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.08)' }}>
+                    style={{ background: 'var(--fill)', border: '1px solid var(--fill-border)' }}>
                     {q}
                   </button>
                 ))}
@@ -171,14 +171,14 @@ export default function ChatPanel({ movies, onClose, initialMessage }: Props) {
               onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send()}
               placeholder="Name a film you love…"
               className="flex-1 px-4 py-2.5 rounded-2xl font-body text-[0.85rem] text-[var(--text)] outline-none transition-all"
-              style={{ background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.08)' }}
+              style={{ background: 'var(--fill)', border: '1px solid var(--fill-border)' }}
             />
             <button
               onClick={() => send()}
               disabled={!input.trim() || loading}
               className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all"
               style={{
-                background: input.trim() && !loading ? 'linear-gradient(135deg,#0071e3,#34aadc)' : 'rgba(0,0,0,0.08)',
+                background: input.trim() && !loading ? 'linear-gradient(135deg,#0071e3,#34aadc)' : 'var(--fill-border)',
                 boxShadow: input.trim() && !loading ? '0 2px 8px rgba(0,113,227,0.3)' : 'none',
               }}
             >

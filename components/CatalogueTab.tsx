@@ -31,7 +31,7 @@ export default function CatalogueTab({ movies }: { movies: Movie[] }) {
       <div className="glass rounded-2xl overflow-hidden">
         <table className="w-full text-[0.85rem]">
           <thead>
-            <tr style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
+            <tr style={{ borderBottom: '1px solid var(--separator)' }}>
               {cols.map(c => (
                 <th key={c.key}
                   onClick={() => { if(sortBy===c.key) setAsc(!asc); else { setSortBy(c.key); setAsc(false) } }}
@@ -48,7 +48,7 @@ export default function CatalogueTab({ movies }: { movies: Movie[] }) {
           </thead>
           <tbody>
             {sorted.map((m, i) => (
-              <tr key={m.name} style={{ borderBottom: i < sorted.length-1 ? '1px solid rgba(0,0,0,0.04)' : 'none' }}
+              <tr key={m.name} style={{ borderBottom: i < sorted.length-1 ? '1px solid var(--separator)' : 'none' }}
                 className="hover:bg-black/[0.02] transition-colors">
                 <td className="px-5 py-3 font-body text-[0.85rem] text-[var(--text)] font-medium">
                   {m.name} {m.timesWatched >= 2 ? <span style={{color:'var(--gold)'}} className="ml-1">★</span> : ''}

@@ -36,8 +36,8 @@ export default function MultiSelect({ options, selected, onChange, placeholder =
 
   const inputStyle: React.CSSProperties = {
     width: '100%', padding: '7px 10px',
-    borderRadius: '12px', border: '1px solid rgba(0,0,0,0.12)',
-    background: 'white', fontFamily: 'inherit',
+    borderRadius: '12px', border: '1px solid var(--fill-border)',
+    background: 'var(--surface)', fontFamily: 'inherit',
     fontSize: '0.75rem', color: 'var(--text)', outline: 'none',
   }
 
@@ -86,7 +86,7 @@ export default function MultiSelect({ options, selected, onChange, placeholder =
       {open && (filtered.length > 0 || query.length === 0) && options.filter(o => o !== 'All').slice(0,20).length > 0 && (
         <div style={{
           position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0,
-          background: 'white', border: '1px solid rgba(0,0,0,0.1)',
+          background: 'var(--surface)', border: '1px solid var(--fill-border)',
           borderRadius: '12px', boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
           zIndex: 100, overflow: 'hidden', maxHeight: '220px', overflowY: 'auto',
         }}>
@@ -97,12 +97,12 @@ export default function MultiSelect({ options, selected, onChange, placeholder =
                 style={{
                   padding: '9px 12px', fontSize: '0.85rem', cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  background: isSelected ? 'rgba(0,113,227,0.04)' : 'white',
+                  background: isSelected ? 'rgba(0,113,227,0.04)' : 'var(--surface)',
                   color: isSelected ? '#0071e3' : 'var(--text)',
                   fontFamily: 'inherit',
                 }}
-                onMouseEnter={e => (e.currentTarget.style.background = isSelected ? 'rgba(0,113,227,0.08)' : 'rgba(0,0,0,0.03)')}
-                onMouseLeave={e => (e.currentTarget.style.background = isSelected ? 'rgba(0,113,227,0.04)' : 'white')}
+                onMouseEnter={e => (e.currentTarget.style.background = isSelected ? 'rgba(0,113,227,0.08)' : 'var(--fill)')}
+                onMouseLeave={e => (e.currentTarget.style.background = isSelected ? 'rgba(0,113,227,0.04)' : 'var(--surface)')}
               >
                 {opt}
                 {isSelected && (

@@ -33,9 +33,9 @@ export default function FilterBar(p: Props) {
         <button onClick={() => setOpen(!open)}
           className="flex items-center gap-2 px-4 py-2 rounded-full font-body text-[0.75rem] font-medium transition-all"
           style={{
-            background: open ? 'var(--blue)' : 'white',
+            background: open ? 'var(--blue)' : 'var(--surface)',
             color: open ? 'white' : 'var(--sub)',
-            border: `1px solid ${open ? 'var(--blue)' : 'rgba(0,0,0,0.1)'}`,
+            border: `1px solid ${open ? 'var(--blue)' : 'var(--fill-border)'}`,
             boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
           }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -71,7 +71,7 @@ export default function FilterBar(p: Props) {
               <input value={p.search} onChange={e => p.setSearch(e.target.value)}
                 placeholder="Film title…"
                 className="w-full px-3 py-2 rounded-xl font-body text-[0.85rem] text-[var(--text)] outline-none"
-                style={{ background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.08)' }} />
+                style={{ background: 'var(--fill)', border: '1px solid var(--fill-border)' }} />
             </div>
 
             {/* Language */}
@@ -79,7 +79,7 @@ export default function FilterBar(p: Props) {
               <label className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] block mb-2">Language</label>
               <select value={p.language} onChange={e => p.setLanguage(e.target.value)}
                 className="w-full px-3 py-2 rounded-xl font-body text-[0.85rem] text-[var(--text)] outline-none"
-                style={{ background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.08)' }}>
+                style={{ background: 'var(--fill)', border: '1px solid var(--fill-border)' }}>
                 {p.languages.map(l => <option key={l}>{l}</option>)}
               </select>
             </div>
@@ -89,7 +89,7 @@ export default function FilterBar(p: Props) {
               <label className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] block mb-2">Genre</label>
               <select value={p.genre} onChange={e => p.setGenre(e.target.value)}
                 className="w-full px-3 py-2 rounded-xl font-body text-[0.85rem] text-[var(--text)] outline-none"
-                style={{ background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.08)' }}>
+                style={{ background: 'var(--fill)', border: '1px solid var(--fill-border)' }}>
                 {p.genres.map(g => <option key={g}>{g}</option>)}
               </select>
             </div>
@@ -114,7 +114,7 @@ export default function FilterBar(p: Props) {
                   value={p.watchYear?.[0] ?? p.minWY}
                   onChange={e => p.setWatchYear([parseInt(e.target.value), p.watchYear?.[1] ?? p.maxWY])}
                   className="flex-1 px-2 py-2 rounded-xl font-body text-[0.85rem] text-[var(--text)] outline-none"
-                  style={{ background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.08)' }}>
+                  style={{ background: 'var(--fill)', border: '1px solid var(--fill-border)' }}>
                   {Array.from({ length: p.maxWY - p.minWY + 1 }, (_, i) => p.minWY + i).map(y => (
                     <option key={y}>{y}</option>
                   ))}
@@ -123,7 +123,7 @@ export default function FilterBar(p: Props) {
                   value={p.watchYear?.[1] ?? p.maxWY}
                   onChange={e => p.setWatchYear([p.watchYear?.[0] ?? p.minWY, parseInt(e.target.value)])}
                   className="flex-1 px-2 py-2 rounded-xl font-body text-[0.85rem] text-[var(--text)] outline-none"
-                  style={{ background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.08)' }}>
+                  style={{ background: 'var(--fill)', border: '1px solid var(--fill-border)' }}>
                   {Array.from({ length: p.maxWY - p.minWY + 1 }, (_, i) => p.minWY + i).map(y => (
                     <option key={y}>{y}</option>
                   ))}
@@ -139,9 +139,9 @@ export default function FilterBar(p: Props) {
                   <button key={opt} onClick={() => p.setRewatchFilter(opt)}
                     className="flex-1 py-1.5 rounded-full font-body text-[0.7rem] font-medium transition-all"
                     style={{
-                      background: p.rewatchFilter === opt ? 'var(--blue)' : 'rgba(0,0,0,0.04)',
+                      background: p.rewatchFilter === opt ? 'var(--blue)' : 'var(--fill)',
                       color: p.rewatchFilter === opt ? 'white' : 'var(--sub)',
-                      border: `1px solid ${p.rewatchFilter === opt ? 'var(--blue)' : 'rgba(0,0,0,0.08)'}`,
+                      border: `1px solid ${p.rewatchFilter === opt ? 'var(--blue)' : 'var(--fill-border)'}`,
                     }}>
                     {opt}
                   </button>

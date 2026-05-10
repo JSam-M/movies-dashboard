@@ -6,6 +6,7 @@ import ChatPanel from '@/components/ChatPanel'
 import MultiSelect from '@/components/MultiSelect'
 import AboutModal from '@/components/AboutModal'
 import ScrollJump from '@/components/ScrollJump'
+import ThemeToggle from '@/components/ThemeToggle'
 import Link from 'next/link'
 
 type SortKey = 'rating' | 'rewatched' | 'date'
@@ -38,7 +39,7 @@ function MovieModal({ movie, onClose }: { movie: Movie; onClose: () => void }) {
       style={{background:'rgba(0,0,0,0.25)',backdropFilter:'blur(12px)'}}
       onClick={onClose}>
       <div className="relative w-full animate-fade-up rounded-3xl"
-        style={{maxWidth:'480px',background:'rgba(255,255,255,0.96)',padding:'28px',boxShadow:'0 32px 80px rgba(0,0,0,0.18)',border:'1px solid rgba(255,255,255,0.9)'}}
+        style={{maxWidth:'480px',background:'var(--modal-bg)',padding:'28px',boxShadow:'0 32px 80px rgba(0,0,0,0.18)',border:'1px solid var(--glass-border)'}}
         onClick={e => e.stopPropagation()}>
         <button onClick={onClose} className="absolute top-5 right-5 text-[var(--muted)] hover:text-[var(--text)] transition-colors">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -68,7 +69,7 @@ function MovieModal({ movie, onClose }: { movie: Movie; onClose: () => void }) {
           <span className="font-body text-[0.75rem] text-[var(--text)]">{movie.director.split(',')[0].trim()}</span>
           {movie.genre.split(',').slice(0,3).map(g => (
             <span key={g} className="font-body text-[0.6rem] px-2 py-0.5 rounded-full"
-              style={{background:'rgba(0,0,0,0.05)',color:'var(--sub)'}}>{g.trim()}</span>
+              style={{background:'var(--fill)',color:'var(--sub)'}}>{g.trim()}</span>
           ))}
         </div>
       </div>
@@ -138,8 +139,8 @@ export default function DiscoverPage() {
 
   const btnStyle = (active: boolean): React.CSSProperties => ({
     padding:'8px 14px', borderRadius:'9999px',
-    border:`1px solid ${active?'#0071e3':'rgba(0,0,0,0.08)'}`,
-    background: active ? '#0071e3' : 'white',
+    border:`1px solid ${active?'var(--blue)':'var(--fill-border)'}`,
+    background: active ? 'var(--blue)' : 'var(--surface)',
     color: active ? 'white' : 'var(--sub)',
     fontSize:'0.75rem', fontFamily:'inherit', cursor:'pointer',
     fontWeight: active ? 500 : 400, transition:'all 0.15s',
@@ -156,13 +157,14 @@ export default function DiscoverPage() {
   return (
     <div className="min-h-screen mesh-bg">
       {/* NAV */}
-      <nav className="sticky top-0 z-40 border-b border-black/7" style={{background:'rgba(245,245,247,0.85)',backdropFilter:'blur(20px)'}}>
+      <nav className="sticky top-0 z-40 border-b border-black/7" style={{background:'var(--nav-bg)',backdropFilter:'blur(20px)'}}>
         <div className="max-w-[1200px] mx-auto px-4 sm:px-8 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div style={{width:'22px',height:'22px',borderRadius:'6px',background:'#0071e3',display:'inline-flex',alignItems:'center',justifyContent:'center',fontFamily:'Georgia,serif',fontSize:'12px',fontWeight:300,color:'white',letterSpacing:'-0.5px',flexShrink:0}}>fc</div>
             <span className="font-display text-[1rem] font-light text-[var(--text)] hidden sm:inline">Film Collection</span>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
             <button
               onClick={() => setAboutOpen(true)}
               className="font-body text-[0.75rem] font-medium text-[var(--sub)] hover:text-[var(--text)] transition-colors"
@@ -218,7 +220,7 @@ export default function DiscoverPage() {
           <div style={{display:'flex',flexWrap:'wrap',gap:'8px',justifyContent:'center',marginTop:'14px'}}>
             {['Something feel-good','I loved Parasite — suggest similar','Best Tamil films','Under 2 hours','Hidden gems','Watch with family'].map(q=>(
               <button key={q} onClick={()=>{setInitialMsg(q);setChatOpen(true)}}
-                style={{padding:'6px 14px',borderRadius:'9999px',border:'1px solid rgba(0,0,0,0.06)',background:'rgba(255,255,255,0.6)',backdropFilter:'blur(12px)',fontSize:'0.75rem',fontFamily:'inherit',color:'var(--sub)',cursor:'pointer'}}>
+                style={{padding:'6px 14px',borderRadius:'9999px',border:'1px solid var(--fill-border)',background:'var(--glass)',backdropFilter:'blur(12px)',fontSize:'0.75rem',fontFamily:'inherit',color:'var(--sub)',cursor:'pointer'}}>
                 {q}
               </button>
             ))}
@@ -274,7 +276,7 @@ export default function DiscoverPage() {
                 </svg>
                 <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search films or directors…"
                   className="w-full pl-9 pr-4 py-2.5 rounded-xl font-body text-[0.85rem] outline-none multiselect-input"
-                  style={{background:'white',border:'1px solid rgba(0,0,0,0.08)',color:'var(--text)'}}/>
+                  style={{background:'var(--surface)',border:'1px solid var(--fill-border)',color:'var(--text)'}}/>
               </div>
               <div className="flex gap-1.5 sm:gap-2 flex-wrap">
                 {(['rating','rewatched','date'] as SortKey[]).map(k=>(
@@ -311,8 +313,8 @@ export default function DiscoverPage() {
                 </div>
                 <div className="flex gap-2 flex-shrink-0 items-center">
                   {m.timesWatched>=2&&<span className="font-body text-[0.6rem] px-2 py-1 rounded-full font-semibold" style={{background:'var(--gold-bg)',color:'var(--gold)'}}>{m.timesWatched}×</span>}
-                  <span className="hidden sm:inline font-body text-[0.6rem] px-2 py-1 rounded-full" style={{background:'rgba(0,0,0,0.04)',color:'var(--sub)'}}>{m.language}</span>
-                  <span className="hidden sm:inline font-body text-[0.6rem] px-2 py-1 rounded-full" style={{background:'rgba(0,0,0,0.04)',color:'var(--sub)'}}>{m.genre.split(',')[0].trim()}</span>
+                  <span className="hidden sm:inline font-body text-[0.6rem] px-2 py-1 rounded-full" style={{background:'var(--fill)',color:'var(--sub)'}}>{m.language}</span>
+                  <span className="hidden sm:inline font-body text-[0.6rem] px-2 py-1 rounded-full" style={{background:'var(--fill)',color:'var(--sub)'}}>{m.genre.split(',')[0].trim()}</span>
                 </div>
               </button>
             ))}
@@ -330,7 +332,7 @@ export default function DiscoverPage() {
         </div>
 
         <div className="mt-12 sm:mt-16 pt-6 border-t border-black/7 text-center">
-          <p className="font-body text-[0.6rem] tracking-[0.12em] uppercase text-[rgba(0,0,0,0.2)]">
+          <p className="font-body text-[0.6rem] tracking-[0.12em] uppercase text-[var(--muted)]">
             {stats.total as number} films · {new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'})}
           </p>
         </div>
