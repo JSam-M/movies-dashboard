@@ -346,15 +346,23 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
           </div>
           <div className="glass rounded-2xl p-4 sm:p-6">
             <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-4">Top Genres</p>
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={[...genreData].reverse()} layout="vertical" margin={{left:0,right:36,top:0,bottom:0}}>
-                <XAxis type="number" tick={{fontFamily:'inherit',fontSize:9,fill:'#86868b'}} axisLine={false} tickLine={false} />
-                <YAxis type="category" dataKey="name" width={110} tick={{fontFamily:'inherit',fontSize:11,fill:'#1d1d1f'}} axisLine={false} tickLine={false} />
-                <Tooltip {...tt} />
-                <Bar dataKey="value" radius={[0,4,4,0]} fill="#0071e3"
-                  label={{position:'right',fontSize:10,fill:'#86868b',fontFamily:'inherit'}} />
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="space-y-2">
+              {(() => {
+                const max = genreData[0]?.value || 1
+                return genreData.map((item, i) => (
+                  <div key={item.name} className="flex items-center gap-3">
+                    <span className="font-body text-[0.75rem] text-[var(--text)] text-right flex-shrink-0"
+                      style={{width:'100px'}}>{item.name}</span>
+                    <div className="flex-1 h-[22px] rounded-[4px] overflow-hidden" style={{background:'rgba(0,0,0,0.04)'}}>
+                      <div className="h-full rounded-[4px] transition-all"
+                        style={{width:`${(item.value/max)*100}%`, background:`hsl(${210+i*8},${75-i*3}%,${50+i*2}%)`}} />
+                    </div>
+                    <span className="font-body text-[0.7rem] text-[var(--muted)] flex-shrink-0"
+                      style={{width:'24px'}}>{item.value}</span>
+                  </div>
+                ))
+              })()}
+            </div>
           </div>
         </div>
       </Section>
