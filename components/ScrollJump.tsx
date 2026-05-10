@@ -10,7 +10,8 @@ export default function ScrollJump() {
 
   useEffect(() => {
     const onScroll = () => {
-      const y = window.scrollY
+      const y         = window.scrollY
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight
       setVisible(y > 200)
 
       if (y !== lastY.current) {
@@ -18,7 +19,13 @@ export default function ScrollJump() {
         lastY.current = y
 
         if (debounce.current) clearTimeout(debounce.current)
-        debounce.current = setTimeout(() => setGoingDown(down), 150)
+        debounce.current = setTimeout(() => {
+          const atBottom = maxScroll > 0 && y >= maxScroll - 50
+          const atTop    = y <= 0
+          if (atBottom)   setGoingDown(false)
+          else if (atTop) setGoingDown(true)
+          else            setGoingDown(down)
+        }, 150)
       }
     }
     window.addEventListener('scroll', onScroll, { passive: true })
