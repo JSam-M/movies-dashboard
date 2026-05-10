@@ -126,8 +126,7 @@ export default function StatsPage() {
   return (
     <div className="min-h-screen mesh-bg flex flex-col">
       {/* NAV */}
-      <nav className="sticky top-0 z-40 border-b border-black/7 flex-shrink-0"
-        style={{background:'var(--nav-bg)',backdropFilter:'blur(20px)'}}>
+      <nav className="liquid-nav sticky top-0 z-40 border-b border-black/7 flex-shrink-0">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-8 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2 sm:gap-3">
             <Link href="/" className="flex items-center gap-2 hover:opacity-70 transition-opacity">
@@ -166,8 +165,8 @@ export default function StatsPage() {
 
       {/* FILTER PANEL */}
       {sidebarOpen && (
-        <div className="sticky z-30 border-b border-black/7 animate-fade-in flex-shrink-0"
-          style={{top:'56px',background:'var(--nav-bg)',backdropFilter:'blur(24px)'}}>
+        <div className="liquid-nav sticky z-30 border-b border-black/7 animate-fade-in flex-shrink-0"
+          style={{top:'56px'}}>
           <div className="max-w-[1200px] mx-auto px-4 sm:px-8 py-4 space-y-3">
 
             {/* Row 1: Searchable filters */}
