@@ -406,7 +406,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
       <Section eyebrow="Filmmakers" title="Top Directors" id="section-directors">
         <div className="glass rounded-2xl p-4 sm:p-6">
           <ResponsiveContainer width="100%" height={340}>
-            <BarChart data={[...dirData].reverse()} layout="vertical" margin={{left:0,right:36,top:0,bottom:0}}>
+            <BarChart data={[...dirData]} layout="vertical" margin={{left:0,right:36,top:0,bottom:0}}>
               <XAxis type="number" tick={{fontFamily:'inherit',fontSize:9,fill:'#86868b'}} axisLine={false} tickLine={false} />
               <YAxis type="category" dataKey="name" width={170} tick={{fontFamily:'inherit',fontSize:11,fill:'#86868b'}} axisLine={false} tickLine={false} />
               <Tooltip {...tt} />
@@ -421,7 +421,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
         <Section eyebrow="Personal Picks" title="Most Rewatched" id="section-rewatched">
           <div className="glass rounded-2xl p-4 sm:p-6">
             <ResponsiveContainer width="100%" height={280}>
-              <BarChart data={[...topRewatched].reverse()} layout="vertical" margin={{left:0,right:40,top:0,bottom:0}}>
+              <BarChart data={[...topRewatched]} layout="vertical" margin={{left:0,right:40,top:0,bottom:0}}>
                 <XAxis type="number" tick={{fontFamily:'inherit',fontSize:9,fill:'#86868b'}} axisLine={false} tickLine={false} />
                 <YAxis type="category" dataKey="name" width={180} tick={{fontFamily:'inherit',fontSize:11,fill:'#86868b'}} axisLine={false} tickLine={false} />
                 <Tooltip {...tt} formatter={(v:number)=>[`${v}×`,'Times watched']} />
