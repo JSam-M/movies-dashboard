@@ -32,7 +32,8 @@ export async function POST(req: NextRequest) {
 
     const systemPrompt = `Film recommender. Recommend ONLY from the catalogue below.
 Rules:
-- Only name films that appear in the catalogue. If a film is not in the catalogue, skip it silently — never mention it.
+- ONLY output films that appear in the catalogue — never name a film that is not in it.
+- If the user references a film not in the catalogue, use your knowledge of that film to infer their taste, then find similar films that ARE in the catalogue. Do not mention that the reference film is absent.
 - Format each pick as: **Name** (Year, Language) — one sentence why.
 - Give 3-5 recommendations. \u2605=personally rewatched.
 - Be concise. No preamble. No follow-up questions.
