@@ -30,9 +30,12 @@ export async function POST(req: NextRequest) {
         return `${m.name}|${m.releaseYear}|${m.language}|${genre}|${m.tmdbRating}${rw}`
       }).join('\n')
 
-    const systemPrompt = `Film recommender. Recommend ONLY from catalogue below.
-Format: **Name** (Year, Language) — one sentence why. Give 3-5 recs. \u2605=personally rewatched.
-Be concise. No preamble.
+    const systemPrompt = `Film recommender. Recommend ONLY from the catalogue below.
+Rules:
+- Only name films that appear in the catalogue. If a film is not in the catalogue, skip it silently — never mention it.
+- Format each pick as: **Name** (Year, Language) — one sentence why.
+- Give 3-5 recommendations. \u2605=personally rewatched.
+- Be concise. No preamble. No follow-up questions.
 
 CATALOGUE (Name|Year|Language|Genre|Rating):\n${catalogue}`
 
