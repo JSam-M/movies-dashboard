@@ -251,7 +251,7 @@ body {
   <div class="sidebar-label">Director</div>
   <div class="multi-select" id="dirSelect"></div>
 
-  <div class="sidebar-label">Minimum TMDb Rating</div>
+  <div class="sidebar-label">Minimum IMDb Rating</div>
   <div class="range-group">
     <div class="range-values"><span id="ratingVal">0.0</span><span>10.0</span></div>
     <input type="range" id="ratingSlider" min="0" max="10" step="0.5" value="0" oninput="document.getElementById('ratingVal').textContent=parseFloat(this.value).toFixed(1); applyFilters()">
@@ -341,7 +341,7 @@ body {
         <div>
           <p class="section-label">BY RATING</p>
           <p class="section-title">Highest Rated</p>
-          <p class="section-subtitle">Top 10 films by TMDb community rating.</p>
+          <p class="section-subtitle">Top 10 films by IMDb community rating.</p>
           <div id="chartTopRated"></div>
         </div>
         <div>
@@ -765,7 +765,7 @@ function renderTopPicks() {
       hovertemplate:'<b>%{y}</b><br>Rating: %{x:.1f}<extra></extra>',
     }], {
       ...PLOTLY_LAYOUT_BASE, height:440,
-      xaxis:{title:'TMDb Rating', range:[0, Math.max(...vals)*1.12], showgrid:false, zeroline:false},
+      xaxis:{title:'IMDb Rating', range:[0, Math.max(...vals)*1.12], showgrid:false, zeroline:false},
       yaxis:{title:'', showgrid:false, zeroline:false, tickfont:{size:11}},
     }, PLOTLY_CFG);
   }
