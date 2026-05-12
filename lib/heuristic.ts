@@ -130,7 +130,7 @@ export function heuristicRecommend(query: string, movies: HeuristicMovie[]): str
 
   const lines = results.map(m => {
     const rw = m.timesWatched >= 2 ? ' ★' : ''
-    return `**${m.name}** (${m.releaseYear}, ${m.language}) — ${m.genre.split(',')[0].trim()}, ${m.tmdbRating.toFixed(1)} on TMDb${rw}.`
+    return `**${m.name}** (${m.releaseYear}, ${m.language}) — ${m.genre.split(',')[0].trim()}, ${m.tmdbRating.toFixed(1)} on IMDb${rw}.`
   })
   return lines.join('\n\n') + '\n\nWant something different? Tell me more about your mood or a film you love.'
 }

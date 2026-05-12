@@ -60,7 +60,7 @@ function MovieModal({ movie, onClose }: { movie: Movie; onClose: () => void }) {
           </div>
           <div className="text-right flex-shrink-0 ml-4">
             <div className="font-display text-[2.2rem] font-light" style={{color:'var(--blue)'}}>{movie.tmdbRating.toFixed(1)}</div>
-            <div className="font-body text-[0.6rem] text-[var(--muted)]">TMDb</div>
+            <div className="font-body text-[0.6rem] text-[var(--muted)]">IMDb</div>
           </div>
         </div>
         <p className="font-body text-[0.85rem] text-[var(--sub)] leading-relaxed mb-5">{movie.overview || 'No overview available.'}</p>

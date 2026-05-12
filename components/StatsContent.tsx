@@ -118,7 +118,7 @@ function CatalogueSection({ movies }: { movies: Movie[] }) {
               </div>
               <div className="text-right flex-shrink-0 ml-4">
                 <div className="font-display text-[2.2rem] font-light" style={{color:'var(--blue)'}}>{selectedMovie.tmdbRating.toFixed(1)}</div>
-                <div className="font-body text-[0.6rem] text-[var(--muted)]">TMDb</div>
+                <div className="font-body text-[0.6rem] text-[var(--muted)]">IMDb</div>
               </div>
             </div>
             <p className="font-body text-[0.85rem] text-[var(--sub)] leading-relaxed mb-5">{selectedMovie.overview || 'No overview available.'}</p>
@@ -284,7 +284,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
           <KPICard value={String(movies.length)}      label="Unique Films"    sectionId="section-catalogue"  dot="#0071e3" />
           <KPICard value={String(entries.length)}     label="Total Watches"   sectionId="section-trends"     dot="#5856d6" sub="incl. rewatches" />
-          <KPICard value={avgRating}                  label="Avg TMDb Rating" sectionId="section-quality"    dot="#ff9500" sub="out of 10" />
+          <KPICard value={avgRating}                  label="Avg IMDb Rating" sectionId="section-quality"    dot="#ff9500" sub="out of 10" />
           <KPICard value={pctHighRated+'%'}           label="Rated ≥7.5"      sectionId="section-quality"    dot="#34c759" sub={`${highRated} films`} />
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -372,7 +372,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
       <Section eyebrow="Quality" title="Rating Distribution" id="section-quality">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-stretch">
           <div className="glass rounded-2xl p-4 sm:p-6 flex flex-col">
-            <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-4">Films by TMDb Score</p>
+            <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)] mb-4">Films by IMDb Score</p>
             <div className="flex-1" style={{minHeight:'200px'}}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={ratingData} margin={{left:0,right:8,top:4,bottom:0}}>
