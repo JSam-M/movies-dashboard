@@ -20,14 +20,15 @@ export async function POST(req: NextRequest) {
 
     const allMovies = getUniqueMovies()
 
-    // Minimal catalogue — name|genre|rating only, no overviews, top 400 by rating
+    // Minimal catalogue — name|year|language|genre|director|rating, top 400 by rating
     const catalogue = allMovies
       .sort((a, b) => b.tmdbRating - a.tmdbRating)
       .slice(0, 400)
       .map(m => {
         const genre = m.genre.split(',')[0].trim()
-        const rw = m.timesWatched >= 2 ? '\u2605' : ''
-        return `${m.name}|${m.releaseYear}|${m.language}|${genre}|${m.tmdbRating}${rw}`
+        const director = m.director.split(',')[0].trim()
+        const rw = m.timesWatched >= 2 ? '★' : ''
+        return `${m.name}|${m.releaseYear}|${m.language}|${genre}|${director}|${m.tmdbRating}${rw}`
       }).join('\n')
 
     const systemPrompt = `Film recommender. Recommend ONLY from the catalogue below.
@@ -35,10 +36,10 @@ Rules:
 - ONLY output films that appear in the catalogue — never name a film that is not in it.
 - If the user references a film not in the catalogue, use your knowledge of that film to infer their taste, then find similar films that ARE in the catalogue. Do not mention that the reference film is absent.
 - Format each pick as: **Name** (Year, Language) — one sentence why.
-- Give 3-5 recommendations. \u2605=personally rewatched.
+- Give 3-5 recommendations. ★=personally rewatched.
 - Be concise. No preamble. No follow-up questions.
 
-CATALOGUE (Name|Year|Language|Genre|Rating):\n${catalogue}`
+CATALOGUE (Name|Year|Language|Genre|Director|Rating):\n${catalogue}`
 
     // Send only last 4 messages to keep token count low
     const trimmedMessages = messages.slice(-4)

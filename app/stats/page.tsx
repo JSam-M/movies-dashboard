@@ -226,7 +226,7 @@ export default function StatsPage() {
 
               <MultiSelect label="Language" options={languages} selected={selLanguages} onChange={setSelLanguages} placeholder="Search languages…" />
               <MultiSelect label="Genre" options={genres} selected={selGenres} onChange={setSelGenres} placeholder="Search genres…" />
-              <MultiSelect label="Director" options={directors.slice(0,300)} selected={selDirectors} onChange={setSelDirectors} placeholder="Search directors…" />
+              <MultiSelect label="Director" options={directors} selected={selDirectors} onChange={setSelDirectors} placeholder="Search directors…" />
             </div>
 
             {/* Row 2: Range, year chips, rewatch, count */}
