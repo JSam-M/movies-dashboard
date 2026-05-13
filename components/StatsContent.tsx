@@ -31,6 +31,28 @@ function scrollTo(id: string) {
   if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
+function RewatchedTooltip({ active, payload }: { active?: boolean; payload?: Array<{ payload: { fullName: string; times: number; allTime: number; isYearFiltered: boolean } }> }) {
+  if (!active || !payload?.length) return null
+  const d = payload[0].payload
+  return (
+    <div style={{
+      background: 'var(--modal-bg)', border: '1px solid var(--fill-border)',
+      borderRadius: '12px', boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+      fontFamily: 'inherit', fontSize: '12px', padding: '8px 12px',
+    }}>
+      <p style={{ color: 'var(--text)', fontWeight: 500, marginBottom: 4 }}>{d.fullName}</p>
+      {d.isYearFiltered ? (
+        <>
+          <p style={{ color: 'var(--text)' }}>{d.times}× this year</p>
+          <p style={{ color: 'var(--muted)' }}>{d.allTime}× all time</p>
+        </>
+      ) : (
+        <p style={{ color: 'var(--text)' }}>{d.times}× watched</p>
+      )}
+    </div>
+  )
+}
+
 function Section({ eyebrow, title, children, id }: { eyebrow: string; title: string; children: React.ReactNode; id?: string }) {
   return (
     <div className="mb-14" id={id}>
@@ -270,8 +292,24 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
   })
   const ratingData = Object.entries(ratingBuckets).map(([name,value])=>({name,value}))
 
-  const topRewatched = rewatched.sort((a,b)=>b.timesWatched-a.timesWatched).slice(0,8)
-    .map(m=>({name:m.name.length>26?m.name.slice(0,23)+'\u2026':m.name, times:m.timesWatched, rating:m.tmdbRating}))
+  const yearWatchCount: Record<string, number> = {}
+  if (watchYears.length > 0) {
+    entries.forEach(e => { yearWatchCount[e.name] = (yearWatchCount[e.name] || 0) + 1 })
+  }
+
+  const topRewatched = [...(watchYears.length > 0 ? rewatched.filter(m => (yearWatchCount[m.name] || 0) > 0) : rewatched)]
+    .sort((a, b) => watchYears.length > 0
+      ? (yearWatchCount[b.name] || 0) - (yearWatchCount[a.name] || 0)
+      : b.timesWatched - a.timesWatched)
+    .slice(0, 8)
+    .map(m => ({
+      name: m.name.length > 26 ? m.name.slice(0, 23) + '\u2026' : m.name,
+      fullName: m.name,
+      times: watchYears.length > 0 ? (yearWatchCount[m.name] || 0) : m.timesWatched,
+      allTime: m.timesWatched,
+      isYearFiltered: watchYears.length > 0,
+      rating: m.tmdbRating,
+    }))
 
   return (
     <div>
@@ -424,7 +462,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
               <BarChart data={[...topRewatched]} layout="vertical" margin={{left:0,right:40,top:0,bottom:0}}>
                 <XAxis type="number" tick={{fontFamily:'inherit',fontSize:9,fill:'#86868b'}} axisLine={false} tickLine={false} />
                 <YAxis type="category" dataKey="name" width={180} tick={{fontFamily:'inherit',fontSize:11,fill:'#86868b'}} axisLine={false} tickLine={false} />
-                <Tooltip {...tt} formatter={(v:number)=>[`${v}×`,'Times watched']} />
+                <Tooltip content={<RewatchedTooltip />} cursor={{ fill: 'var(--fill)' }} />
                 <Bar dataKey="times" radius={[0,4,4,0]} fill="#ff9500"
                   label={{position:'right',fontSize:11,fill:'#86868b',fontFamily:'inherit',formatter:(v:number)=>`${v}×`}} />
               </BarChart>
