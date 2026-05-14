@@ -99,7 +99,7 @@ CATALOGUE (Name|Year|Language|Genre|Director|Rating):\n${catalogue}`
     const response = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 500,
-      system: systemPrompt,
+      system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
       messages: trimmedMessages,
     })
 
