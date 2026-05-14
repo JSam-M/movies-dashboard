@@ -35,14 +35,7 @@ export async function POST(req: NextRequest) {
 
     const allMovies = getUniqueMovies()
 
-    // Rewrite bare language queries to avoid Claude confusing them with film titles
-    const LANGUAGES = new Set(['tamil','hindi','malayalam','telugu','kannada','english','korean','japanese','french','spanish','portuguese','german','italian','chinese','bengali'])
     const rewrittenMessages = [...messages]
-    const queryNorm = query.trim().toLowerCase()
-    if (LANGUAGES.has(queryNorm)) {
-      const idx = rewrittenMessages.map((m: {role:string}) => m.role).lastIndexOf('user')
-      if (idx !== -1) rewrittenMessages[idx] = { ...rewrittenMessages[idx], content: `Recommend highly rated ${query.trim()} language films from the catalogue.` }
-    }
 
     // Fuzzy-match a short bare query against film titles (first word vs first word, edit dist ≤ 1)
     let referencedFilm: Movie | null = null
@@ -94,6 +87,7 @@ Rules:
 - ONLY output films that appear in the catalogue — never name a film not in it.
 - If the user references a film not in the catalogue, use your knowledge of that film to infer their taste, then find thematically similar films that ARE in the catalogue. Do not mention the reference film is absent.
 - Start with exactly one short intro line referencing what the user liked or asked for (e.g. "Since you enjoyed X, you might like these:" or "For a feel-good night, here are some picks:"). Then list recommendations.
+- If the user mentions a language (e.g. "English", "Tamil"), treat it as a filter and ONLY recommend films where the Language field matches that language exactly. Do not recommend films in other languages.
 - Format EXACTLY as: **Name** (Year, Language) — one sentence explaining why it suits the user's taste (themes, tone, style). Do NOT just list the genre or rating.
 - Give 3-5 recommendations. ★=personally rewatched.
 - End with exactly one short closing line inviting refinement (e.g. "Want me to narrow it down by mood or language?").
@@ -104,7 +98,7 @@ CATALOGUE (Name|Year|Language|Genre|Director|Rating):\n${catalogue}`
 
     const response = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 300,
+      max_tokens: 500,
       system: systemPrompt,
       messages: trimmedMessages,
     })
