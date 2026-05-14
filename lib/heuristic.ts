@@ -45,7 +45,7 @@ const LANG_MAP: Record<string, string[]> = {
   'English':   ['english','hollywood'],
 }
 
-const SIMILAR_RE = /(?:similar to|like|loved?|enjoyed?|watched?|fan of)\s+["']?([A-Z][^,.!?]+?)["']?(?:\s*[,—–.!?]|$)/gi
+const SIMILAR_RE = /(?:similar to|like|liked|loved?|enjoyed?|watched?|fan of)\s+["']?([A-Z][^,.!?]+?)["']?(?:\s*[,—–.!?]|$)/gi
 
 function parseRuntime(r: string): number { const n = parseInt(r); return isNaN(n) ? 0 : n }
 
