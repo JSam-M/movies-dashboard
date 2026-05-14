@@ -92,7 +92,7 @@ Rules:
 - Start with exactly one short intro line referencing what the user liked or asked for (e.g. "Since you enjoyed X, you might like these:" or "For a feel-good night, here are some picks:"). Then list recommendations.
 - Format EXACTLY as: **Name** (Year, Language) — one sentence explaining why it suits the user's taste (themes, tone, style). Do NOT just list the genre or rating.
 - Give 3-5 recommendations. ★=personally rewatched.
-- No closing question.
+- End with exactly one short closing line inviting refinement (e.g. "Want me to narrow it down by mood or language?").
 
 CATALOGUE (Name|Year|Language|Genre|Director|Rating):\n${catalogue}`
 
