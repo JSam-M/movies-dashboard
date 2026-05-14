@@ -35,6 +35,15 @@ export async function POST(req: NextRequest) {
 
     const allMovies = getUniqueMovies()
 
+    // Rewrite bare language queries to avoid Claude confusing them with film titles
+    const LANGUAGES = new Set(['tamil','hindi','malayalam','telugu','kannada','english','korean','japanese','french','spanish','portuguese','german','italian','chinese','bengali'])
+    const rewrittenMessages = [...messages]
+    const queryNorm = query.trim().toLowerCase()
+    if (LANGUAGES.has(queryNorm)) {
+      const idx = rewrittenMessages.map((m: {role:string}) => m.role).lastIndexOf('user')
+      if (idx !== -1) rewrittenMessages[idx] = { ...rewrittenMessages[idx], content: `Recommend highly rated ${query.trim()} language films from the catalogue.` }
+    }
+
     // Fuzzy-match a short bare query against film titles (first word vs first word, edit dist ≤ 1)
     let referencedFilm: Movie | null = null
     const words = query.trim().split(/\s+/)
@@ -91,7 +100,7 @@ Rules:
 
 CATALOGUE (Name|Year|Language|Genre|Director|Rating):\n${catalogue}`
 
-    const trimmedMessages = messages.slice(-4)
+    const trimmedMessages = rewrittenMessages.slice(-4)
 
     const response = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
