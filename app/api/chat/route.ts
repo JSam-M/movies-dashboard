@@ -5,6 +5,8 @@ import { needsApiCall } from '@/lib/heuristic'
 
 const client = new Anthropic()
 
+type Movie = ReturnType<typeof getUniqueMovies>[0]
+
 const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '')
 
 function editDist(a: string, b: string): number {
@@ -16,6 +18,13 @@ function editDist(a: string, b: string): number {
     for (let j = 1; j <= n; j++)
       dp[i][j] = a[i-1] === b[j-1] ? dp[i-1][j-1] : 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1])
   return dp[m][n]
+}
+
+function formatEntry(m: Movie): string {
+  const genre = m.genre.split(',')[0].trim()
+  const director = m.director.split(',')[0].trim()
+  const rw = m.timesWatched >= 2 ? '★' : ''
+  return `${m.name}|${m.releaseYear}|${m.language}|${genre}|${director}|${m.tmdbRating}${rw}`
 }
 
 export async function POST(req: NextRequest) {
@@ -32,6 +41,7 @@ export async function POST(req: NextRequest) {
     const allMovies = getUniqueMovies()
 
     // Fuzzy-match a short bare query against film titles (first word vs first word, edit dist ≤ 1)
+    let referencedFilm: Movie | null = null
     const words = query.trim().split(/\s+/)
     if (words.length <= 4) {
       const qWord = normalize(words[0])
@@ -50,29 +60,30 @@ export async function POST(req: NextRequest) {
         }
 
         if (matches.length === 1) {
-          // Rewrite the message silently and proceed
-          const match = matches[0]
+          referencedFilm = matches[0]
           const idx = messages.map((m: {role:string}) => m.role).lastIndexOf('user')
           if (idx !== -1) {
             messages[idx] = {
               ...messages[idx],
-              content: `I liked "${match.name}" — recommend similar films from the catalogue.`,
+              content: `I liked "${referencedFilm.name}" — recommend similar films from the catalogue.`,
             }
           }
         }
       }
     }
 
-    // Minimal catalogue — name|year|language|genre|director|rating, top 400 by rating
-    const catalogue = allMovies
-      .sort((a, b) => b.tmdbRating - a.tmdbRating)
-      .slice(0, 400)
-      .map(m => {
-        const genre = m.genre.split(',')[0].trim()
-        const director = m.director.split(',')[0].trim()
-        const rw = m.timesWatched >= 2 ? '★' : ''
-        return `${m.name}|${m.releaseYear}|${m.language}|${genre}|${director}|${m.tmdbRating}${rw}`
-      }).join('\n')
+    // Also detect the film name from a pill-rewritten message like: I liked "Film Name" —
+    if (!referencedFilm) {
+      const pillMatch = query.match(/I liked "([^"]+)"/)
+      if (pillMatch) {
+        referencedFilm = allMovies.find(m => m.name === pillMatch[1]) ?? null
+      }
+    }
+
+    // Top 400 by rating; always append the referenced film if it falls outside top 400
+    const top400 = [...allMovies].sort((a, b) => b.tmdbRating - a.tmdbRating).slice(0, 400)
+    const needsExtra = referencedFilm && !top400.find(m => m.name === referencedFilm!.name)
+    const catalogue = [...top400, ...(needsExtra ? [referencedFilm!] : [])].map(formatEntry).join('\n')
 
     const systemPrompt = `Film recommender. Recommend ONLY from the catalogue below.
 Rules:
