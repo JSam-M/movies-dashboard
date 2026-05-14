@@ -20,16 +20,6 @@ export async function POST(req: NextRequest) {
 
     const allMovies = getUniqueMovies()
 
-    // Fuzzy-match a bare title query (e.g. "vazha" → "Vaazha")
-    const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '')
-    const normQuery = normalize(query)
-    const titleMatch = query.trim().split(/\s+/).length <= 4
-      ? allMovies.find(m => {
-          const t = normalize(m.name)
-          return t === normQuery || t.startsWith(normQuery) || normQuery.startsWith(t)
-        })
-      : null
-
     // Minimal catalogue — name|year|language|genre|director|rating, top 400 by rating
     const catalogue = allMovies
       .sort((a, b) => b.tmdbRating - a.tmdbRating)
@@ -51,13 +41,8 @@ Rules:
 
 CATALOGUE (Name|Year|Language|Genre|Director|Rating):\n${catalogue}`
 
-    // Send only last 4 messages to keep token count low; rewrite bare title queries
-    const trimmedMessages = messages.slice(-4).map((m: {role:string; content:string}, i: number, arr: {role:string; content:string}[]) => {
-      if (titleMatch && m.role === 'user' && i === arr.length - 1) {
-        return { ...m, content: `I liked "${titleMatch.name}" — recommend similar films from the catalogue.` }
-      }
-      return m
-    })
+    // Send only last 4 messages to keep token count low
+    const trimmedMessages = messages.slice(-4)
 
     const response = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',

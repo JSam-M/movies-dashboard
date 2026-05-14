@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import type { Movie } from '@/lib/movies'
 import { heuristicRecommend } from '@/lib/heuristic'
 
@@ -16,45 +16,13 @@ const QUICK_PROMPTS = [
   'Great films to watch with family',
 ]
 
-const REC_RE = /^\*\*(.+?)\*\*\s*\((\d{4}),\s*([^)]+)\)\s*[—–]\s*(.+)/
-
 function formatMessage(text: string) {
-  const lines = text.split('\n')
-  const nodes: React.ReactNode[] = []
-  let recCount = 0
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim()
-    if (!line) continue
-    const m = line.match(REC_RE)
-    if (m) {
-      const [, title, year, lang, desc] = m
-      const hasRW = desc.includes('★')
-      const cleanDesc = desc.replace('★', '').trim()
-      recCount++
-      nodes.push(
-        <div key={i} style={{
-          padding: '10px 12px',
-          borderRadius: '12px',
-          background: 'var(--fill)',
-          marginBottom: '6px',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '2px' }}>
-            <span style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text)' }}>
-              {title}{hasRW && <span style={{ color: 'var(--gold)', marginLeft: '4px', fontSize: '0.75rem' }}>★</span>}
-            </span>
-            <span style={{ fontSize: '0.65rem', color: 'var(--muted)', flexShrink: 0, marginLeft: '8px' }}>
-              {year} · {lang.trim()}
-            </span>
-          </div>
-          <p style={{ fontSize: '0.78rem', color: 'var(--sub)', lineHeight: 1.45, margin: 0 }}>{cleanDesc}</p>
-        </div>
-      )
-    } else {
-      nodes.push(<p key={i} style={{ fontSize: '0.85rem', color: 'var(--sub)', marginBottom: '6px' }}>{line}</p>)
-    }
-  }
-  return <>{nodes}</>
+  const parts = text.split(/(\*\*[^*]+\*\*)/g)
+  return parts.map((p, i) => {
+    if (p.startsWith('**') && p.endsWith('**'))
+      return <strong key={i} className="font-semibold text-[var(--text)]">{p.slice(2, -2)}</strong>
+    return <span key={i}>{p}</span>
+  })
 }
 
 export default function ChatPanel({ movies, onClose, initialMessage }: Props) {
