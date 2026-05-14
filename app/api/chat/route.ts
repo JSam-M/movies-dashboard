@@ -89,9 +89,10 @@ export async function POST(req: NextRequest) {
 Rules:
 - ONLY output films that appear in the catalogue — never name a film not in it.
 - If the user references a film not in the catalogue, use your knowledge of that film to infer their taste, then find thematically similar films that ARE in the catalogue. Do not mention the reference film is absent.
+- Start with exactly one short intro line referencing what the user liked or asked for (e.g. "Since you enjoyed X, you might like these:" or "For a feel-good night, here are some picks:"). Then list recommendations.
 - Format EXACTLY as: **Name** (Year, Language) — one sentence explaining why it suits the user's taste (themes, tone, style). Do NOT just list the genre or rating.
 - Give 3-5 recommendations. ★=personally rewatched.
-- No preamble. No closing question. Recommendations only.
+- No closing question.
 
 CATALOGUE (Name|Year|Language|Genre|Director|Rating):\n${catalogue}`
 
