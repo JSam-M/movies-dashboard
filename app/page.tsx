@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { track } from '@/lib/track'
 import type { Movie } from '@/lib/movies'
 import ChatPanel from '@/components/ChatPanel'
 import MultiSelect from '@/components/MultiSelect'
@@ -95,6 +96,8 @@ export default function DiscoverPage() {
   const [selectedMovie,setSelectedMovie]= useState<Movie|null>(null)
   const [dailyPicks,   setDailyPicks]   = useState<Movie[]>([])
   const aiInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => { track('page_view', '/') }, [])
 
   useEffect(() => {
     fetch('/api/movies')

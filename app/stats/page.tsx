@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { track } from '@/lib/track'
 import type { Movie } from '@/lib/movies'
 import ChatPanel from '@/components/ChatPanel'
 import Link from 'next/link'
@@ -31,6 +32,8 @@ export default function StatsPage() {
   const [minRating,     setMinRating]     = useState(0)
   const [watchYears,    setWatchYears]    = useState<number[]>([])
   const [rewatchFilter, setRewatchFilter] = useState('All')
+
+  useEffect(() => { track('page_view', '/stats') }, [])
 
   useEffect(() => {
     fetch('/api/movies')

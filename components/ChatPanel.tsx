@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import type { Movie } from '@/lib/movies'
 import { heuristicRecommend } from '@/lib/heuristic'
+import { track } from '@/lib/track'
 
 interface DisambigOption { name: string; year: number; language: string }
 interface Message { role: 'user' | 'assistant'; content: string; disambiguate?: DisambigOption[] }
@@ -40,6 +41,7 @@ export default function ChatPanel({ movies, onClose, initialMessage }: Props) {
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages, loading])
   useEffect(() => { inputRef.current?.focus() }, [])
+  useEffect(() => { track('chat_open') }, [])
   useEffect(() => {
     if (initialMessage && messages.length === 1) send(initialMessage)
   }, [initialMessage]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -49,6 +51,7 @@ export default function ChatPanel({ movies, onClose, initialMessage }: Props) {
     if (!content || loading) return
     setInput('')
 
+    track('chat_query')
     const userMsg: Message = { role: 'user', content }
     const newMessages = [...messages, userMsg]
     setMessages(newMessages)
