@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { getUniqueMovies } from '@/lib/movies'
-import { needsApiCall } from '@/lib/heuristic'
 
 const client = new Anthropic()
 
@@ -33,10 +32,6 @@ export async function POST(req: NextRequest) {
 
     const lastUserMsg = [...messages].reverse().find((m: {role:string}) => m.role === 'user')
     const query = lastUserMsg?.content || ''
-
-    if (!needsApiCall(query)) {
-      return NextResponse.json({ useHeuristic: true })
-    }
 
     const allMovies = getUniqueMovies()
 
