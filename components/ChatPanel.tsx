@@ -4,7 +4,8 @@ import { useState, useRef, useEffect } from 'react'
 import type { Movie } from '@/lib/movies'
 import { heuristicRecommend } from '@/lib/heuristic'
 
-interface Message { role: 'user' | 'assistant'; content: string }
+interface DisambigOption { name: string; year: number; language: string }
+interface Message { role: 'user' | 'assistant'; content: string; disambiguate?: DisambigOption[] }
 interface Props { movies: Movie[]; onClose: () => void; initialMessage?: string }
 
 const QUICK_PROMPTS = [
@@ -62,11 +63,11 @@ export default function ChatPanel({ movies, onClose, initialMessage }: Props) {
         body: JSON.stringify({ messages: newMessages.map(m => ({ role: m.role, content: m.content })) }),
       }).then(r => r.json())
 
-      if (needsApi.useHeuristic) {
-        // Use local heuristic result
+      if (needsApi.disambiguate) {
+        setMessages(prev => [...prev, { role: 'assistant', content: 'Did you mean:', disambiguate: needsApi.disambiguate }])
+      } else if (needsApi.useHeuristic) {
         setMessages(prev => [...prev, { role: 'assistant', content: hResult }])
       } else if (needsApi.error === 'overloaded') {
-        // API busy — fall back to heuristic gracefully
         setMessages(prev => [...prev, { role: 'assistant', content: hResult }])
       } else {
         setMessages(prev => [...prev, { role: 'assistant', content: needsApi.message || 'Sorry, something went wrong.' }])
@@ -122,11 +123,28 @@ export default function ChatPanel({ movies, onClose, initialMessage }: Props) {
                 <div className="w-6 h-6 rounded-full mr-2 mt-1 flex-shrink-0"
                   style={{ background: 'linear-gradient(135deg,#0071e3,#34aadc)' }} />
               )}
-              <div
-                className={`max-w-[85%] px-4 py-3 font-body text-[0.85rem] leading-relaxed ${m.role === 'user' ? 'chat-bubble-user' : 'chat-bubble-ai'}`}
-                style={{ whiteSpace: 'pre-wrap' }}
-              >
-                {formatMessage(m.content)}
+              <div className={`max-w-[85%] font-body text-[0.85rem] leading-relaxed ${m.role === 'user' ? 'chat-bubble-user px-4 py-3' : m.disambiguate ? '' : 'chat-bubble-ai px-4 py-3'}`}
+                style={{ whiteSpace: 'pre-wrap' }}>
+                {m.disambiguate ? (
+                  <div className="chat-bubble-ai px-4 py-3">
+                    <p className="text-[var(--sub)] mb-3">{m.content}</p>
+                    <div className="flex flex-col gap-2">
+                      {m.disambiguate.map(opt => (
+                        <button key={opt.name} onClick={() => send(`I liked "${opt.name}" — recommend similar films from the catalogue.`)}
+                          className="text-left px-3 py-2.5 rounded-2xl transition-all hover:opacity-80"
+                          style={{ background: 'var(--fill)', border: '1px solid var(--fill-border)' }}>
+                          <span className="font-medium text-[var(--text)] text-[0.85rem]">{opt.name}</span>
+                          <span className="text-[var(--muted)] text-[0.72rem] ml-2">{opt.year} · {opt.language}</span>
+                        </button>
+                      ))}
+                      <button onClick={() => inputRef.current?.focus()}
+                        className="text-left px-3 py-2 rounded-2xl transition-all hover:opacity-80 text-[0.8rem] text-[var(--muted)]"
+                        style={{ border: '1px solid var(--fill-border)' }}>
+                        Something else
+                      </button>
+                    </div>
+                  </div>
+                ) : formatMessage(m.content)}
               </div>
             </div>
           ))}

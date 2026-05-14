@@ -5,20 +5,63 @@ import { needsApiCall } from '@/lib/heuristic'
 
 const client = new Anthropic()
 
+const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '')
+
+function editDist(a: string, b: string): number {
+  const m = a.length, n = b.length
+  const dp = Array.from({ length: m + 1 }, (_, i) =>
+    Array.from({ length: n + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0))
+  )
+  for (let i = 1; i <= m; i++)
+    for (let j = 1; j <= n; j++)
+      dp[i][j] = a[i-1] === b[j-1] ? dp[i-1][j-1] : 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1])
+  return dp[m][n]
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { messages } = await req.json()
 
-    // Only the latest user message is used for heuristic check
     const lastUserMsg = [...messages].reverse().find((m: {role:string}) => m.role === 'user')
     const query = lastUserMsg?.content || ''
 
-    // If query doesn't need API, signal the client to use heuristic
     if (!needsApiCall(query)) {
       return NextResponse.json({ useHeuristic: true })
     }
 
     const allMovies = getUniqueMovies()
+
+    // Fuzzy-match a short bare query against film titles (first word vs first word, edit dist ≤ 1)
+    const words = query.trim().split(/\s+/)
+    if (words.length <= 4) {
+      const qWord = normalize(words[0])
+      if (qWord.length >= 3) {
+        const matches = allMovies.filter(m => {
+          const tWord = normalize(m.name.split(/[\s:–,]/)[0])
+          return editDist(qWord, tWord) <= 1
+        })
+
+        if (matches.length >= 2) {
+          return NextResponse.json({
+            disambiguate: matches.slice(0, 4).map(m => ({
+              name: m.name, year: m.releaseYear, language: m.language,
+            })),
+          })
+        }
+
+        if (matches.length === 1) {
+          // Rewrite the message silently and proceed
+          const match = matches[0]
+          const idx = messages.map((m: {role:string}) => m.role).lastIndexOf('user')
+          if (idx !== -1) {
+            messages[idx] = {
+              ...messages[idx],
+              content: `I liked "${match.name}" — recommend similar films from the catalogue.`,
+            }
+          }
+        }
+      }
+    }
 
     // Minimal catalogue — name|year|language|genre|director|rating, top 400 by rating
     const catalogue = allMovies
@@ -41,7 +84,6 @@ Rules:
 
 CATALOGUE (Name|Year|Language|Genre|Director|Rating):\n${catalogue}`
 
-    // Send only last 4 messages to keep token count low
     const trimmedMessages = messages.slice(-4)
 
     const response = await client.messages.create({
