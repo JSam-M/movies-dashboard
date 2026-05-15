@@ -227,7 +227,9 @@ export default function DiscoverPage() {
       <nav className="liquid-nav sticky top-0 z-40 border-b border-black/7">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-8 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div style={{width:'22px',height:'22px',borderRadius:'6px',background:'#0071e3',display:'inline-flex',alignItems:'center',justifyContent:'center',fontFamily:'Georgia,serif',fontSize:'12px',fontWeight:300,color:'white',letterSpacing:'-0.5px',flexShrink:0}}>fc</div>
+            <Link href="/analytics" style={{cursor:'default'}}>
+              <div style={{width:'22px',height:'22px',borderRadius:'6px',background:'#0071e3',display:'inline-flex',alignItems:'center',justifyContent:'center',fontFamily:'Georgia,serif',fontSize:'12px',fontWeight:300,color:'white',letterSpacing:'-0.5px',flexShrink:0}}>fc</div>
+            </Link>
             <span className="font-display text-[1rem] font-light text-[var(--text)] hidden sm:inline">Film Collection</span>
           </div>
           <div className="flex items-center gap-3">
