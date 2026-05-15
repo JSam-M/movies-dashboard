@@ -27,7 +27,7 @@ function seededRng(seed: number) {
 }
 
 function getDailyChips(movies: Movie[]): string[] {
-  const rand = seededRng(getDailySeed())
+  const rand = Math.random.bind(Math)
   const pick = <T,>(arr: T[]): T => arr[Math.floor(rand() * arr.length)]
 
   // Top directors (≥4 films)
