@@ -143,7 +143,7 @@ export default function StatsPage() {
               <span className="font-display text-[1rem] font-light text-[var(--text)] hidden sm:inline">Film Collection</span>
             </Link>
             <span className="text-[var(--border)] hidden sm:inline">/</span>
-            <span className="font-body text-[0.75rem] font-semibold text-[var(--sub)]">Stats</span>
+            <Link href="/stats" className="font-body text-[0.75rem] font-semibold text-[var(--sub)] hover:text-[var(--text)] transition-colors">Stats</Link>
           </div>
           <div className="flex items-center gap-3" style={{position:'relative',zIndex:1}}>
             <button
