@@ -176,9 +176,12 @@ interface Movie {
 
 - Password-gated with `sessionStorage` (password saved for the session, not persisted across browser sessions)
 - Fetches from `/api/analytics` using `x-analytics-password` header
-- **KPI cards**: Total Page Views, Unique Visitors, Returning Visitors, Chat Opens, Total Queries, Queries per Session
-- **Daily page views chart** (line, last 30 days, Recharts)
-- **Top pages table**
+- **KPI cards**: Total Views (with week-over-week trend), Unique Visitors, Avg Daily Views, Chat Opens, Queries Sent, Peak Day
+- **Daily trend chart** — area chart with gradient fill, last 90 days, plus 7-day rolling average overlay (Recharts)
+- **Patterns section**: day-of-week bar chart (weekdays in blue, weekends in purple) + chat engagement funnel with conversion metrics
+- **Hourly heatmap** — 24 cells showing UTC traffic distribution; hidden if no data
+- **Top pages** — visual progress bars with percentage share per page
+- **Week-over-week comparison** — last 7 days vs previous 7 days with growth indicator
 - Password: stored in `ANALYTICS_PASSWORD` env var on Vercel
 
 ---
@@ -298,8 +301,13 @@ All calls are fire-and-forget (`fetch(...).catch(() => {})`). Tracking failures 
 | Chat opens | `chat_events` rows where `event_type = 'chat_open'` |
 | Total queries | `chat_events` rows where `event_type = 'chat_query'` |
 | Queries per session | `chatQueries / chatOpens` |
-| Daily views (last 30d) | Group `page_views` by `created_at` date |
+| Daily views (last 90d) | Group `page_views` by `created_at` date |
 | Top pages | Group `page_views` by `path`, sorted by count |
+| Last 7 days / prev 7 days | Count rows in each 7-day window |
+| Hourly distribution | Group `page_views` by UTC hour (0–23) |
+| Day-of-week distribution | Group `page_views` by UTC weekday |
+| Peak day | Day with highest single-day view count |
+| Avg daily views | `totalViews / uniqueDayCount` |
 
 ---
 
