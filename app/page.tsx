@@ -233,10 +233,10 @@ export default function DiscoverPage() {
             style={{position:'absolute',left:'50%',transform:'translateX(-50%)',width:'33%',height:'100%',touchAction:'manipulation',cursor:'default',zIndex:0}}
           />
           <div className="flex items-center gap-2" style={{position:'relative',zIndex:1}}>
-            <Link href="/">
+            <Link href="/" className="flex items-center gap-2 hover:opacity-70 transition-opacity">
               <div style={{width:'22px',height:'22px',borderRadius:'6px',background:'#0071e3',display:'inline-flex',alignItems:'center',justifyContent:'center',fontFamily:'Georgia,serif',fontSize:'12px',fontWeight:300,color:'white',letterSpacing:'-0.5px',flexShrink:0}}>fc</div>
+              <span className="font-display text-[1rem] font-light text-[var(--text)] hidden sm:inline">Film Collection</span>
             </Link>
-            <span className="font-display text-[1rem] font-light text-[var(--text)] hidden sm:inline">Film Collection</span>
           </div>
           <div className="flex items-center gap-3" style={{position:'relative',zIndex:1}}>
             <button
