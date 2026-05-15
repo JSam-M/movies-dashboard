@@ -406,7 +406,7 @@ export default function DiscoverPage() {
 
         <div className="mt-12 sm:mt-16 pt-6 text-center" style={{borderTop:'1px solid var(--separator)'}}>
           <p className="font-body text-[0.6rem] tracking-[0.12em] uppercase text-[var(--muted)]">
-            {stats.total as number} films · {new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'})}
+            {stats.total as number} films <Link href="/analytics" style={{color:'inherit',textDecoration:'none',cursor:'default'}}>·</Link> {new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'})}
           </p>
         </div>
       </div>

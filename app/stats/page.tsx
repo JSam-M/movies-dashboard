@@ -138,6 +138,7 @@ export default function StatsPage() {
             </Link>
             <span className="text-[var(--border)] hidden sm:inline">/</span>
             <span className="font-body text-[0.75rem] font-semibold text-[var(--sub)]">Stats</span>
+            <Link href="/analytics" className="text-[var(--border)] hidden sm:inline" style={{textDecoration:'none',cursor:'default'}}>·</Link>
           </div>
           <div className="flex items-center gap-3">
             <button
