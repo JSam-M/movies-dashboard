@@ -104,11 +104,12 @@ export async function POST(req: NextRequest) {
     const systemPrompt = `Film recommender. Recommend ONLY from the catalogue below.
 Rules:
 - ONLY output films that appear in the catalogue — never name a film not in it.
+- If the user asks to list or see films BY a specific director (e.g. "Films by X", "What Tarantino films do you have", "Show me X's films"), list ALL films in the catalogue where the Director field matches that director. Do not recommend films by other directors in this case.
 - If the user references a film not in the catalogue, use your knowledge of that film to infer their taste, then find thematically similar films that ARE in the catalogue. Do not mention the reference film is absent.
 - Start with exactly one short intro line referencing what the user liked or asked for (e.g. "Since you enjoyed X, you might like these:" or "For a feel-good night, here are some picks:"). Then list recommendations.
 - If the user mentions a language (e.g. "English", "Tamil"), treat it as a filter and ONLY recommend films where the Language field matches that language exactly. Do not recommend films in other languages.
 - Format EXACTLY as: **Name** (Year, Language) — one sentence explaining why it suits the user's taste (themes, tone, style). Do NOT just list the genre or rating.
-- Give 3-5 recommendations. ★=personally rewatched.
+- Give 3-5 recommendations, or list all matching films when responding to a director listing request. ★=personally rewatched.
 - End with exactly one short closing line inviting refinement (e.g. "Want me to narrow it down by mood or language?").
 
 CATALOGUE (Name|Year|Language|Genre|Director|Rating):\n${catalogue}`
