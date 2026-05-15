@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import { track } from '@/lib/track'
 import type { Movie } from '@/lib/movies'
 import ChatPanel from '@/components/ChatPanel'
@@ -12,6 +13,7 @@ import AboutModal from '@/components/AboutModal'
 import ThemeToggle from '@/components/ThemeToggle'
 
 export default function StatsPage() {
+  const router = useRouter()
   const [allMovies,   setAllMovies]   = useState<Movie[]>([])
   const [allEntries,  setAllEntries]  = useState<Movie[]>([])
   const [filtered,    setFiltered]    = useState<Movie[]>([])
@@ -130,17 +132,20 @@ export default function StatsPage() {
     <div className="min-h-screen mesh-bg flex flex-col">
       {/* NAV + FILTER — single unified glass surface */}
       <div className="liquid-nav sticky top-0 z-40 border-b border-black/7 flex-shrink-0">
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-8 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2 sm:gap-3">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-8 h-14 flex items-center justify-between" style={{position:'relative'}}>
+          <div
+            onDoubleClick={() => router.push('/analytics')}
+            style={{position:'absolute',left:'50%',transform:'translateX(-50%)',width:'33%',height:'100%',touchAction:'manipulation',cursor:'default',zIndex:0}}
+          />
+          <div className="flex items-center gap-2 sm:gap-3" style={{position:'relative',zIndex:1}}>
             <Link href="/" className="flex items-center gap-2 hover:opacity-70 transition-opacity">
               <div style={{width:'22px',height:'22px',borderRadius:'6px',background:'#0071e3',display:'inline-flex',alignItems:'center',justifyContent:'center',fontFamily:'Georgia,serif',fontSize:'12px',fontWeight:300,color:'white',letterSpacing:'-0.5px',flexShrink:0}}>fc</div>
               <span className="font-display text-[1rem] font-light text-[var(--text)] hidden sm:inline">Film Collection</span>
             </Link>
             <span className="text-[var(--border)] hidden sm:inline">/</span>
             <span className="font-body text-[0.75rem] font-semibold text-[var(--sub)]">Stats</span>
-            <Link href="/analytics" className="text-[var(--border)] hidden sm:inline" style={{textDecoration:'none',cursor:'default'}}>·</Link>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3" style={{position:'relative',zIndex:1}}>
             <button
               onClick={() => setAboutOpen(true)}
               className="font-body text-[0.75rem] font-medium text-[var(--sub)] hover:text-[var(--text)] transition-colors"

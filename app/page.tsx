@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import { track } from '@/lib/track'
 import type { Movie } from '@/lib/movies'
 import ChatPanel from '@/components/ChatPanel'
@@ -144,6 +145,7 @@ export default function DiscoverPage() {
   const [allMovies,    setAllMovies]    = useState<Movie[]>([])
   const [filtered,     setFiltered]     = useState<Movie[]>([])
   const [loading,      setLoading]      = useState(true)
+  const router = useRouter()
   const [chatOpen,     setChatOpen]     = useState(false)
   const [aboutOpen,    setAboutOpen]    = useState(false)
   const [aiQuery,      setAiQuery]      = useState('')
@@ -225,14 +227,18 @@ export default function DiscoverPage() {
     <div className="min-h-screen mesh-bg">
       {/* NAV */}
       <nav className="liquid-nav sticky top-0 z-40 border-b border-black/7">
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-8 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Link href="/analytics" style={{cursor:'default'}}>
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-8 h-14 flex items-center justify-between" style={{position:'relative'}}>
+          <div
+            onDoubleClick={() => router.push('/analytics')}
+            style={{position:'absolute',left:'50%',transform:'translateX(-50%)',width:'33%',height:'100%',touchAction:'manipulation',cursor:'default',zIndex:0}}
+          />
+          <div className="flex items-center gap-2" style={{position:'relative',zIndex:1}}>
+            <Link href="/">
               <div style={{width:'22px',height:'22px',borderRadius:'6px',background:'#0071e3',display:'inline-flex',alignItems:'center',justifyContent:'center',fontFamily:'Georgia,serif',fontSize:'12px',fontWeight:300,color:'white',letterSpacing:'-0.5px',flexShrink:0}}>fc</div>
             </Link>
             <span className="font-display text-[1rem] font-light text-[var(--text)] hidden sm:inline">Film Collection</span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3" style={{position:'relative',zIndex:1}}>
             <button
               onClick={() => setAboutOpen(true)}
               className="font-body text-[0.75rem] font-medium text-[var(--sub)] hover:text-[var(--text)] transition-colors"
@@ -408,7 +414,7 @@ export default function DiscoverPage() {
 
         <div className="mt-12 sm:mt-16 pt-6 text-center" style={{borderTop:'1px solid var(--separator)'}}>
           <p className="font-body text-[0.6rem] tracking-[0.12em] uppercase text-[var(--muted)]">
-            {stats.total as number} films <Link href="/analytics" style={{color:'inherit',textDecoration:'none',cursor:'default'}}>·</Link> {new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'})}
+            {stats.total as number} films · {new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'})}
           </p>
         </div>
       </div>

@@ -1,7 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
+import ThemeToggle from '@/components/ThemeToggle'
+import AboutModal from '@/components/AboutModal'
 
 interface AnalyticsData {
   totalViews: number
@@ -30,12 +34,43 @@ function KPI({ value, label, sub }: { value: string | number; label: string; sub
   )
 }
 
+function Nav({ onAbout }: { onAbout: () => void }) {
+  const router = useRouter()
+  return (
+    <nav className="liquid-nav sticky top-0 z-40 border-b border-black/7">
+      <div className="max-w-[1100px] mx-auto px-4 sm:px-8 h-14 flex items-center justify-between" style={{position:'relative'}}>
+        <div
+          onDoubleClick={() => router.push('/analytics')}
+          style={{position:'absolute',left:'50%',transform:'translateX(-50%)',width:'33%',height:'100%',touchAction:'manipulation',cursor:'default',zIndex:0}}
+        />
+        <div className="flex items-center gap-2" style={{position:'relative',zIndex:1}}>
+          <Link href="/">
+            <div style={{width:'22px',height:'22px',borderRadius:'6px',background:'#0071e3',display:'inline-flex',alignItems:'center',justifyContent:'center',fontFamily:'Georgia,serif',fontSize:'12px',fontWeight:300,color:'white',letterSpacing:'-0.5px',flexShrink:0}}>fc</div>
+          </Link>
+          <span className="font-display text-[1rem] font-light text-[var(--text)] hidden sm:inline">Film Collection</span>
+        </div>
+        <div className="flex items-center gap-3" style={{position:'relative',zIndex:1}}>
+          <button onClick={onAbout} className="font-body text-[0.75rem] font-medium text-[var(--sub)] hover:text-[var(--text)] transition-colors">About</button>
+          <Link href="/stats" className="font-body text-[0.75rem] font-medium text-[var(--sub)] hover:text-[var(--text)] transition-colors flex items-center gap-1.5">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+            </svg>
+            <span className="hidden sm:inline">My Stats</span>
+          </Link>
+          <ThemeToggle />
+        </div>
+      </div>
+    </nav>
+  )
+}
+
 export default function AnalyticsPage() {
   const [password, setPassword] = useState('')
   const [authed, setAuthed]     = useState(false)
   const [error, setError]       = useState('')
   const [data, setData]         = useState<AnalyticsData | null>(null)
   const [loading, setLoading]   = useState(false)
+  const [aboutOpen, setAboutOpen] = useState(false)
 
   useEffect(() => {
     const saved = sessionStorage.getItem('analytics_pw')
@@ -52,7 +87,10 @@ export default function AnalyticsPage() {
   }
 
   if (!authed) return (
-    <div className="min-h-screen mesh-bg flex items-center justify-center">
+    <div className="min-h-screen mesh-bg flex flex-col">
+      <Nav onAbout={() => setAboutOpen(true)} />
+      {aboutOpen && <AboutModal onClose={() => setAboutOpen(false)} />}
+      <div className="flex-1 flex items-center justify-center">
       <div className="glass rounded-3xl p-10 w-full max-w-sm">
         <p className="font-display text-[1.8rem] font-light text-[var(--text)] mb-2">Analytics</p>
         <p className="font-body text-[0.8rem] text-[var(--sub)] mb-8">Enter password to continue</p>
@@ -72,6 +110,7 @@ export default function AnalyticsPage() {
           {loading ? 'Checking…' : 'Continue'}
         </button>
       </div>
+      </div>
     </div>
   )
 
@@ -81,6 +120,8 @@ export default function AnalyticsPage() {
 
   return (
     <div className="min-h-screen mesh-bg">
+      <Nav onAbout={() => setAboutOpen(true)} />
+      {aboutOpen && <AboutModal onClose={() => setAboutOpen(false)} />}
       <div className="max-w-[1100px] mx-auto px-4 sm:px-8 py-12">
 
         <div className="mb-10 pb-8" style={{ borderBottom: '1px solid var(--separator)' }}>
