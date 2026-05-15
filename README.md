@@ -202,7 +202,7 @@ Flow:
    - 2+ matches → return `{ disambiguate: [{ name, year, language }] }` (disambiguation chips)
    - 1 match → rewrite the user message to `I liked "Film Name" — recommend similar films from the catalogue.`
 3. **Pill detection**: if message starts with `I liked "X"`, extract film name as `referencedFilm`
-4. Build catalogue: top 400 films by TMDb rating. If the referenced film is outside top 400, append it anyway. If a director name is detected in the query, all their films outside top 400 are appended too.
+4. Build catalogue: top 400 films by TMDb rating. If the referenced film is outside top 400, append it anyway. If a director name is detected, all their films outside top 400 are appended. If a language is detected, all films in that language outside top 400 are appended.
 5. Call **Claude Haiku** (`claude-haiku-4-5-20251001`) with:
    - `max_tokens: 500`
    - System prompt (cached with `cache_control: ephemeral`)

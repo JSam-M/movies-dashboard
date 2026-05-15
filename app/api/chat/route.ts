@@ -86,8 +86,9 @@ export async function POST(req: NextRequest) {
     // Append the referenced film if it falls outside top 400
     if (referencedFilm && !inTop400.has(referencedFilm.name)) extras.push(referencedFilm)
 
-    // Detect director names in the query and append all their films outside top 400
     const qLower = query.toLowerCase()
+
+    // Detect director names in the query and append all their films outside top 400
     const allDirectors = Array.from(new Set(
       allMovies.flatMap(m => m.director.split(',').map(d => d.trim()).filter(Boolean))
     ))
@@ -95,6 +96,16 @@ export async function POST(req: NextRequest) {
     if (mentionedDirectors.length) {
       allMovies
         .filter(m => mentionedDirectors.some(d => m.director.split(',').map(x => x.trim()).includes(d)))
+        .filter(m => !inTop400.has(m.name) && !extras.find(e => e.name === m.name))
+        .forEach(m => extras.push(m))
+    }
+
+    // Detect language mentions and append all films in that language outside top 400
+    const allLanguages = Array.from(new Set(allMovies.map(m => m.language).filter(Boolean)))
+    const mentionedLanguages = allLanguages.filter(l => qLower.includes(l.toLowerCase()))
+    if (mentionedLanguages.length) {
+      allMovies
+        .filter(m => mentionedLanguages.includes(m.language))
         .filter(m => !inTop400.has(m.name) && !extras.find(e => e.name === m.name))
         .forEach(m => extras.push(m))
     }
