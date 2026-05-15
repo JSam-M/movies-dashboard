@@ -149,7 +149,7 @@ interface Movie {
 ### `/` — Main Dashboard (`app/page.tsx`)
 
 - **Hero** with animated gradient heading and AI search pill
-- **Quick prompt chips** (feel-good, Parasite fans, Tamil films, etc.) that open ChatPanel pre-filled
+- **Quick prompt chips** — generated daily from the actual collection (a top director, a language, a highly-rated film, a genre, and two mood prompts). Rotate every midnight using the same date seed as Daily Picks.
 - **Daily Picks** — 6 films selected deterministically each day using a seeded shuffle (seed = YYYYMMDD, hashed per full film name). Always pulls from films rated ≥7.0. Picks rotate every midnight. Clicks open a detail modal.
 - **Movie detail modal** — shows genre tag, rating, year/language/runtime, overview, director, genre tags
 - **Browse/filter** — search by title or director, filter by genre (multi-select) and language (multi-select), sort by rating/rewatched/date, filter to rewatched favourites only

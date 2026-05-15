@@ -13,6 +13,64 @@ import Link from 'next/link'
 type SortKey = 'rating' | 'rewatched' | 'date'
 type SortDir = 'desc' | 'asc'
 
+function getDailySeed(): number {
+  const d = new Date()
+  return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate()
+}
+
+function seededRng(seed: number) {
+  let s = seed >>> 0
+  return () => {
+    s = (Math.imul(1664525, s) + 1013904223) >>> 0
+    return s / 0xFFFFFFFF
+  }
+}
+
+function getDailyChips(movies: Movie[]): string[] {
+  const rand = seededRng(getDailySeed())
+  const pick = <T,>(arr: T[]): T => arr[Math.floor(rand() * arr.length)]
+
+  // Top directors (≥4 films)
+  const directorCounts: Record<string, number> = {}
+  movies.forEach(m => m.director.split(',').forEach(d => {
+    const name = d.trim(); if (name) directorCounts[name] = (directorCounts[name] || 0) + 1
+  }))
+  const topDirectors = Object.entries(directorCounts).filter(([,c]) => c >= 4).map(([d]) => d)
+
+  // Languages with enough films
+  const langCounts: Record<string, number> = {}
+  movies.forEach(m => { if (m.language) langCounts[m.language] = (langCounts[m.language] || 0) + 1 })
+  const topLangs = Object.entries(langCounts).filter(([,c]) => c >= 10).map(([l]) => l)
+
+  // Genres
+  const genreCounts: Record<string, number> = {}
+  movies.forEach(m => m.genre.split(',').forEach(g => {
+    const name = g.trim(); if (name) genreCounts[name] = (genreCounts[name] || 0) + 1
+  }))
+  const topGenres = Object.entries(genreCounts).filter(([,c]) => c >= 8).map(([g]) => g)
+
+  // Highly-rated films for "I loved X" chip
+  const gems = movies.filter(m => m.tmdbRating >= 8.0)
+
+  const moodPool = [
+    'Something feel-good', 'Under 2 hours', 'Hidden gems',
+    'Watch with family', 'A slow-burn thriller', 'Something thought-provoking',
+    'A great one-liner film', 'Best of the decade',
+  ]
+
+  const chips: string[] = []
+  if (topDirectors.length) chips.push(`Films by ${pick(topDirectors)}`)
+  if (topLangs.length)     chips.push(`Best ${pick(topLangs)} films`)
+  if (gems.length)         chips.push(`I loved ${pick(gems).name} — suggest similar`)
+  if (topGenres.length)    chips.push(`Best ${pick(topGenres)} films`)
+
+  // Fill remaining slots from mood pool (pick 2, no duplicates)
+  const shuffledMood = [...moodPool].sort(() => rand() - 0.5)
+  shuffledMood.slice(0, Math.max(2, 6 - chips.length)).forEach(m => chips.push(m))
+
+  return chips.slice(0, 6)
+}
+
 function getDailyPicks(movies: Movie[]): Movie[] {
   const today = new Date()
   const seed  = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate()
@@ -99,6 +157,7 @@ export default function DiscoverPage() {
   const [stats,        setStats]        = useState<Record<string,unknown>>({})
   const [selectedMovie,setSelectedMovie]= useState<Movie|null>(null)
   const [dailyPicks,   setDailyPicks]   = useState<Movie[]>([])
+  const [quickPrompts, setQuickPrompts] = useState<string[]>([])
   const aiInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => { track('page_view', '/') }, [])
@@ -109,6 +168,7 @@ export default function DiscoverPage() {
       .then(({ movies, stats: s }) => {
         setAllMovies(movies); setStats(s)
         setDailyPicks(getDailyPicks(movies))
+        setQuickPrompts(getDailyChips(movies))
         setLoading(false)
       })
   }, [])
@@ -225,7 +285,7 @@ export default function DiscoverPage() {
 
           {/* Quick prompts */}
           <div style={{display:'flex',flexWrap:'wrap',gap:'8px',justifyContent:'center',marginTop:'14px'}}>
-            {['Something feel-good','I loved Parasite — suggest similar','Best Tamil films','Under 2 hours','Hidden gems','Watch with family'].map(q=>(
+            {quickPrompts.map(q=>(
               <button key={q} onClick={()=>{setInitialMsg(q);setChatOpen(true)}}
                 style={{padding:'6px 14px',borderRadius:'9999px',border:'1px solid var(--fill-border)',background:'var(--glass)',backdropFilter:'blur(12px)',fontSize:'0.75rem',fontFamily:'inherit',color:'var(--sub)',cursor:'pointer'}}>
                 {q}
