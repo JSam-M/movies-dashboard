@@ -150,7 +150,7 @@ interface Movie {
 
 - **Hero** with animated gradient heading and AI search pill
 - **Quick prompt chips** (feel-good, Parasite fans, Tamil films, etc.) that open ChatPanel pre-filled
-- **Daily Picks** — 6 films selected deterministically each day using a seeded shuffle (seed = YYYYMMDD). Always pulls from films rated ≥7.0. Clicks open a detail modal.
+- **Daily Picks** — 6 films selected deterministically each day using a seeded shuffle (seed = YYYYMMDD, hashed per full film name). Always pulls from films rated ≥7.0. Picks rotate every midnight. Clicks open a detail modal.
 - **Movie detail modal** — shows genre tag, rating, year/language/runtime, overview, director, genre tags
 - **Browse/filter** — search by title or director, filter by genre (multi-select) and language (multi-select), sort by rating/rewatched/date, filter to rewatched favourites only
 - Shows first 60 results; "View full collection →" links to stats page

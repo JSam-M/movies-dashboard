@@ -17,15 +17,19 @@ function getDailyPicks(movies: Movie[]): Movie[] {
   const today = new Date()
   const seed  = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate()
   const eligible = movies.filter(m => m.tmdbRating >= 7.0)
-  const shuffled = [...eligible].sort((a, b) => {
-    const ha = ((seed * 1103515245 + (a.name.charCodeAt(0) || 0)) >>> 0) % 1000
-    const hb = ((seed * 1103515245 + (b.name.charCodeAt(0) || 0)) >>> 0) % 1000
-    return ha - hb
-  })
-  const topRated     = [...shuffled].sort((a,b) => b.tmdbRating - a.tmdbRating).slice(0,3)
-  const topRewatched = shuffled.filter(m => m.timesWatched >= 2).sort((a,b) => b.timesWatched - a.timesWatched).slice(0,2)
-  const rest         = shuffled.filter(m => !topRated.find(x=>x.name===m.name) && !topRewatched.find(x=>x.name===m.name))
-  return Array.from(new Map([...topRated, ...topRewatched, ...rest].map(m=>[m.name,m])).values()).slice(0,6)
+
+  // Seeded hash using the full film name so every film gets a unique, day-varying position
+  function filmHash(name: string): number {
+    let h = seed
+    for (let i = 0; i < name.length; i++) {
+      h = Math.imul(h ^ name.charCodeAt(i), 2654435761)
+      h ^= h >>> 16
+    }
+    return (h >>> 0)
+  }
+
+  const shuffled = [...eligible].sort((a, b) => filmHash(a.name) - filmHash(b.name))
+  return shuffled.slice(0, 6)
 }
 
 function MovieModal({ movie, onClose }: { movie: Movie; onClose: () => void }) {
