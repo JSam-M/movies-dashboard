@@ -37,7 +37,7 @@ function KPI({ value, label, sub }: { value: string | number; label: string; sub
 function Nav({ onAbout }: { onAbout: () => void }) {
   const router = useRouter()
   return (
-    <nav className="liquid-nav sticky top-0 z-40 border-b border-black/7">
+    <nav className="liquid-nav sticky top-0 z-40">
       <div className="max-w-[1100px] mx-auto px-4 sm:px-8 h-14 flex items-center justify-between" style={{position:'relative'}}>
         <div
           onDoubleClick={() => router.push('/analytics')}

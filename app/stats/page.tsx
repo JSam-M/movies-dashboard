@@ -131,7 +131,7 @@ export default function StatsPage() {
   return (
     <div className="min-h-screen mesh-bg flex flex-col">
       {/* NAV + FILTER — single unified glass surface */}
-      <div className="liquid-nav sticky top-0 z-40 border-b border-black/7 flex-shrink-0">
+      <div className="liquid-nav sticky top-0 z-40 flex-shrink-0">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-8 h-14 flex items-center justify-between" style={{position:'relative'}}>
           <div
             onDoubleClick={() => router.push('/analytics')}
