@@ -37,34 +37,46 @@ export async function POST(req: NextRequest) {
 
     const rewrittenMessages = [...messages]
 
-    // Fuzzy-match a short bare query against film titles (first word vs first word, edit dist ≤ 1)
+    // Detect a film title mentioned anywhere in the query
     let referencedFilm: Movie | null = null
+    const qNorm = normalize(query)
+
+    // 1. Substring match: find any catalogue title whose normalized form appears in the normalized query
+    const substringMatches = allMovies.filter(m => {
+      const t = normalize(m.name)
+      return t.length >= 3 && qNorm.includes(t)
+    })
+
+    // 2. Fuzzy match on first word of a short bare query (original behaviour, kept as fallback)
     const words = query.trim().split(/\s+/)
-    if (words.length <= 4) {
+    const fuzzyMatches: Movie[] = []
+    if (words.length <= 4 && substringMatches.length === 0) {
       const qWord = normalize(words[0])
       if (qWord.length >= 3) {
-        const matches = allMovies.filter(m => {
+        allMovies.forEach(m => {
           const tWord = normalize(m.name.split(/[\s:–,]/)[0])
-          return editDist(qWord, tWord) <= 1
+          if (editDist(qWord, tWord) <= 1) fuzzyMatches.push(m)
         })
+      }
+    }
 
-        if (matches.length >= 2) {
-          return NextResponse.json({
-            disambiguate: matches.slice(0, 4).map(m => ({
-              name: m.name, year: m.releaseYear, language: m.language,
-            })),
-          })
-        }
+    const candidates = substringMatches.length ? substringMatches : fuzzyMatches
 
-        if (matches.length === 1) {
-          referencedFilm = matches[0]
-          const idx = messages.map((m: {role:string}) => m.role).lastIndexOf('user')
-          if (idx !== -1) {
-            messages[idx] = {
-              ...messages[idx],
-              content: `I liked "${referencedFilm.name}" — recommend similar films from the catalogue.`,
-            }
-          }
+    if (candidates.length >= 2) {
+      return NextResponse.json({
+        disambiguate: candidates.slice(0, 4).map(m => ({
+          name: m.name, year: m.releaseYear, language: m.language,
+        })),
+      })
+    }
+
+    if (candidates.length === 1) {
+      referencedFilm = candidates[0]
+      const idx = messages.map((m: {role:string}) => m.role).lastIndexOf('user')
+      if (idx !== -1) {
+        messages[idx] = {
+          ...messages[idx],
+          content: `I liked "${referencedFilm.name}" — recommend similar films from the catalogue.`,
         }
       }
     }
