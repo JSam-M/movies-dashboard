@@ -185,7 +185,7 @@ export default function DiscoverPage() {
       let diff = 0
       if (sortKey === 'rating')    diff = a.tmdbRating - b.tmdbRating
       if (sortKey === 'rewatched') diff = a.timesWatched - b.timesWatched
-      if (sortKey === 'date')      diff = a.date.localeCompare(b.date)
+      if (sortKey === 'date')      diff = a.releaseYear - b.releaseYear
       return sortDir === 'desc' ? -diff : diff
     })
     setFiltered(f)
@@ -354,7 +354,7 @@ export default function DiscoverPage() {
               <div className="flex gap-1.5 sm:gap-2 flex-wrap">
                 {(['rating','rewatched','date'] as SortKey[]).map(k=>(
                   <button key={k} onClick={()=>handleSort(k)} style={btnStyle(sortKey===k)}>
-                    {k==='rating'?'Rating':k==='rewatched'?'Rewatched':'Date'}{sortArrow(k)}
+                    {k==='rating'?'Rating':k==='rewatched'?'Rewatched':'Year'}{sortArrow(k)}
                   </button>
                 ))}
               </div>
