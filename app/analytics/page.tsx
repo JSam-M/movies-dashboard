@@ -109,27 +109,30 @@ function HourlyHeatmap({ data }: { data: { hour: number; count: number }[] }) {
   const max = Math.max(...data.map(d => d.count), 1)
   const labelHours = new Set([0, 6, 12, 18, 23])
   return (
-    <div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(24, 1fr)', gap: '3px', marginBottom: '6px' }}>
-        {data.map(d => (
-          <div
-            key={d.hour}
-            style={{
-              height: '40px', borderRadius: '5px',
-              background: '#0071e3',
-              opacity: d.count === 0 ? 0.05 : 0.08 + (d.count / max) * 0.82,
-              cursor: 'default',
-            }}
-            title={`${fmtHour(d.hour)}: ${d.count} views`}
-          />
-        ))}
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(24, 1fr)', gap: '3px' }}>
-        {data.map((d) => (
-          <div key={d.hour} className="font-body text-center" style={{ fontSize: '0.55rem', color: 'var(--muted)', overflow: 'hidden', whiteSpace: 'nowrap' }}>
-            {labelHours.has(d.hour) ? fmtHour(d.hour) : ''}
-          </div>
-        ))}
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' } as any}>
+      <div style={{ minWidth: '480px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(24, 1fr)', gap: '3px', marginBottom: '6px' }}>
+          {data.map(d => (
+            <div
+              key={d.hour}
+              style={{
+                height: '40px', borderRadius: '5px',
+                background: '#0071e3',
+                opacity: d.count === 0 ? 0.05 : 0.08 + (d.count / max) * 0.82,
+                cursor: 'default',
+              }}
+              title={`${fmtHour(d.hour)}: ${d.count} views`}
+            />
+          ))}
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(24, 1fr)', gap: '3px' }}>
+          {data.map((d) => (
+            <div key={d.hour} className="font-body text-center" style={{ fontSize: '0.55rem', color: 'var(--muted)', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+              {labelHours.has(d.hour) ? fmtHour(d.hour) : ''}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )
@@ -359,12 +362,12 @@ export default function AnalyticsPage() {
         {/* Daily Trend */}
         <Section eyebrow="Traffic" title="Daily Trend">
           <div className="glass rounded-2xl p-5 sm:p-7">
-            <div className="flex items-start justify-between mb-7">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-7">
               <div>
                 <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)]">Page Views Over Time</p>
                 <p className="font-body text-[0.7rem] text-[var(--muted)] mt-1">Last {withRolling.length} days</p>
               </div>
-              <div className="flex items-center gap-4 flex-shrink-0">
+              <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
                   <div className="w-6 h-[2px] rounded-full" style={{ background: '#0071e3' }} />
                   <span className="font-body text-[0.65rem] text-[var(--muted)]">Daily</span>
@@ -503,14 +506,14 @@ export default function AnalyticsPage() {
             <div className="glass rounded-2xl p-6 flex flex-col justify-between" style={{ minHeight: '110px' }}>
               <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)]">Last 7 Days</p>
               <div>
-                <p className="font-display text-[2.6rem] font-light text-[var(--text)] leading-none">{data.last7.toLocaleString()}</p>
+                <p className="font-display text-[2rem] sm:text-[2.6rem] font-light text-[var(--text)] leading-none">{data.last7.toLocaleString()}</p>
                 <p className="font-body text-[0.6rem] text-[var(--muted)] mt-1">page views</p>
               </div>
             </div>
             <div className="glass rounded-2xl p-6 flex flex-col justify-between" style={{ minHeight: '110px' }}>
               <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[var(--sub)]">Previous 7 Days</p>
               <div>
-                <p className="font-display text-[2.6rem] font-light text-[var(--text)] leading-none">{data.prev7.toLocaleString()}</p>
+                <p className="font-display text-[2rem] sm:text-[2.6rem] font-light text-[var(--text)] leading-none">{data.prev7.toLocaleString()}</p>
                 <p className="font-body text-[0.6rem] mt-1" style={{
                   color: trendDir === 'up' ? '#34c759' : trendDir === 'down' ? '#ff3b30' : 'var(--muted)',
                 }}>
