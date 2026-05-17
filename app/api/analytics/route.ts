@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
+import { rateLimit } from '@/lib/rateLimit'
 
 type ViewRow = {
   visitor_id: string
@@ -20,6 +21,10 @@ function getWeekMonday(dateStr: string): string {
 }
 
 export async function GET(req: NextRequest) {
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown'
+  const { allowed } = rateLimit(`analytics:${ip}`, { limit: 10, windowMs: 60_000 })
+  if (!allowed) return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+
   const password = req.headers.get('x-analytics-password')
   if (password !== process.env.ANALYTICS_PASSWORD) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

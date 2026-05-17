@@ -1,10 +1,10 @@
 function getVisitorId(): string {
   try {
-    const key = 'fc_visitor_id'
-    let id = localStorage.getItem(key)
+    const key = 'fc_vid'
+    let id = sessionStorage.getItem(key)
     if (!id) {
       id = crypto.randomUUID()
-      localStorage.setItem(key, id)
+      sessionStorage.setItem(key, id)
     }
     return id
   } catch {
