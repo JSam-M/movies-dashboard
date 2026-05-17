@@ -1,23 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 
-async function hashIp(ip: string): Promise<string> {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(ip))
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('')
+function getDeviceType(ua: string): 'mobile' | 'tablet' | 'desktop' {
+  if (/iPad|Tablet|PlayBook/i.test(ua)) return 'tablet'
+  if (/Mobile|Android|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua)) return 'mobile'
+  return 'desktop'
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const { event, path } = await req.json()
-    const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim()
-      || req.headers.get('x-real-ip')
-      || '0.0.0.0'
-    const ip_hash = await hashIp(ip)
+    const { event, path, visitorId, referrer } = await req.json()
+    const vid = visitorId || 'anonymous'
 
     if (event === 'page_view') {
-      await supabase.from('page_views').insert({ path: path || '/', ip_hash })
+      const ua = req.headers.get('user-agent') || ''
+      const country = req.headers.get('x-vercel-ip-country') || null
+      const device_type = getDeviceType(ua)
+      await supabase.from('page_views').insert({
+        path: path || '/',
+        visitor_id: vid,
+        device_type,
+        country,
+        referrer: referrer || null,
+      })
     } else if (event === 'chat_open' || event === 'chat_query') {
-      await supabase.from('chat_events').insert({ event_type: event, ip_hash })
+      await supabase.from('chat_events').insert({ event_type: event, visitor_id: vid })
     }
 
     return NextResponse.json({ ok: true })
