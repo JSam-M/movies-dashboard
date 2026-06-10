@@ -3,9 +3,9 @@
 A personal film collection dashboard with AI-powered recommendations, collection stats, and analytics. Built with Next.js (Vercel) and Streamlit (Streamlit Cloud), both reading from the same `movies.csv`.
 
 **Live URLs:**
-- Next.js dashboard: `https://movies-dashboard-jsam.vercel.app`
+- Next.js dashboard: `https://jsam.uk` (also `https://jsam-movies-dashboard.vercel.app`)
 - Streamlit dashboard: `https://jsam-movies-dashboard.streamlit.app`
-- Analytics: `https://movies-dashboard-jsam.vercel.app/analytics` (password-protected)
+- Analytics: `https://jsam.uk/analytics` (password-protected)
 
 ---
 
