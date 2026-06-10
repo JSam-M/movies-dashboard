@@ -137,8 +137,23 @@ export default function AboutModal({ onClose }: Props) {
           </p>
         </div>
 
+        <div className="mt-6 pt-5" style={{ borderTop: '1px solid var(--separator)' }}>
+          <p
+            className="font-body mb-2"
+            style={{ fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--sub)' }}
+          >
+            Privacy
+          </p>
+          <p className="font-body text-[0.7rem] text-[var(--muted)] leading-relaxed">
+            This site keeps lightweight, anonymous visit stats — pages viewed, device type, and country — tied to a
+            random ID that resets when you close your browser. No IP addresses are stored and no cookies are used.
+            Chat messages are processed by Anthropic&apos;s Claude API to generate recommendations. Feedback you share
+            below is posted as a public GitHub issue, so please don&apos;t include personal details.
+          </p>
+        </div>
+
         <div
-          className="mt-8 pt-6 flex items-center justify-between"
+          className="mt-6 pt-5 flex items-center justify-between"
           style={{ borderTop: '1px solid var(--separator)' }}
         >
           <p className="font-body text-[0.7rem] text-[var(--muted)]">800+ films · 2019 – present</p>

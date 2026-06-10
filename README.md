@@ -76,7 +76,7 @@ movies-dashboard/
 ├── lib/
 │   ├── movies.ts               ← CSV parsing, Movie type, getMovies(), getUniqueMovies(), getStats()
 │   ├── heuristic.ts            ← Client-side fallback recommender (no API needed)
-│   ├── supabase.ts             ← Supabase client (server-side only)
+│   ├── supabase.ts             ← Supabase clients (anon for inserts, service-role for analytics reads)
 │   ├── rateLimit.ts            ← In-memory per-IP rate limiter for API routes
 │   └── track.ts                ← Client-side analytics fire-and-forget helper
 │
@@ -84,7 +84,8 @@ movies-dashboard/
 │   └── app.py                  ← Streamlit dashboard (reads same movies.csv)
 │
 ├── supabase/
-│   └── migration_add_analytics.sql ← Adds visitor_id, device/country/referrer columns + indexes
+│   ├── migration_add_analytics.sql ← Adds visitor_id, device/country/referrer columns + indexes
+│   └── migration_enable_rls.sql    ← Enables Row Level Security (insert-only for anon key)
 │
 ├── requirements.txt            ← Python deps for update script + Streamlit
 ├── package.json                ← Node deps: next, anthropic, @supabase/supabase-js, recharts, papaparse
@@ -243,6 +244,7 @@ Header: `x-analytics-password: <password>`
 
 - Rate-limited to 10 requests/minute per IP
 - Verifies password against `ANALYTICS_PASSWORD` env var (constant-time comparison)
+- Reads via the Supabase service-role key (bypasses RLS; falls back to the anon key if `SUPABASE_SERVICE_ROLE_KEY` isn't set)
 - Queries both Supabase tables (falls back to legacy `ip_hash` column if the migration hasn't run)
 - Returns: `{ totalViews, uniqueVisitors, returningVisitors, chatOpens, chatQueries, dailyViews, monthlyViews, topPages, deviceBreakdown, topCountries, topReferrers, sessionStats, streaks, newVsReturning, chatTrend, ... }`
 
@@ -299,7 +301,7 @@ Two tables (see [Database Schema](#database-schema)):
 - `chat_events` — every `chat_open` or `chat_query` event
 
 ### Privacy
-No IPs are stored. Each browser generates a random `visitorId` UUID (persisted in sessionStorage, so it resets per browser session) and unique visitor counting is based on distinct `visitor_id` values. Rows written before the analytics migration used a SHA-256 `ip_hash` instead; the analytics API still reads those as a fallback.
+No IPs are stored. Each browser generates a random `visitorId` UUID (persisted in sessionStorage, so it resets per browser session) and unique visitor counting is based on distinct `visitor_id` values. Rows written before the analytics migration used a SHA-256 `ip_hash` instead; the analytics API still reads those as a fallback. A privacy note in the About modal discloses the visit stats, Anthropic API processing of chat messages, and that feedback becomes a public GitHub issue.
 
 ### Client tracking (`lib/track.ts`)
 ```ts
@@ -397,6 +399,7 @@ SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your_anon_key_here
 ANALYTICS_PASSWORD=your_chosen_password
 GITHUB_TOKEN=your_github_pat_here
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
 ```
 
 ### 3. Create Supabase tables
@@ -447,8 +450,9 @@ EXCEL_FILE  = "/Users/jsam/path/to/Movies.xlsx"
 | `SUPABASE_ANON_KEY` | Yes | Supabase anon public key (Project Settings → API) |
 | `ANALYTICS_PASSWORD` | Yes | Password to access `/analytics` dashboard |
 | `GITHUB_TOKEN` | Yes | GitHub PAT with issue-write access — used by `/api/feedback` to file feedback issues |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes* | Supabase service_role key (Project Settings → API) — used by `/api/analytics` to read tables once RLS is enabled. *Optional until `migration_enable_rls.sql` is run; analytics falls back to the anon key. |
 
-All five must be set in Vercel (Settings → Environment Variables) for production.
+All of these must be set in Vercel (Settings → Environment Variables) for production.
 
 ---
 
@@ -479,6 +483,16 @@ create table chat_events (
 
 For existing deployments, run `supabase/migration_add_analytics.sql` in the Supabase SQL editor to add the `visitor_id`, `device_type`, `country`, and `referrer` columns plus indexes.
 
+### Row Level Security
+
+`supabase/migration_enable_rls.sql` enables RLS on both tables: the anon key keeps insert-only access (for `/api/track`), while reads require the service_role key (used by `/api/analytics`). Rollout order matters:
+
+1. Set `SUPABASE_SERVICE_ROLE_KEY` in Vercel
+2. Redeploy
+3. Run `migration_enable_rls.sql` in the Supabase SQL editor
+
+If the SQL is run before the env var is set, `/api/analytics` returns empty data until the key is added (tracking is unaffected).
+
 ---
 
 ## Deployment
@@ -502,7 +516,7 @@ For existing deployments, run `supabase/migration_add_analytics.sql` in the Supa
 ### Key dependencies
 | Package | Version | Purpose |
 |---|---|---|
-| `next` | 14.2.5 | React framework |
+| `next` | 14.2.35 | React framework |
 | `@anthropic-ai/sdk` | latest | Claude API client |
 | `@supabase/supabase-js` | latest | Supabase database client |
 | `recharts` | latest | Charts in stats and analytics pages |

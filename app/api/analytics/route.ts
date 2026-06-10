@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { timingSafeEqual } from 'crypto'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase'
 import { rateLimit } from '@/lib/rateLimit'
 
 function safeCompare(a: string, b: string): boolean {
@@ -41,13 +41,13 @@ export async function GET(req: NextRequest) {
 
   // Try full select (post-migration), fall back to legacy columns
   let v: ViewRow[] = []
-  const { data: fullViews, error: fullError } = await supabase
+  const { data: fullViews, error: fullError } = await supabaseAdmin
     .from('page_views')
     .select('visitor_id, created_at, path, device_type, country, referrer')
     .order('created_at', { ascending: true })
 
   if (fullError) {
-    const { data: legacyViews } = await supabase
+    const { data: legacyViews } = await supabaseAdmin
       .from('page_views')
       .select('ip_hash, created_at, path')
       .order('created_at', { ascending: true })
@@ -60,7 +60,7 @@ export async function GET(req: NextRequest) {
     v = fullViews ?? []
   }
 
-  const { data: events } = await supabase
+  const { data: events } = await supabaseAdmin
     .from('chat_events')
     .select('event_type, created_at')
     .order('created_at', { ascending: true })
