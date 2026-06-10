@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { timingSafeEqual } from 'crypto'
 import { supabase } from '@/lib/supabase'
 import { rateLimit } from '@/lib/rateLimit'
+
+function safeCompare(a: string, b: string): boolean {
+  const ab = Buffer.from(a)
+  const bb = Buffer.from(b)
+  if (ab.length !== bb.length) return false
+  return timingSafeEqual(ab, bb)
+}
 
 type ViewRow = {
   visitor_id: string
@@ -26,7 +34,8 @@ export async function GET(req: NextRequest) {
   if (!allowed) return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
 
   const password = req.headers.get('x-analytics-password')
-  if (password !== process.env.ANALYTICS_PASSWORD) {
+  const expected = process.env.ANALYTICS_PASSWORD
+  if (!password || !expected || !safeCompare(password, expected)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

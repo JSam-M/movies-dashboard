@@ -53,8 +53,9 @@ movies-dashboard/
 │   │   └── page.tsx            ← Analytics dashboard (password-gated, sessionStorage auth)
 │   └── api/
 │       ├── movies/route.ts     ← GET /api/movies — returns parsed movies + stats
-│       ├── chat/route.ts       ← POST /api/chat — Claude Haiku recommender
-│       ├── track/route.ts      ← POST /api/track — records page_view/chat events to Supabase
+│       ├── chat/route.ts       ← POST /api/chat — Claude Haiku recommender (rate-limited)
+│       ├── track/route.ts      ← POST /api/track — records page_view/chat events to Supabase (rate-limited)
+│       ├── feedback/route.ts   ← POST /api/feedback — files feedback as a GitHub issue (rate-limited)
 │       └── analytics/route.ts ← GET /api/analytics — returns aggregated analytics (password-protected)
 │
 ├── components/
@@ -76,17 +77,24 @@ movies-dashboard/
 │   ├── movies.ts               ← CSV parsing, Movie type, getMovies(), getUniqueMovies(), getStats()
 │   ├── heuristic.ts            ← Client-side fallback recommender (no API needed)
 │   ├── supabase.ts             ← Supabase client (server-side only)
+│   ├── rateLimit.ts            ← In-memory per-IP rate limiter for API routes
 │   └── track.ts                ← Client-side analytics fire-and-forget helper
 │
 ├── streamlit/
 │   └── app.py                  ← Streamlit dashboard (reads same movies.csv)
 │
-├── update_movies.py            ← Python script: Excel → TMDb enrichment → CSV → GitHub push
+├── supabase/
+│   └── migration_add_analytics.sql ← Adds visitor_id, device/country/referrer columns + indexes
+│
 ├── requirements.txt            ← Python deps for update script + Streamlit
 ├── package.json                ← Node deps: next, anthropic, @supabase/supabase-js, recharts, papaparse
-├── tailwind.config.ts
+├── tailwind.config.js
 ├── tsconfig.json
 └── .env.local                  ← Local secrets (never committed)
+
+Local-only (not in the repo): `update_movies.py` — Python script that reads
+`Movies.xlsx`, enriches new rows via TMDb, writes `public/movies.csv`, and
+pushes to GitHub. Kept out of the repo because it contains a GitHub PAT.
 ```
 
 ---
@@ -139,7 +147,7 @@ interface Movie {
 ### Key data logic
 
 - **`getMovies()`** — parses the full CSV (includes duplicate rows for rewatches)
-- **`getUniqueMovies()`** — deduplicates by title; if a film appears multiple times, the highest `timesWatched` value is kept. This is the list shown in the UI and used for AI recommendations.
+- **`getUniqueMovies()`** — deduplicates by title + release year (so same-titled remakes stay separate); if a film appears multiple times, the highest `timesWatched` value is kept. This is the list shown in the UI and used for AI recommendations.
 - **`getStats()`** — computes totals, avg rating, genre/language/director counts, watch-year histogram
 
 ---
@@ -199,6 +207,8 @@ Returns `{ movies: Movie[], allEntries: Movie[], stats: Stats }`.
 #### `POST /api/chat`
 Body: `{ messages: { role: 'user'|'assistant', content: string }[] }`
 
+Rate-limited to 10 requests/minute per IP (protects the Anthropic API key from abuse).
+
 Flow:
 1. Extract last user message as `query`
 2. **Fuzzy match**: if query is ≤4 words, compute Levenshtein edit distance between the first word of the query and the first word of each film title. If edit distance ≤1:
@@ -215,18 +225,26 @@ Flow:
 On overload error: return `{ error: 'overloaded' }` → client falls back to heuristic.
 
 #### `POST /api/track`
-Body: `{ event: 'page_view'|'chat_open'|'chat_query', path?: string }`
+Body: `{ event: 'page_view'|'chat_open'|'chat_query', path?: string, visitorId?: string, referrer?: string }`
 
-- Reads client IP from `x-forwarded-for` or `x-real-ip`
-- SHA-256 hashes the IP (no raw IPs stored)
-- Writes to Supabase: `page_views` (path, ip_hash) or `chat_events` (event_type, ip_hash)
+- Rate-limited to 30 requests/minute per IP
+- Identifies visitors by a client-generated `visitorId` UUID (no IPs stored)
+- Derives `device_type` from the User-Agent and `country` from the `x-vercel-ip-country` header
+- Writes to Supabase: `page_views` (path, visitor_id, device_type, country, referrer) or `chat_events` (event_type, visitor_id)
+
+#### `POST /api/feedback`
+Body: `{ body: string }`
+
+- Rate-limited to 3 requests/minute per IP; body truncated to 2000 chars
+- Creates a GitHub issue labelled `feedback` on this repo using `GITHUB_TOKEN`
 
 #### `GET /api/analytics`
 Header: `x-analytics-password: <password>`
 
-- Verifies password against `ANALYTICS_PASSWORD` env var
-- Queries both Supabase tables
-- Returns: `{ totalViews, uniqueVisitors, returningVisitors, chatOpens, chatQueries, dailyViews, topPages }`
+- Rate-limited to 10 requests/minute per IP
+- Verifies password against `ANALYTICS_PASSWORD` env var (constant-time comparison)
+- Queries both Supabase tables (falls back to legacy `ip_hash` column if the migration hasn't run)
+- Returns: `{ totalViews, uniqueVisitors, returningVisitors, chatOpens, chatQueries, dailyViews, monthlyViews, topPages, deviceBreakdown, topCountries, topReferrers, sessionStats, streaks, newVsReturning, chatTrend, ... }`
 
 ---
 
@@ -281,7 +299,7 @@ Two tables (see [Database Schema](#database-schema)):
 - `chat_events` — every `chat_open` or `chat_query` event
 
 ### Privacy
-IPs are SHA-256 hashed before storage. No raw IPs are ever written to the database. Unique visitor counting is based on distinct `ip_hash` values.
+No IPs are stored. Each browser generates a random `visitorId` UUID (persisted in sessionStorage, so it resets per browser session) and unique visitor counting is based on distinct `visitor_id` values. Rows written before the analytics migration used a SHA-256 `ip_hash` instead; the analytics API still reads those as a fallback.
 
 ### Client tracking (`lib/track.ts`)
 ```ts
@@ -378,6 +396,7 @@ ANTHROPIC_API_KEY=your_key_here
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your_anon_key_here
 ANALYTICS_PASSWORD=your_chosen_password
+GITHUB_TOKEN=your_github_pat_here
 ```
 
 ### 3. Create Supabase tables
@@ -427,8 +446,9 @@ EXCEL_FILE  = "/Users/jsam/path/to/Movies.xlsx"
 | `SUPABASE_URL` | Yes | Supabase project URL (Project Settings → API) |
 | `SUPABASE_ANON_KEY` | Yes | Supabase anon public key (Project Settings → API) |
 | `ANALYTICS_PASSWORD` | Yes | Password to access `/analytics` dashboard |
+| `GITHUB_TOKEN` | Yes | GitHub PAT with issue-write access — used by `/api/feedback` to file feedback issues |
 
-All four must be set in Vercel (Settings → Environment Variables) for production.
+All five must be set in Vercel (Settings → Environment Variables) for production.
 
 ---
 
@@ -437,20 +457,27 @@ All four must be set in Vercel (Settings → Environment Variables) for producti
 ```sql
 -- Tracks every page visit
 create table page_views (
-  id         bigserial primary key,
-  path       text        not null,   -- e.g. "/", "/stats"
-  ip_hash    text        not null,   -- SHA-256 of visitor IP
-  created_at timestamptz default now()
+  id          bigserial primary key,
+  path        text        not null,   -- e.g. "/", "/stats"
+  ip_hash     text,                   -- legacy column (pre-migration rows only)
+  visitor_id  text,                   -- client-generated UUID
+  device_type text,                   -- 'mobile' | 'tablet' | 'desktop'
+  country     text,                   -- ISO 3166-1 alpha-2, from x-vercel-ip-country
+  referrer    text,                   -- hostname only, NULL for direct
+  created_at  timestamptz default now()
 );
 
 -- Tracks chat interactions
 create table chat_events (
   id         bigserial primary key,
   event_type text        not null,   -- "chat_open" or "chat_query"
-  ip_hash    text        not null,   -- SHA-256 of visitor IP
+  ip_hash    text,                   -- legacy column (pre-migration rows only)
+  visitor_id text,                   -- client-generated UUID
   created_at timestamptz default now()
 );
 ```
+
+For existing deployments, run `supabase/migration_add_analytics.sql` in the Supabase SQL editor to add the `visitor_id`, `device_type`, `country`, and `referrer` columns plus indexes.
 
 ---
 

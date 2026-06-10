@@ -62,13 +62,15 @@ export function getMovies(): Movie[] {
 export function getUniqueMovies(): Movie[] {
   const movies = getMovies()
   const seen = new Map<string, Movie>()
-  // CSV is newest-first, so first occurrence = most recent watch
+  // CSV is newest-first, so first occurrence = most recent watch.
+  // Key includes release year so same-titled remakes stay separate entries.
   for (const m of movies) {
-    if (!seen.has(m.name)) seen.set(m.name, m)
+    const key = `${m.name}|${m.releaseYear}`
+    if (!seen.has(key)) seen.set(key, m)
     else {
-      const existing = seen.get(m.name)!
+      const existing = seen.get(key)!
       if (m.timesWatched > existing.timesWatched)
-        seen.set(m.name, { ...existing, timesWatched: m.timesWatched })
+        seen.set(key, { ...existing, timesWatched: m.timesWatched })
     }
   }
   return Array.from(seen.values())

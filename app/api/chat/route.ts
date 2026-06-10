@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { getUniqueMovies } from '@/lib/movies'
+import { rateLimit } from '@/lib/rateLimit'
 
 const client = new Anthropic()
 
@@ -28,6 +29,10 @@ function formatEntry(m: Movie): string {
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown'
+    const { allowed } = rateLimit(`chat:${ip}`, { limit: 10, windowMs: 60_000 })
+    if (!allowed) return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+
     const { messages } = await req.json()
 
     const lastUserMsg = [...messages].reverse().find((m: {role:string}) => m.role === 'user')
@@ -72,10 +77,10 @@ export async function POST(req: NextRequest) {
 
     if (candidates.length === 1) {
       referencedFilm = candidates[0]
-      const idx = messages.map((m: {role:string}) => m.role).lastIndexOf('user')
+      const idx = rewrittenMessages.map((m: {role:string}) => m.role).lastIndexOf('user')
       if (idx !== -1) {
-        messages[idx] = {
-          ...messages[idx],
+        rewrittenMessages[idx] = {
+          ...rewrittenMessages[idx],
           content: `I liked "${referencedFilm.name}" — recommend similar films from the catalogue.`,
         }
       }

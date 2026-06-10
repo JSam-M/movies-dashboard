@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
+import { rateLimit } from '@/lib/rateLimit'
 
 function getDeviceType(ua: string): 'mobile' | 'tablet' | 'desktop' {
   if (/iPad|Tablet|PlayBook/i.test(ua)) return 'tablet'
@@ -9,6 +10,10 @@ function getDeviceType(ua: string): 'mobile' | 'tablet' | 'desktop' {
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown'
+    const { allowed } = rateLimit(`track:${ip}`, { limit: 30, windowMs: 60_000 })
+    if (!allowed) return NextResponse.json({ ok: false }, { status: 429 })
+
     const { event, path, visitorId, referrer } = await req.json()
     const vid = visitorId || 'anonymous'
 
