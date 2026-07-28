@@ -345,11 +345,21 @@ All colors and surfaces use CSS custom properties defined in `globals.css`. Ligh
 | `--bg` | `#f5f5f7` | `#000000` |
 | `--surface` | `#ffffff` | `#1c1c1e` |
 | `--text` | `#1d1d1f` | `#f5f5f7` |
-| `--sub` | `#6e6e73` | `#8e8e93` |
-| `--muted` | `#86868b` | `#636366` |
+| `--sub` | `#6e6e73` | `#aeaeb2` |
+| `--muted` | `#86868b` | `#8e8e93` |
 | `--blue` | `#0071e3` | `#0a84ff` |
+| `--blue-text` | `#0071e3` | `#409cff` |
+| `--rate-high` | `#248a3d` | `#30db5b` |
+| `--rate-good` | `#0071e3` | `#409cff` |
+| `--rate-mid` | `#c93400` | `#ffb340` |
+| `--rate-low` | `#ff3b30` | `#ff6961` |
 | `--glass` | `rgba(255,255,255,0.72)` | `rgba(28,28,30,0.82)` |
 | `--modal-bg` | `rgba(255,255,255,0.97)` | `rgba(28,28,30,0.97)` |
+
+**`--blue` vs `--blue-text`** — `--blue` is for *fills* (buttons, pills, the FAB) that carry white
+text on top; `--blue-text` is for blue rendered *as text on a surface*. They are separate because
+lightening blue for text legibility in dark mode would wreck the white-on-blue fills (measured
+Lc 69 → 50). Never use `--blue` as a text colour.
 
 ### Dark Mode
 Toggled by adding/removing `class="dark"` on `<html>`. Preference persisted to `localStorage`. An inline script in `layout.tsx` applies the class before paint to prevent flash.
@@ -358,11 +368,36 @@ Toggled by adding/removing `class="dark"` on `<html>`. Preference persisted to `
 `.glass` class applies `backdrop-filter: blur(20px) saturate(1.8)` — used for cards, panels, modals.
 
 ### Rating Color Scale
-Films are color-coded by TMDb rating in the browse list:
-- ≥8.5 → green (`#34c759`)
-- ≥7.5 → blue (`#0071e3`)
-- ≥6.5 → orange (`#ff9500`)
-- <6.5 → red (`#ff3b30`)
+Films are color-coded by TMDb rating in the browse list, via the `--rate-*` tokens above:
+- ≥8.5 → green (`--rate-high`)
+- ≥7.5 → blue (`--rate-good`)
+- ≥6.5 → orange (`--rate-mid`)
+- <6.5 → red (`--rate-low`)
+
+These were previously four hardcoded hex literals that never responded to the theme, so the
+same colour was used on a white card and a near-black one. They now use Apple's **Accessible**
+system-colour variants, which ship as separate light/dark values for this exact purpose.
+
+### Contrast Policy
+Text colours are chosen against **APCA** (the WCAG 3 candidate method), not WCAG 2 contrast
+ratio. WCAG 2 is blind to font weight and size, so it scores a 16px/300 serif identically to a
+16px/700 sans — it rated the old card titles as passing AA at 4.59:1 while they were effectively
+illegible. APCA's `Lc` accounts for both.
+
+Targets, measured against the *composited* background (the glass cards are translucent, so the
+real backdrop is `#fcfcfd` light / `#171719` dark — not the `--surface` token):
+
+| Text role | Target |
+|---|---|
+| Body / titles | Lc 75+ (90 preferred) |
+| Larger or heavier content text (≥19px) | Lc 60 |
+| Absolute floor for any text | Lc 30 |
+
+**Known shortfall:** dark-mode blue and red rating numerals sit at Lc 47 against a Lc 60 target.
+This is deliberate — those are Apple's official Accessible variants, and beating the target would
+mean inventing colours outside the system palette. Apple's own palette is not APCA-compliant
+(their dark tertiary label is Lc 16, quaternary is Lc 0), so full fidelity and full compliance
+cannot both hold. Palette coherence was chosen over the last 13 points.
 
 ---
 

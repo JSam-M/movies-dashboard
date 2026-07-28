@@ -30,7 +30,7 @@ function FeedbackTrigger() {
   if (!open) return (
     <button
       onClick={() => setOpen(true)}
-      className="font-body text-[0.7rem] text-[var(--blue)] hover:opacity-70 transition-opacity"
+      className="font-body text-[0.7rem] text-[var(--blue-text)] hover:opacity-70 transition-opacity"
     >
       Share feedback
     </button>

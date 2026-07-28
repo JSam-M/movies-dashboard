@@ -129,7 +129,7 @@ function CatalogueSection({ movies }: { movies: Movie[] }) {
             <div className="flex items-start justify-between mb-4 pr-8">
               <div>
                 <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase px-2 py-1 rounded-full mb-3 inline-block"
-                  style={{background:'rgba(0,113,227,0.07)',color:'var(--blue)'}}>
+                  style={{background:'rgba(0,113,227,0.07)',color:'var(--blue-text)'}}>
                   {selectedMovie.genre.split(',')[0].trim()}
                 </p>
                 <h2 className="font-display text-[1.5rem] font-light text-[var(--text)] leading-tight">{selectedMovie.name}</h2>
@@ -139,7 +139,7 @@ function CatalogueSection({ movies }: { movies: Movie[] }) {
                 </p>
               </div>
               <div className="text-right flex-shrink-0 ml-4">
-                <div className="font-display text-[2.2rem] font-light" style={{color:'var(--blue)'}}>{selectedMovie.tmdbRating.toFixed(1)}</div>
+                <div className="font-display text-[2.2rem] font-light" style={{color:'var(--blue-text)'}}>{selectedMovie.tmdbRating.toFixed(1)}</div>
                 <div className="font-body text-[0.6rem] text-[var(--muted)]">IMDb</div>
               </div>
             </div>
@@ -197,7 +197,7 @@ function CatalogueSection({ movies }: { movies: Movie[] }) {
         {sorted.map(m => (
           <button key={m.name} onClick={() => setSelectedMovie(m)}
             className="glass rounded-xl px-4 py-3.5 flex items-center gap-3 hover:bg-white/90 transition-all text-left w-full">
-            <div className="font-display text-[1.5rem] font-light w-10 text-center flex-shrink-0" style={{color:'var(--blue)'}}>
+            <div className="font-display text-[1.5rem] font-light w-10 text-center flex-shrink-0" style={{color:'var(--blue-text)'}}>
               {m.tmdbRating>0?m.tmdbRating.toFixed(1):'—'}
             </div>
             <div className="flex-1 min-w-0">
@@ -433,7 +433,7 @@ export default function StatsContent({ movies, allEntries, watchYears }: Props) 
                     <p className="font-body text-[0.85rem] font-medium text-[var(--text)] truncate">{m.name}</p>
                     <p className="font-body text-[0.7rem] text-[var(--sub)]">{m.releaseYear} · {m.genre.split(',')[0]}</p>
                   </div>
-                  <span className="font-display text-[1.2rem] font-light flex-shrink-0" style={{color:'var(--blue)'}}>{m.tmdbRating.toFixed(1)}</span>
+                  <span className="font-display text-[1.2rem] font-light flex-shrink-0" style={{color:'var(--blue-text)'}}>{m.tmdbRating.toFixed(1)}</span>
                 </div>
               ))}
             </div>

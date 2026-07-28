@@ -287,7 +287,7 @@ export default function StatsPage() {
               {/* Count + Clear */}
               <div className="flex items-center gap-3 ml-auto pb-0.5">
                 {activeFilters > 0 && (
-                  <button onClick={resetFilters} className="font-body text-[0.6rem] text-[var(--blue)] hover:opacity-70">Clear all</button>
+                  <button onClick={resetFilters} className="font-body text-[0.6rem] text-[var(--blue-text)] hover:opacity-70">Clear all</button>
                 )}
                 <p className="font-body text-[0.7rem] text-[var(--muted)]">
                   <span style={{color:'var(--text)',fontWeight:600}}>{filtered.length}</span> of {allMovies.length}

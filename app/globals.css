@@ -11,6 +11,16 @@
   --sub:         #6e6e73;
   --muted:       #86868b;
   --blue:        #0071e3;
+  /* --blue as *text on a surface*. Kept separate from --blue so the blue fills
+     (buttons, pills, FAB) keep their white-on-blue contrast when this is lightened. */
+  --blue-text:   #0071e3;
+  /* Rating ramp. Apple "Accessible" system-colour variants where the default
+     system colour is too low-contrast for text. Used as numeral colour, so
+     these are contrast-bound, not decorative. */
+  --rate-high:   #248a3d;   /* Accessible Green  — was #34c759 (Lc 41) */
+  --rate-good:   #0071e3;   /* systemBlue        — Lc 70, unchanged */
+  --rate-mid:    #c93400;   /* Accessible Orange — was #ff9500 (Lc 41) */
+  --rate-low:    #ff3b30;   /* systemRed         — Lc 60, unchanged */
   --gold:        var(--sub);
   --gold-bg:     rgba(0,0,0,0.05);
   --yellow:      #ffcc00;
@@ -29,9 +39,14 @@ html.dark {
   --surface:     #1c1c1e;
   --border:      rgba(255,255,255,0.1);
   --text:        #f5f5f7;
-  --sub:         #8e8e93;
-  --muted:       #636366;
-  --blue:        #0a84ff;
+  --sub:         #aeaeb2;   /* systemGray2 — was #8e8e93 (Lc 41), now Lc 58 */
+  --muted:       #8e8e93;   /* systemGray  — was #636366 (Lc 21), now Lc 41 */
+  --blue:        #0a84ff;   /* systemBlue dark — fills only, white-on-blue Lc 69 */
+  --blue-text:   #409cff;   /* Accessible systemBlue dark — Lc 47, vs Lc 37 for --blue */
+  --rate-high:   #30db5b;   /* Accessible Green  — Lc 68 */
+  --rate-good:   #409cff;   /* Accessible Blue   — Lc 47, was #0071e3 (Lc 29) */
+  --rate-mid:    #ffb340;   /* Accessible Orange — Lc 69 */
+  --rate-low:    #ff6961;   /* Accessible Red    — Lc 47, was #ff3b30 (Lc 39) */
   --gold:        var(--sub);
   --gold-bg:     rgba(255,255,255,0.08);
   --yellow:      #ffd60a;

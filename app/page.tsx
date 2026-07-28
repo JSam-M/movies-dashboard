@@ -113,7 +113,7 @@ function MovieModal({ movie, onClose }: { movie: Movie; onClose: () => void }) {
         <div className="flex items-start justify-between mb-4 pr-8">
           <div>
             <p className="font-body text-[0.6rem] font-semibold tracking-[0.12em] uppercase px-2 py-1 rounded-full mb-3 inline-block"
-              style={{background:'rgba(0,113,227,0.07)',color:'var(--blue)'}}>
+              style={{background:'rgba(0,113,227,0.07)',color:'var(--blue-text)'}}>
               {movie.genre.split(',')[0].trim()}
             </p>
             <h2 className="font-display text-[1.5rem] font-light text-[var(--text)] leading-tight">{movie.name}</h2>
@@ -123,7 +123,7 @@ function MovieModal({ movie, onClose }: { movie: Movie; onClose: () => void }) {
             </p>
           </div>
           <div className="text-right flex-shrink-0 ml-4">
-            <div className="font-display text-[2.2rem] font-light" style={{color:'var(--blue)'}}>{movie.tmdbRating.toFixed(1)}</div>
+            <div className="font-display text-[2.2rem] font-light" style={{color:'var(--blue-text)'}}>{movie.tmdbRating.toFixed(1)}</div>
             <div className="font-body text-[0.6rem] text-[var(--muted)]">IMDb</div>
           </div>
         </div>
@@ -318,10 +318,10 @@ export default function DiscoverPage() {
                   <em className="font-display text-[0.85rem] font-light" style={{fontStyle:'italic',color:'var(--sub)'}}>
                     {m.genre.split(',')[0].trim()}
                   </em>
-                  <span className="font-display text-[1.2rem] font-light" style={{color:'var(--blue)'}}>{m.tmdbRating.toFixed(1)}</span>
+                  <span className="font-display text-[1.2rem] font-light" style={{color:'var(--blue-text)'}}>{m.tmdbRating.toFixed(1)}</span>
                 </div>
-                <p className="font-display text-[1rem] font-light leading-tight mb-1" style={{color:'var(--blue)'}}>{m.name}</p>
-                <p className="font-body text-[0.7rem] text-[var(--sub)] mb-2">
+                <p className="font-display text-[1.15rem] font-normal leading-tight mb-1.5 text-[var(--text)]">{m.name}</p>
+                <p className="font-body text-[0.75rem] text-[var(--sub)] mb-2">
                   {m.releaseYear} · {m.language} · {m.runtime}
                   {m.timesWatched>=2&&<span className="font-semibold ml-2" style={{color:'var(--gold)'}}>{m.timesWatched}× watched</span>}
                 </p>
@@ -378,7 +378,7 @@ export default function DiscoverPage() {
 
           <div className="grid grid-cols-1 gap-2" style={{position:'relative',zIndex:10}}>
             {filtered.slice(0,60).map(m=>{
-              const accentColor = m.tmdbRating>=8.5?'#34c759':m.tmdbRating>=7.5?'#0071e3':m.tmdbRating>=6.5?'#ff9500':'#ff3b30'
+              const accentColor = m.tmdbRating>=8.5?'var(--rate-high)':m.tmdbRating>=7.5?'var(--rate-good)':m.tmdbRating>=6.5?'var(--rate-mid)':'var(--rate-low)'
               return (
               <button key={m.name} onClick={()=>setSelectedMovie(m)}
                 className="glass rounded-xl flex items-center gap-3 sm:gap-5 hover:bg-white/90 transition-all text-left w-full"
@@ -404,7 +404,7 @@ export default function DiscoverPage() {
             {filtered.length > 60 && (
               <div className="py-6 text-center">
                 <p className="font-body text-[0.75rem] text-[var(--muted)] mb-2">Showing 60 of {filtered.length} films</p>
-                <Link href="/stats#section-catalogue" className="font-body text-[0.75rem] font-medium text-[var(--blue)] hover:opacity-70 transition-opacity">
+                <Link href="/stats#section-catalogue" className="font-body text-[0.75rem] font-medium text-[var(--blue-text)] hover:opacity-70 transition-opacity">
                   View full collection →
                 </Link>
               </div>
