@@ -412,6 +412,18 @@ cannot both hold. Palette coherence was chosen over the last 13 points.
    - Writes updated `public/movies.csv`
    - Commits and pushes to GitHub
 5. Vercel detects the push and redeploys in ~30 seconds
+
+### False "Not Found" entries
+If TMDb drops the connection while fetching a film's details, the script prints
+`Error fetching details: ... Connection reset by peer` followed by `✗ Not found`. That film is
+saved with `API_Status = Not Found` and every metadata field `N/A`, even though TMDb has it.
+Re-running the script does **not** fix it — the script only processes films missing from
+`movies.csv`, and this row is already there.
+
+Detail fetches now retry 6 times with backoff (1–16s), which makes this rare but not impossible.
+To repair one: delete its row from `public/movies.csv` and re-run the script, or fill the row
+from TMDb by hand. Edit the row as text — round-tripping the file through pandas reformats every
+line (e.g. `Var` becomes `0.0`).
 6. Streamlit auto-refreshes
 
 ---
